@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doqu Home | Fiyat Etiketi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --cream:#F7F3E9;
+    --card:#FFFFFF;
+    --ink:#232323;
+    --ink-soft:#6b6459;
+    --rule:#E4DCC9;
+    --petrol:#3E5D68;
+    --petrol-deep:#2B4650;
+    --gold:#C99A54;
+    --row-alt:#FBF9F3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    font-family:'Manrope',sans-serif;
+    color:var(--ink);
+  }
+
+  /* ---- Top nav ---- */
+  .browserbar{
+    background:#e9e4d6; padding:8px 18px; font-size:12px; color:var(--ink-soft);
+    border-bottom:1px solid var(--rule);
+  }
+  nav.topnav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 32px; background:var(--card); border-bottom:1px solid var(--rule);
+  }
+  .logo{display:flex; align-items:center; gap:10px;}
+  .logo .mark{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--petrol); color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800; font-size:16px;
+  }
+  .logo b{font-size:20px; font-weight:800; letter-spacing:-0.01em;}
+  .logo b span{color:var(--gold);}
+  .navlinks{display:flex; gap:26px; font-size:14px; font-weight:600; color:var(--ink-soft);}
+  .navlinks a{color:inherit; text-decoration:none;}
+  .navlinks a.active{color:var(--petrol-deep);}
+  @media (max-width:880px){ .navlinks{display:none;} }
+
+  main{
+    display:grid; grid-template-columns: 300px 1fr;
+    gap:0;
+    max-width:1320px; margin:0 auto;
+  }
+  @media (max-width:960px){ main{grid-template-columns:1fr;} }
+
+  /* ---- Left panel ---- */
+  aside.panel{
+    padding:26px 22px; border-right:1px solid var(--rule); background:var(--card);
+  }
+  aside.panel h2{
+    font-size:12px; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--ink-soft); margin:0 0 14px;
+  }
+  label{
+    display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--ink-soft); margin:14px 0 6px;
+  }
+  label:first-of-type{margin-top:0;}
+  select, input{
+    width:100%; padding:10px 11px; border:1px solid var(--rule); border-radius:6px;
+    background:var(--cream); font-family:inherit; font-size:13.5px; color:var(--ink);
+  }
+  select:focus, input:focus{outline:2px solid var(--petrol); outline-offset:1px;}
+
+  button.reset{
+    width:100%; margin-top:16px; padding:11px; border-radius:6px;
+    border:1px solid var(--rule); background:var(--card); color:var(--ink);
+    font-weight:700; font-size:13px; cursor:pointer;
+  }
+  button.reset:hover{border-color:var(--petrol); color:var(--petrol-deep);}
+
+  .support-box{
+    margin-top:26px; padding:16px; border-radius:8px; background:var(--cream);
+    border:1px solid var(--rule);
+  }
+  .support-box h3{margin:0 0 6px; font-size:13px; font-weight:800;}
+  .support-box p{margin:0 0 12px; font-size:12px; color:var(--ink-soft); line-height:1.5;}
+  .support-box .btnrow{display:flex; gap:8px;}
+  .support-box button{
+    flex:1; padding:10px 8px; border-radius:6px; border:none; font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .btn-dark{background:var(--petrol-deep); color:#fff;}
+  .btn-light{background:var(--card); color:var(--ink); border:1px solid var(--rule) !important;}
+
+  .catalog-note{
+    margin-top:20px; font-size:11px; color:var(--ink-soft); line-height:1.6;
+    padding-top:16px; border-top:1px dashed var(--rule);
+  }
+
+  /* ---- Tag sheet (tekli ürün etiketleri) ---- */
+  .tagbar{
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    margin-top:36px; padding-top:18px; border-top:1px solid var(--rule);
+  }
+  .tagbar h2{font-size:16px; font-weight:800; margin:0 0 4px;}
+  .tagbar p{font-size:12px; color:var(--ink-soft); margin:0; max-width:520px;}
+  .tagbar button{
+    padding:10px 18px; border-radius:6px; border:none; background:var(--petrol-deep); color:#fff;
+    font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap;
+  }
+  .tagbar button:hover{background:var(--petrol);}
+
+  .tag-sheet{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:22px;
+    margin-top:20px;
+  }
+  .tagcard{
+    position:relative; background:linear-gradient(180deg,#fff,#faf8f2);
+    border:1px solid var(--rule); border-radius:12px;
+    padding:30px 14px 14px; text-align:center;
+    box-shadow:0 2px 8px rgba(35,35,35,.06);
+  }
+  .tagcard .tc-logo{
+    position:absolute; top:-15px; left:50%; transform:translateX(-50%);
+    background:#fff; border:1px solid var(--rule); border-radius:999px;
+    padding:5px 16px 4px; white-space:nowrap;
+  }
+  .tagcard .tc-logo b{font-size:14px; font-weight:800; letter-spacing:-0.01em;}
+  .tagcard .tc-logo small{display:block; font-size:7.5px; letter-spacing:.18em; font-weight:700; color:var(--ink-soft); margin-top:-1px;}
+  .tagcard .tc-name{font-size:12.5px; font-weight:800; text-transform:uppercase; line-height:1.35; margin:6px 0 12px; min-height:34px;}
+  .tagcard .tc-price{font-size:28px; font-weight:800; color:var(--ink); margin-bottom:12px;}
+  .tagcard .tc-price .tc-old{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); text-decoration:line-through; margin-bottom:2px;}
+  .tagcard .tc-qr{width:70px; height:70px; margin:0 auto 10px;}
+  .tagcard .tc-qr img{width:100%; height:100%; display:block; border-radius:4px;}
+  .tagcard .tc-foot{font-size:8px; color:var(--ink-soft); line-height:1.5; border-top:1px dashed var(--rule); padding-top:8px; margin-top:2px;}
+  .tagcard .tc-badge{
+    position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:50%;
+    border:1.5px solid var(--petrol); color:var(--petrol-deep);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:5.5px; font-weight:800; line-height:1.15;
+  }
+  .tagcard .tc-qty{
+    position:absolute; top:8px; right:10px; font-size:10px; font-weight:700; color:var(--ink-soft);
+  }
+
+  /* ---- Right content ---- */
+  .content{padding:30px 34px 50px;}
+  .head-row{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  }
+  .head-row .brandbig{display:flex; align-items:center; gap:12px;}
+  .head-row .brandbig .mark{width:44px;height:44px;border-radius:50%;background:var(--petrol);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;}
+  .head-row .brandbig b{font-size:26px; font-weight:800;}
+  h1.settitle{font-size:27px; font-weight:800; margin:22px 0 2px;}
+  .setsub{font-size:13px; color:var(--ink-soft); margin:0 0 20px;}
+
+  .price-strip{
+    display:flex; align-items:center; gap:22px; flex-wrap:wrap;
+    padding:22px 0 10px;
+  }
+  .price-strip .old{font-size:16px; color:var(--ink-soft); text-decoration:line-through;}
+  .price-strip .cash{font-size:38px; font-weight:800; color:var(--petrol-deep);}
+  .price-strip .badge{
+    background:var(--gold); color:#fff; font-size:13px; font-weight:800;
+    padding:5px 12px; border-radius:20px;
+  }
+  .price-strip .install{font-size:38px; font-weight:800; color:var(--ink);}
+
+  .chips{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:22px;}
+  .chip{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--rule); border-radius:24px;
+    padding:8px 16px; font-size:12px; color:var(--ink-soft); background:var(--card);
+  }
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);}
+  .chip b{color:var(--ink); font-weight:700;}
+
+  .table-wrap{display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;}
+  table.units{border-collapse:collapse; flex:1; min-width:640px;}
+  table.units th{
+    background:var(--petrol); color:#fff; text-align:left; font-size:11px;
+    text-transform:uppercase; letter-spacing:0.05em; padding:11px 10px; font-weight:700;
+  }
+  table.units th.center, table.units td.center{text-align:center;}
+  table.units td{padding:9px 10px; border-bottom:1px solid var(--rule); font-size:13px; vertical-align:middle;}
+  table.units tr:nth-child(even) td{background:var(--row-alt);}
+  table.units select{padding:8px 9px; font-size:12.5px;}
+  table.units input[type=number]{padding:8px 6px; text-align:center; width:52px;}
+  td.price{white-space:nowrap;}
+  td.price .strike{display:block; font-size:10.5px; color:var(--ink-soft); text-decoration:line-through;}
+  td.dim{font-size:12px; color:var(--ink-soft); white-space:nowrap;}
+  .opt-flag{color:var(--gold); font-weight:800; font-size:11px;}
+  input[type=checkbox]{width:16px; height:16px;}
+
+  .icon-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:14px; width:190px;
+  }
+  .icon-card{
+    text-align:center; padding:14px 8px; border:1px solid var(--rule); border-radius:8px; background:var(--card);
+  }
+  .icon-card .glyph{
+    width:30px;height:30px;margin:0 auto 8px; border-radius:50%; background:var(--cream);
+    display:flex;align-items:center;justify-content:center; color:var(--petrol-deep); font-size:15px;
+  }
+  .icon-card span{font-size:10.5px; color:var(--ink-soft); line-height:1.3; display:block;}
+
+  .footdisc{
+    margin-top:26px; padding-top:16px; border-top:1px solid var(--rule);
+    font-size:11px; color:var(--ink-soft); line-height:1.6;
+  }
+  .footdisc b{color:var(--ink);}
+
+  @media print{
+    .browserbar, nav.topnav, aside.panel, .icon-grid{display:none !important;}
+    main{grid-template-columns:1fr; max-width:100%;}
+    body{background:#fff;}
+    /* Normal "Yazdır" (özet fiyat etiketi) yazdırırken tekli etiket alanı görünmesin */
+    .tagbar, .tag-sheet{display:none !important;}
+  }
+  /* "Etiketleri Yazdır" ile yazdırırken SADECE tekli ürün etiketleri görünsün */
+  @media print{
+    body.printing-tags .head-row, body.printing-tags h1.settitle, body.printing-tags .setsub,
+    body.printing-tags .price-strip, body.printing-tags .chips, body.printing-tags .table-wrap,
+    body.printing-tags .footdisc{ display:none !important; }
+    body.printing-tags .tagbar{ display:none !important; }
+    body.printing-tags .tag-sheet{ display:grid !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="browserbar">doquhome.com.tr/fiyat-etiketi</div>
+
+<nav class="topnav">
+  <div class="logo"><div class="mark">D</div><b>Doqu<span>Home</span></b></div>
+  <div class="navlinks">
+    <a href="#" class="active">Fiyat Etiketi</a>
+    <a href="#">Koltuklar</a>
+    <a href="#">Yatak &amp; Yatak Pedi</a>
+    <a href="#">Ev Tekstili</a>
+    <a href="#">Banyo Tekstili</a>
+  </div>
+</nav>
+
+<main>
+  <aside class="panel">
+    <h2>Seçim Paneli</h2>
+
+    <label for="kategori">Kategori</label>
+    <select id="kategori"></select>
+
+    <label for="takim">Takım</label>
+    <select id="takim"></select>
+
+    <button type="button" class="reset" id="resetBtn">↺ Varsayılana Dön</button>
+
+    <div class="support-box">
+      <h3>Destek İçin Bize Ulaşın</h3>
+      <p>Seçtiğiniz takım bilgileriyle destek talebi oluşturabilirsiniz.</p>
+      <div class="btnrow">
+        <button class="btn-dark" id="mailBtn">✉ E-Posta Gönder</button>
+        <button class="btn-light" id="printBtn">🖨 Yazdır</button>
+      </div>
+    </div>
+
+    <button type="button" class="reset" id="refreshBtn" style="margin-top:10px;">⟳ Fiyatları Şimdi Yenile</button>
+
+    <div class="catalog-note" id="syncNote">
+      Fiyatlar merkezi listeden otomatik güncellenir.
+    </div>
+  </aside>
+
+  <section class="content">
+    <div class="head-row">
+      <div class="brandbig"><div class="mark">D</div><b>Doqu Home</b></div>
+    </div>
+
+    <h1 class="settitle" id="setTitle">—</h1>
+    <p class="setsub" id="setSub">—</p>
+
+    <div class="price-strip">
+      <div>
+        <span class="old" id="oldPrice"></span>
+        <span class="cash" id="cashPrice">0 ₺</span>
+      </div>
+      <span class="badge" id="badge" style="display:none">-%0</span>
+      <span class="install" id="installPrice">0 ₺</span>
+    </div>
+
+    <div class="chips">
+      <div class="chip"><span class="dot"></span>Peşin Fiyat 1+4, Word Kart <b id="chipTaksit1">9</b> Taksitli Fiyat / <b id="chipVal1">0 ₺</b> x <span id="chipN1">9</span></div>
+      <div class="chip"><span class="dot"></span>Diğer Kredi Kartlarına <b id="chipTaksit2">9</b> Taksitli Fiyat / <b id="chipVal2">0 ₺</b> x <span id="chipN2">9</span></div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="units">
+        <thead>
+          <tr>
+            <th>Ünite</th>
+            <th class="center">Adet</th>
+            <th>Peşin Fiyat</th>
+            <th>Taksitli Fiyat</th>
+            <th class="center">Opsiyonel</th>
+            <th>Gen</th><th>Der</th><th>Yük</th>
+          </tr>
+        </thead>
+        <tbody id="rowsBody"></tbody>
+      </table>
+
+      <div class="icon-grid">
+        <div class="icon-card"><div class="glyph">✓</div><span>Ücretsiz Kargo</span></div>
+        <div class="icon-card"><div class="glyph">↺</div><span>14 Gün İçinde Kolay İade</span></div>
+        <div class="icon-card"><div class="glyph">🛡</div><span>24 Ay Garanti</span></div>
+        <div class="icon-card"><div class="glyph">🔒</div><span>Güvenli Alışveriş</span></div>
+      </div>
+    </div>
+
+    <div class="footdisc">
+      <b>Fiyat kaynağı:</b> Koltuklar &amp; Yatak/Yatak Pedi → doquhome.com.tr (19 Ağustos 2026 anlık görüntüsü). Diğer tüm kategoriler → <b>Perakakende.xlsx</b> (sayfa: EvTekstili) — sol paneldeki "Fiyat Listesi Yükle" alanından güncel dosyayı yükleyerek fiyatları tazeleyebilirsiniz. Taksitli fiyat = peşin fiyat × 1,10 (9 taksit) formülüyle hesaplanır. Opsiyonel işaretlenen üniteler toplam fiyata dahil edilmez.
+    </div>
+
+    <div class="tagbar">
+      <div>
+        <h2>Tekli Ürün Etiketleri</h2>
+        <p>Tabloya eklediğiniz her ürün için ayrı bir raf etiketi otomatik oluşturulur. QR kod, ürünü doquhome.com.tr üzerinde aratır.</p>
+      </div>
+      <button type="button" id="printTagsBtn">🏷 Etiketleri Yazdır</button>
+    </div>
+    <div class="tag-sheet" id="tagSheet"></div>
+  </section>
+</main>
+
+<script>
+/* ---------------- CATALOG (doquhome.com.tr snapshot, 19 Ağu 2026) ---------------- */
+const CATALOG = {
+  "Koltuklar": [
+    {name:"Bohem Modüler Koltuk 200x100 - Füme", price:13990, disc:10990, gen:"200 cm", der:"100 cm", yuk:"—"},
+    {name:"Bohem Modüler Koltuk 200x100 - Gümüş", price:13990, disc:10990, gen:"200 cm", der:"100 cm", yuk:"—"},
+    {name:"Bohem Modüler Koltuk 200x100 - Kiremit", price:13990, disc:10990, gen:"200 cm", der:"100 cm", yuk:"—"},
+    {name:"Bohem Keten İkili Koltuk - Açık Gri", price:12990, disc:null, gen:"—", der:"—", yuk:"—"},
+    {name:"Bohem Uzanmalı Köşe Koltuk - Füme", price:17990, disc:15990, gen:"—", der:"—", yuk:"—"},
+    {name:"Bohem Uzanmalı Köşe Koltuk - Gümüş", price:17990, disc:15990, gen:"—", der:"—", yuk:"—"},
+    {name:"Bohem Köşe Koltuk - Füme", price:29990, disc:24990, gen:"—", der:"—", yuk:"—"},
+    {name:"Bohem Köşe Koltuk - Gümüş", price:29990, disc:24990, gen:"—", der:"—", yuk:"—"},
+    {name:"Bohem İkili Koltuk - Füme", price:14990, disc:12990, gen:"—", der:"—", yuk:"—"},
+    {name:"Bohem İkili Koltuk - Krem", price:14990, disc:12990, gen:"—", der:"—", yuk:"—"}
+  ],
+  "Yatak & Yatak Pedi": [
+    {name:"Stress Free Sleep Yatak 100x200", price:8990, disc:null, gen:"100 cm", der:"200 cm", yuk:"—"},
+    {name:"Graphene Dream Yatak 100x200", price:8990, disc:null, gen:"100 cm", der:"200 cm", yuk:"—"},
+    {name:"Prosoft Comfort Yatak 90x190", price:5990, disc:null, gen:"90 cm", der:"190 cm", yuk:"—"},
+    {name:"Bamboo Comfort Yatak 90x190", price:5490, disc:null, gen:"90 cm", der:"190 cm", yuk:"—"},
+    {name:"Naturel Hand Made Coco Wool Yatak 100x200", price:49990, disc:null, gen:"100 cm", der:"200 cm", yuk:"—"},
+    {name:"Naturel Hand Made Harmony Yatak 200x200", price:59990, disc:null, gen:"200 cm", der:"200 cm", yuk:"—"},
+    {name:"Naturel At Kılı Yatak Pedi 200x200", price:47990, disc:null, gen:"200 cm", der:"200 cm", yuk:"—"},
+    {name:"Naturel Hand Made Pamuk Yatak Pedi 200x200", price:44990, disc:null, gen:"200 cm", der:"200 cm", yuk:"—"}
+  ],
+};
+
+/* ================================================================
+   KAYNAK: Perakakende.xlsx  →  sayfa: EvTekstili
+   Sütun eşleşmesi: price = "Kampanyasız Peşin Fiyat", disc = "Peşin Fiyat"
+   (kampanya yoksa disc:null). "9 Taksitli Fiyat" sütunu bu dosyada
+   price×1,10 formülüyle birebir eşleşiyor, bu yüzden ayrıca saklanmadı.
+   Fiyat güncellemesi: Excel'i güncelleyip aşağıdaki bloğu yeni
+   satırlarla değiştirin (code alanı Excel'deki "Ürün Sınıf Kodu"dur,
+   hızlı eşleştirme/arama için tutuluyor).
+   ================================================================ */
+const EXCEL_CATALOG = {
+  'Yatak Örtüleri': [
+    {name:'BOHO C.SPRING YATAK ORTUSU TEK SOFTIA', code:'2Q9YTOBCSP0010', price:2699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING YATAK ORTUSU CIFT SOFTIA', code:'2Q9YTOBCSP0020', price:3499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY YATAK ORTUSU TEK SOFTIA', code:'2Q9YTOHRMY0010', price:2699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY YATAK ORTUSU CIFT SOFTIA', code:'2Q9YTOHRMY0020', price:3499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LUXURY YAT ORT CFT IMPERIAL BAKIR', code:'2Q9YTOLUXR0020', price:6599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ MILAS YATAK ORTUSU  TEK KISILIK', code:'2Q9YTOAKMS0010', price:3299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ MILAS YATAK ORTUSU  CIFT KISILIK', code:'2Q9YTOAKMS0020', price:3999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO CHIC SPRING MILAS YATAK ORTUSU  TEK KISILIK', code:'2Q9YTOBCMS0010', price:3299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO CHIC SPRING MILAS YATAK ORTUSU  CIFT KISILIK', code:'2Q9YTOBCMS0020', price:3999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE MILAS YATAK ORTUSU  TEK KISILIK', code:'2Q9YTOROMS0010', price:3299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE MILAS YATAK ORTUSU  CIFT KISILIK', code:'2Q9YTOROMS0020', price:3999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ARYA YATAK ÖRTÜSÜ TEK', code:'2Q9YTOARYA0010', price:2399, disc:1999, gen:'—', der:'—', yuk:'—'},
+    {name:'ARYA YATAK ÖRTÜSÜ TEK KİNGSİZE', code:'2Q9YTOARYA0030', price:2759, disc:2299, gen:'—', der:'—', yuk:'—'},
+    {name:'ARYA YATAK ÖRTÜSÜ ÇİFT', code:'2Q9YTOARYA0020', price:3169, disc:2699, gen:'—', der:'—', yuk:'—'},
+    {name:'ARYA YATAK ÖRTÜSÜ ÇİFT KİNGSİZE', code:'2Q9YTOARYA0040', price:3629, disc:2999, gen:'—', der:'—', yuk:'—'},
+    {name:'OTTO YATAK ÖRTÜSÜ TEK', code:'2Q9YTOOTTO0010', price:2579, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'OTTO YATAK ÖRTÜSÜ ÇİFT', code:'2Q9YTOOTTO0020', price:3359, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'SANTA YATAK ORTUSU TEK', code:'2Q9YTOSNTA0010', price:2759, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'SANTA YATAK ORTUSU CFT', code:'2Q9YTOSNTA0020', price:3449, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'NATURA MUSLIN COK AMACLI ORTU TEK KISILIK', code:'2Q9CAONTRA0010', price:1729, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'NATURA MUSLIN COK AMACLI ORTU CIFT KISILIK', code:'2Q9CAONTRA0020', price:2189, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHERA YATAK ORTUSU TEK KISILIK', code:'2Q9YTOBHRA0010', price:3739, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHERA YATAK ORTUSU CIFT KISILIK', code:'2Q9YTOBHRA0020', price:4999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'POLINA YATAK ORTUSU TEK KISILIK', code:'2Q9YTOPLNA0010', price:3739, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'POLINA YATAK ORTUSU CIFT KISILIK', code:'2Q9YTOPLNA0020', price:4999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET FIRFIRLI YATAK ORTUSU TEK KISILIK', code:'2Q9YTOLRBT0010', price:3699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET FIRFIRLI YATAK ORTUSU CIFT KISILIK', code:'2Q9YTOLRBT0020', price:4899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'NAPOLI YATAK ORTUSU TEK KISILIK', code:'2Q9YTOULTRS001', price:4259, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'NAPOLI YATAK ORTUSU CIFT KISILIK', code:'2Q9YTOULTRS002', price:4829, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'MATHILDA YATAK ORTUSU CFT', code:'2Q9YTOMATH0020', price:7999, disc:6999, gen:'—', der:'—', yuk:'—'},
+    {name:'TALIA YATAK ORTUSU CFT', code:'2Q9YTOTALA0020', price:7999, disc:6999, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Çeyiz Seti': [
+    {name:'SPECIAL CEYIZ SETI', code:'2Q9CYZSPCL0020', price:9198, disc:4599, gen:'—', der:'—', yuk:'—'},
+    {name:'ORLANDO ÇEYİZ SETİ', code:'2Q9CYZORLN0020', price:11299, disc:8999, gen:'—', der:'—', yuk:'—'},
+    {name:'VICTORY ÇEYİZ SETİ', code:'2Q9CYZVICT0020', price:11299, disc:8999, gen:'—', der:'—', yuk:'—'},
+    {name:'MULTI SELECTION TEK GLORIA', code:'2Q9CASMULT0010', price:3997, disc:2799, gen:'—', der:'—', yuk:'—'},
+    {name:'MULTI SELECTION TEK K.SIZE GLORIA', code:'2Q9CASMULT0030', price:4597, disc:3219, gen:'—', der:'—', yuk:'—'},
+    {name:'MULTI SELECTION CFT GLORIA', code:'2Q9CASMULT0020', price:4999, disc:3499, gen:'—', der:'—', yuk:'—'},
+    {name:'MULTI SELECTION CFT K.SIZE GLORIA', code:'2Q9CASMULT0040', price:5997, disc:4199, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Uyku Setleri': [
+    {name:'EASY COTTON COMFORTER UYKU SETİ TEK', code:'2Q9CMFEASY0010', price:3479, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'EASY COTTON COMFORTER UYKU SETİ ÇİFT', code:'2Q9CMFEASY0020', price:4189, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Doqu Baby': [
+    {name:'COMFYLINE BEBEK YASTIK 35x45', code:'2Q9YSBCOMF0190', price:729, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'COMFYLINE BEBEK YORGAN', code:'2Q9YGBCOMFA230', price:1289, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK BEBEK YASTIK 35x45', code:'2Q9YSBPAMK0190', price:1289, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK BEBEK YORGAN', code:'2Q9YRBPAMKA230', price:3229, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU BEBEK YASTIK 35x45', code:'2Q9YSBBMBU0190', price:1429, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU BEBEK YORGAN', code:'2Q9YGBBBBMA230', price:2969, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN BEBEK YASTIK 35x45', code:'2Q9YSBYUNN0190', price:1429, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN BEBEK YORGAN', code:'2Q9YGBYUNNA230', price:3099, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'SLEEPLINE SIVI GEÇİRMEZ ALEZ 60X120', code:'2Q9SGASLLNA200', price:649, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'SLEEPLINE SIVI GEÇİRMEZ ALEZ 70X130', code:'2Q9SGASLLNA210', price:679, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'SLEEPLINE SIVI GEÇİRMEZ ALEZ 70X140', code:'2Q9SGASLLNA220', price:699, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Bebek Yatakları': [
+    {name:'ORGANIC COTTON BEBEK YATAK 070X130', code:'2Q7YTBORCCA210', price:4779, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ORGANIC COTTON BEBEK KATLANIR YATAK', code:'2Q7YTBORCT0000', price:3739, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ORGANIC COTTON BEBEK REFLU YATAK', code:'2Q7YTBORRF0000', price:2199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ORGANIC COTTON BEBEK YASTIK (35X45)', code:'2Q9YSBORCC0190', price:1099, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Bambu Yatak Ped': [
+    {name:'BAMBU YATAK PEDİ 090X190', code:'2Q9YTPBMBUA010', price:4899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 090X200', code:'2Q9YTPBMBUA100', price:4899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 100X200', code:'2Q9YTPBMBUA020', price:4899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 120X200', code:'2Q9YTPBMBUA030', price:4899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 140X190', code:'2Q9YTPBMBUA050', price:7399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 140X200', code:'2Q9YTPBMBUA110', price:7399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 150X200', code:'2Q9YTPBMBUA060', price:7399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 160X200', code:'2Q9YTPBMBUA070', price:7399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 180X200', code:'2Q9YTPBMBUA080', price:7399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BAMBU YATAK PEDİ 200X200', code:'2Q9YTPBMBUA090', price:7399, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Pamuk Yatak Ped': [
+    {name:'PAMUK YATAK PEDİ 090X190', code:'2Q9YTPPAMKA010', price:3699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 090X200', code:'2Q9YTPPAMKA100', price:3699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 100X200', code:'2Q9YTPPAMKA020', price:3699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 120X200', code:'2Q9YTPPAMKA030', price:3699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 140X190', code:'2Q9YTPPAMKA050', price:5599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 140X200', code:'2Q9YTPPAMKA110', price:5599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 150X200', code:'2Q9YTPPAMKA060', price:5599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 160X200', code:'2Q9YTPPAMKA070', price:5599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 180X200', code:'2Q9YTPPAMKA080', price:5599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PAMUK YATAK PEDİ 200X200', code:'2Q9YTPPAMKA090', price:5599, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Yün Yatak Ped': [
+    {name:'YÜN YATAK PEDİ 090X190', code:'2Q9YTPYUNNA010', price:3949, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 090X200', code:'2Q9YTPYUNNA100', price:3949, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 100X200', code:'2Q9YTPYUNNA020', price:3949, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 120X200', code:'2Q9YTPYUNNA030', price:3949, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 140X190', code:'2Q9YTPYUNNA050', price:6199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 140X200', code:'2Q9YTPYUNNA110', price:6199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 150X200', code:'2Q9YTPYUNNA060', price:6199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 160X200', code:'2Q9YTPYUNNA070', price:6199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 180X200', code:'2Q9YTPYUNNA080', price:6199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'YÜN YATAK PEDİ 200X200', code:'2Q9YTPYUNNA090', price:6199, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Visco Yatak Ped': [
+    {name:'VISCO YATAK PEDİ 90X190 X 7CM', code:'2Q9YTPVSCCA010', price:7499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 90X200 X 7CM', code:'2Q9YTPVSCCA100', price:7499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 100X200 X 7CM', code:'2Q9YTPVSCCA020', price:7499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 120X200 X 7CM', code:'2Q9YTPVSCCA030', price:7499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 140X190 X 7CM', code:'2Q9YTPVSCCA050', price:11499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 140X200 X 7CM', code:'2Q9YTPVSCCA110', price:11499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 150X200 X 7CM', code:'2Q9YTPVSCCA060', price:11499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 160X200 X 7CM', code:'2Q9YTPVSCCA070', price:11499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 180X200 X 7CM', code:'2Q9YTPVSCCA080', price:11499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'VISCO YATAK PEDİ 200X200 X 7CM', code:'2Q9YTPVSCCA090', price:11499, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Çarşaflar': [
+    {name:'COLOURFUL FITTED ÇARŞAF TEK KİŞİLİK', code:'2Q9FCRCLRF0010', price:999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'COLOURFUL FITTED ÇARŞAF TEK KINGSIZE', code:'2Q9FCRCLRF0030', price:1099, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'COLOURFUL FITTED ÇARŞAF ÇİFT KİŞİLİK', code:'2Q9FCRCLRF0020', price:1299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'COLOURFUL FITTED ÇARŞAF ÇİFT KINGSIZE', code:'2Q9FCRCLRF0040', price:1449, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'COLOURFUL YASTIK KILIFI İKİLİ', code:'2Q9YKLCLRFB030', price:629, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PENYE ÇARŞAF SETİ TEK (Yastık Kılıflı)', code:'2Q9CRTPNYE0010', price:1299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PENYE KINGSIZE SETİ ÇARŞAF TEK (Yastık Kılıflı)', code:'2Q9CRTPNYE0030', price:1499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PENYE ÇARŞAF SETİ ÇİFT (Yastık Kılıflı)', code:'2Q9CRTPNYE0020', price:1699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PENYE KINGSIZE ÇARŞAF SETİ ÇİFT (Yastık Kılıflı)', code:'2Q9CRTPNYE0040', price:1999, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'El Havlusu': [
+    {name:'LERIS BOUQUET ARMURLU/JARKARLI EL HAVLU 030X050', code:'2Q9ELHLRBT0180', price:269, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Ayak Havlusu': [
+    {name:'JUNGLE MUSE PRMIT AYAK HAV 050X080', code:'2Q9AYHJMPR0170', price:899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ VERONA AYAK HAV 050X080', code:'2Q9AYHAKVR0170', price:699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA AYAK HAV 050X080', code:'2Q9AYHROLZ0170', price:849, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY SEREN AYAK HAV 050X080 BEJ', code:'2Q9AYHHRSR0170', price:999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET AYAK HAVLUSU 50X80', code:'2Q9BPPLRBT0170', price:499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'IVORY AYAK HAVLUSU 050X080', code:'2Q9AYHIVRY0170', price:529, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Yüz Havlusu': [
+    {name:'JUNGLE MUSE PRMIT YUZ HAV 050X090', code:'2Q9YZHJMPR0160', price:599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ VERONA YUZ HAV 050X090', code:'2Q9YZHAKVR0160', price:499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA YUZ HAV 050X090 DUZ', code:'2Q9YZHROLZ0160002', price:549, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA YUZ HAV 050X090 NAKSLI', code:'2Q9YZHROLZ0160001', price:599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY SEREN YUZ HAV 050X090 BEJ', code:'2Q9YZHHRSR0160', price:449, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING YUZ HAV 050X090 ESELLA BRD', code:'2Q9YZHBCSP0160', price:699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET ARMURLU/JAKARLI YUZ HAVLU 050X090', code:'2Q9YZHLRBT0160', price:549, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'IVORY YUZ HAVLUSU 050X090', code:'2Q9YZHIVRY0160', price:369, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Havlu Setleri (Aile Seti)': [
+    {name:'AKDENIZ VERONA BANYO YUZ HAVLU ST', code:'2Q9BHSAKVR0000', price:1899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA BANYO AILE ST', code:'2Q9BHSROLZ0000', price:11999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY SEREN 2LI YUZ HAV 50X90 PUDR/BEJ', code:'2Q9YHSHRSR0160', price:799, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SS YUZ HV ST 50X90 ESELLA DNT/BRD', code:'2Q9YHSBCSP0160', price:1249, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY SEREN 4-LU EL HAVLU SETI 30X50', code:'2Q9ELSHRSR0180', price:749, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Banyo Havlusu': [
+    {name:'JUNGLE MUSE PRMIT BAN HAV 090X150', code:'2Q9BNHJMPR0150', price:1499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ VERONA BAN HAV 090X150', code:'2Q9BNHAKVR0150', price:1299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA BAN HAV 090X150 DUZ', code:'2Q9BNHROLZ0150002', price:1199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA BAN HAV 090X150 NAKSLI', code:'2Q9BNHROLZ0150001', price:1399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY SEREN BAN HAV 090X150 BEJ', code:'2Q9BNHHRSR0150', price:1149, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING BAN HAV 090X150 ESELLA BRD', code:'2Q9BNHBCSP0150', price:1499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET ARMURLU/JAKARLI BANYO HAVLU 090X150', code:'2Q9BNHLRBT0150', price:1499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'IVORY BANYO HAVLUSU 090X150', code:'2Q9BNHIVRY0150', price:869, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Bornoz': [
+    {name:'JUNGLE MUSE PRMIT BORNOZ S/M 110', code:'2Q9BRNJMPR0050', price:3499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'JUNGLE MUSE PRMIT BORNOZ L/XL 120', code:'2Q9BRNJMPRA820', price:3499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA BORNOZ L/XL 120 DUZ', code:'2Q9BRNROLZA820002', price:4499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA BORNOZ L/XL 120 NAKSLI', code:'2Q9BRNROLZA820001', price:4699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA BORNOZ S/M 115 DUZ', code:'2Q9BRNROLZ0050002', price:4499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LINENZA BORNOZ S/M 115 NAKSLI', code:'2Q9BRNROLZ0050001', price:4699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ VERONA BORNOZ L/XL 120 YESIL', code:'2Q9BRNAKVRA820', price:3199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ VERONA BORNOZ S/M 110 BEJ', code:'2Q9BRNAKVR0050', price:3199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY SEREN BORNOZ L/XL 120 BEJ', code:'2Q9BRNHRSRA820', price:4299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HARMONY SEREN BORNOZ S/M 110 BEJ', code:'2Q9BRNHRSR0050', price:4299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING BORNOZ L/XL 130 ESELLA DNT', code:'2Q9BRNBCSPB360', price:3299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING BORNOZ S/M 120 ESELLA BRD', code:'2Q9BRNBCSPB350', price:3299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'KITTY BORNOZ', code:'2Q9BRNKTTYB370', price:1849, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'TEENAGE BORNOZ', code:'2Q9BRNTENGB390', price:1999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'IVORY BORNOZ S/M 120', code:'2Q9BRNIVRYB350', price:2599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'IVORY BORNOZ L/XL 130', code:'2Q9BRNIVRYB360', price:2599, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AYLA BORNOZ S/M 110', code:'2Q9BRNAYLA0050', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AYLA BORNOZ L/XL 120', code:'2Q9BRNAYLAA820', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'SELENY BORNOZ S/M 110', code:'2Q9BRNSLNY0050', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'SELENY BORNOZ L/XL 120', code:'2Q9BRNSLNYA820', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET BORNOZ S/M 110', code:'2Q9BRNLRBT0050', price:3399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET BORNOZ L/XL 120', code:'2Q9BRNLRBTA820', price:3399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LERIS BOUQUET BORNOZ XXL 130', code:'2Q9BRNLRBT0070', price:3399, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Saç Bonesi': [
+    {name:'LERIS BOUQUET SAC BONESI', code:'2Q9SBNLRBT0000', price:599, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Havlu Setleri (Helena/Ivory)': [
+    {name:'HELENA BANYO HAV+YUZ HAV SET EKRU', code:'2Q9BUSHLNA0000', price:1549, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HELENA BRN+YUZ HAV S/M-L/XL EKRU-GRI', code:'2Q9BHSHLNA0000', price:6699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'HELENA YUZ HAV SET 050X090 GRI-EKRU (2\'Lİ)', code:'2Q9YHSHLNA0160', price:899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'IVORY EL HAV SET 030X050 (5\'LI)', code:'2Q9ELSIVRY0180', price:599, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Panço': [
+    {name:'PINY PANCO HAVLU UNICORN', code:'2Q9PBHPINY0000004', price:1399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PINY PANCO HAVLU PANDA', code:'2Q9PBHPINY0000000', price:1399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PINY PANCO HAVLU LION', code:'2Q9PBHPINY0000001', price:1399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PINY PANCO HAVLU KINGFROG', code:'2Q9PBHPINY0000002', price:1399, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'PINY PANCO HAVLU SHARK', code:'2Q9PBHPINY0000003', price:1399, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Banyo Paspası': [
+    {name:'BANYO PASPAS SETI ARTE', code:'2Q9BPSARTEB150', price:1099, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BANYO PASPAS SETI LIVA', code:'2Q9BPSLIVAB150', price:1099, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BANYO PASPAS SETI LORA', code:'2Q9BPSLORAB150', price:1099, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BANYO PASPAS SETI GRANO', code:'2Q9BPSGRANB150', price:1099, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BANYO PASPAS SETI LUPPI', code:'2Q9BPSLUPIB150', price:1299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BANYO PASPAS SETI HARMO', code:'2Q9BPSHARMB150', price:1299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BANYO PASPAS SETI PERA', code:'2Q9BPSPERAB150', price:1299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BANYO PASPAS SETI ZENA', code:'2Q9BPSZENAB150', price:1299, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Dekoratif Kırlent': [
+    {name:'PANDORA DEKORATİF KIRLENT (50X50 CM)', code:'2Q9KRLPAND0110', price:999, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Koleksiyon Pike': [
+    {name:'LUXURY MINA PİKE TEK KİŞİLİK', code:'2Q9PKELXMI0010', price:1699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'LUXURY MINA PİKE ÇİFT  KİŞİLİK', code:'2Q9PKELXMI0020', price:1999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ MINA PİKE TEK KİŞİLİK', code:'2Q9PKEAKMI0010', price:1699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ MINA PİKE ÇİFT  KİŞİLİK', code:'2Q9PKEAKMI0020', price:1999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING MINA PİKE TEK KİŞİLİK', code:'2Q9PKEBCLB0010', price:1699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING MINA PİKE ÇİFT  KİŞİLİK', code:'2Q9PKEBCLB0020', price:1999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'JUNGLE MUSE MINA PİKE TEK KİŞİLİK', code:'2Q9PKEJMMN0010', price:1699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'JUNGLE MUSE MINA PİKE ÇİFT  KİŞİLİK', code:'2Q9PKEJMMN0020', price:1999, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE MINA PİKE TEK KİŞİLİK', code:'2Q9PKEROMI0010', price:1699, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE MINA PİKE ÇİFT  KİŞİLİK', code:'2Q9PKEROMI0020', price:1999, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Koleksiyon Pike Takımı': [
+    {name:'AKDENIZ MARWEN PİKE TAKIMI TEK KİŞİLİK', code:'2Q9PKTAKMW0010', price:2499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ MARWEN PİKE TAKIMI ÇİFT KİŞİLİK', code:'2Q9PKTAKMW0020', price:3199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING MARWEN PİKE TAKIMI TEK KİŞİLİK', code:'2Q9PKTBCMW0010', price:2499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING MARWEN PİKE TAKIMI ÇİFT KİŞİLİK', code:'2Q9PKTBCMW0020', price:3199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'JUNGLE MUSE MARWEN PİKE TAKIMI TEK KİŞİLİK', code:'2Q9PKTJMMW0010', price:2499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'JUNGLE MUSE MARWEN PİKE TAKIMI ÇİFT KİŞİLİK', code:'2Q9PKTJMMW0020', price:3199, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE MARWEN PİKE TAKIMI TEK KİŞİLİK', code:'2Q9PKTROMW0010', price:2499, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE MARWEN PİKE TAKIMI ÇİFT KİŞİLİK', code:'2Q9PKTROMW0020', price:3199, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+  'Koleksiyon Pike Seti': [
+    {name:'AKDENIZ LISBON PİKE SETİ TEK KİŞİLİK', code:'2Q9PKSAKLS0010', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'AKDENIZ LISBON PİKE SETİ ÇİFT KİŞİLİK', code:'2Q9PKSAKLS0020', price:2899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING LISBON PİKE SETİ TEK KİŞİLİK', code:'2Q9PKSBCLB0010', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'BOHO C.SPRING LISBON PİKE SETİ ÇİFT KİŞİLİK', code:'2Q9PKSBCLB0020', price:2899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'JUNGLE MUSE LISBON PİKE SETİ TEK KİŞİLİK', code:'2Q9PKSJMLB0010', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'JUNGLE MUSE LISBON PİKE SETİ ÇİFT  KİŞİLİK', code:'2Q9PKSJMLB0020', price:2899, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LISBON PİKE SETİ TEK KİŞİLİK', code:'2Q9PKSROLS0010', price:2299, disc:null, gen:'—', der:'—', yuk:'—'},
+    {name:'ROSABELLE LISBON PİKE SETİ ÇİFT KİŞİLİK', code:'2Q9PKSROLS0020', price:2899, disc:null, gen:'—', der:'—', yuk:'—'},
+  ],
+};
+
+Object.assign(CATALOG, EXCEL_CATALOG);
+
+const PRESETS = {
+  "Koltuklar": {
+    "Bohem Salon Takımı": [
+      {name:"Bohem Köşe Koltuk - Füme", qty:1},
+      {name:"Bohem İkili Koltuk - Füme", qty:1}
+    ],
+    "Bohem Oturma Grubu": [
+      {name:"Bohem Modüler Koltuk 200x100 - Füme", qty:2},
+      {name:"Bohem Keten İkili Koltuk - Açık Gri", qty:1}
+    ]
+  },
+  "Yatak & Yatak Pedi": {
+    "Stress Free Uyku Seti": [
+      {name:"Stress Free Sleep Yatak 100x200", qty:1}
+    ],
+    "Graphene Dream + Pamuk Ped Seti": [
+      {name:"Graphene Dream Yatak 100x200", qty:1},
+      {name:"Naturel Hand Made Pamuk Yatak Pedi 200x200", qty:1}
+    ]
+  },
+};
+
+/* Excel'den gelen her kategori için "Takım" = tek bir ürün (o kategorideki
+   ürünlerden biri). Kategori seçilince Takım listesi otomatik dolar; Takım
+   seçilince tablo o ürünle 1 satır olarak başlar. Alt satırlardaki
+   "— Ünite Seç —" listesi de yalnızca seçili kategorinin ürünlerini gösterir
+   (Mondi'deki gibi: önce kategori, sonra diğer seçimler açılır). */
+Object.keys(EXCEL_CATALOG).forEach(cat=>{
+  PRESETS[cat] = {};
+  EXCEL_CATALOG[cat].forEach(it=>{
+    PRESETS[cat][it.name] = [{name: it.name, qty:1}];
+  });
+});
+
+const ROW_COUNT = 9;
+const TAKSIT_ORANI = 1.10;
+const TAKSIT_SAYISI = 9;
+
+const kategoriSel = document.getElementById('kategori');
+const takimSel = document.getElementById('takim');
+const rowsBody = document.getElementById('rowsBody');
+
+let flatCatalog = []; // {key, name, cat, price, disc, gen, der, yuk}
+Object.entries(CATALOG).forEach(([cat, items])=>{
+  items.forEach(it=> flatCatalog.push({...it, cat, key: cat+'::'+it.name}));
+});
+
+let rows = []; // {key or null, qty, optional}
+
+function fmt(n){
+  return Math.round(n).toLocaleString('tr-TR') + ' ₺';
+}
+
+function fmtTag(n){
+  return Math.round(n).toLocaleString('tr-TR') + 'TL';
+}
+
+function findItem(key){
+  return flatCatalog.find(f=>f.key===key);
+}
+
+function populateKategori(){
+  // Fiyat senkronizasyonu her tetiklendiğinde (sayfa açılışı veya elle yenileme)
+  // bu fonksiyon yeniden çağrılır. Önceden seçili kategori varsa ve yeni listede
+  // hâlâ mevcutsa onu korur — aksi halde kullanıcının baktığı ürün, senkronizasyon
+  // her olduğunda sessizce ilk kategoriye sıçrardı ve bu da "fiyat değişmiyor"
+  // izlenimi veriyordu (aslında değişen ürün, ekranda görünenden farklıydı).
+  const prevSelected = kategoriSel.value;
+  kategoriSel.innerHTML = '';
+  Object.keys(CATALOG).forEach(cat=>{
+    const o = document.createElement('option');
+    o.value = cat; o.textContent = cat;
+    kategoriSel.appendChild(o);
+  });
+  if(prevSelected && CATALOG[prevSelected]) kategoriSel.value = prevSelected;
+}
+function populateTakim(){
+  const prevSelected = takimSel.value;
+  takimSel.innerHTML = '';
+  const presets = PRESETS[kategoriSel.value] || {};
+  Object.keys(presets).forEach(name=>{
+    const o = document.createElement('option');
+    o.value = name; o.textContent = name;
+    takimSel.appendChild(o);
+  });
+  if(prevSelected && presets[prevSelected]) takimSel.value = prevSelected;
+}
+
+function applyPreset(){
+  const cat = kategoriSel.value;
+  const takim = takimSel.value;
+  const preset = (PRESETS[cat] || {})[takim] || [];
+  rows = [];
+  preset.forEach(p=>{
+    const key = cat + '::' + p.name;
+    rows.push({key, qty:p.qty, optional:false});
+  });
+  while(rows.length < ROW_COUNT) rows.push({key:null, qty:1, optional:false});
+  renderRows();
+}
+
+kategoriSel.addEventListener('change', ()=>{ populateTakim(); applyPreset(); });
+takimSel.addEventListener('change', applyPreset);
+document.getElementById('resetBtn').addEventListener('click', applyPreset);
+document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+document.getElementById('mailBtn').addEventListener('click', ()=>{
+  const subject = encodeURIComponent('Doqu Home Fiyat Etiketi - ' + (takimSel.value||''));
+  const body = encodeURIComponent(document.getElementById('setSub').textContent + '\n\nToplam Peşin: ' + document.getElementById('cashPrice').textContent + '\nToplam Taksitli: ' + document.getElementById('installPrice').textContent);
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+});
+
+document.getElementById('printTagsBtn').addEventListener('click', ()=>{
+  document.body.classList.add('printing-tags');
+  window.print();
+});
+window.addEventListener('afterprint', ()=>{
+  document.body.classList.remove('printing-tags');
+});
+
+function buildRowSelect(rowIdx, selectedKey){
+  // Satır seçenekleri YALNIZCA panelde seçili olan Kategori'nin ürünleridir.
+  // Yani önce soldan bir Kategori seçilir, ancak ondan sonra bu satırlardaki
+  // "Ünite Seç" listeleri o kategoriye ait ürünlerle dolar (Mondi'deki gibi).
+  const sel = document.createElement('select');
+  const empty = document.createElement('option');
+  empty.value = ''; empty.textContent = '— Ünite Seç —';
+  sel.appendChild(empty);
+  const cat = kategoriSel.value;
+  (CATALOG[cat] || []).forEach(it=>{
+    const key = cat+'::'+it.name;
+    const o = document.createElement('option');
+    o.value = key; o.textContent = it.name;
+    if(key === selectedKey) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change', ()=>{
+    rows[rowIdx].key = sel.value || null;
+    // Bir üniteyi elle seçtiğinizde "Opsiyonel" kutusu kendiliğinden işaretlenir.
+    rows[rowIdx].optional = !!sel.value;
+    renderRows();
+  });
+  return sel;
+}
+
+function renderRows(){
+  rowsBody.innerHTML = '';
+  rows.forEach((row, idx)=>{
+    const tr = document.createElement('tr');
+
+    const tdName = document.createElement('td');
+    tdName.appendChild(buildRowSelect(idx, row.key));
+    tr.appendChild(tdName);
+
+    const tdQty = document.createElement('td');
+    tdQty.className = 'center';
+    const qtyInput = document.createElement('input');
+    qtyInput.type = 'number'; qtyInput.min = 1; qtyInput.value = row.qty;
+    qtyInput.addEventListener('input', ()=>{ rows[idx].qty = Math.max(1, parseInt(qtyInput.value)||1); renderTotals(); });
+    tdQty.appendChild(qtyInput);
+    tr.appendChild(tdQty);
+
+    const item = row.key ? findItem(row.key) : null;
+
+    const tdCash = document.createElement('td');
+    tdCash.className = 'price';
+    if(item){
+      const unit = item.disc ?? item.price;
+      tdCash.innerHTML = (item.disc ? `<span class="strike">${fmt(item.price)}</span>` : '') + fmt(unit);
+    } else { tdCash.textContent = '—'; }
+    tr.appendChild(tdCash);
+
+    const tdInstall = document.createElement('td');
+    tdInstall.className = 'price';
+    if(item){
+      const unit = item.disc ?? item.price;
+      tdInstall.textContent = fmt(unit * TAKSIT_ORANI);
+    } else { tdInstall.textContent = '—'; }
+    tr.appendChild(tdInstall);
+
+    const tdOpt = document.createElement('td');
+    tdOpt.className = 'center';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = row.optional;
+    cb.addEventListener('change', ()=>{ rows[idx].optional = cb.checked; renderTotals(); });
+    tdOpt.appendChild(cb);
+    if(row.optional){
+      const flag = document.createElement('div');
+      flag.className = 'opt-flag'; flag.textContent = 'Opsiyonel';
+      tdOpt.appendChild(flag);
+    }
+    tr.appendChild(tdOpt);
+
+    ['gen','der','yuk'].forEach(dim=>{
+      const td = document.createElement('td');
+      td.className = 'dim';
+      td.textContent = item ? item[dim] : '—';
+      tr.appendChild(td);
+    });
+
+    rowsBody.appendChild(tr);
+  });
+  renderTotals();
+  renderTagSheet();
+}
+
+function todayTR(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`;
+}
+
+function renderTagSheet(){
+  const wrap = document.getElementById('tagSheet');
+  wrap.innerHTML = '';
+  // Tabloda ürünü seçilmiş her satır için ayrı bir raf etiketi (görseldeki DOQU HOME
+  // etiketi gibi) otomatik üretilir — her yeni ünite seçiminde bu alan güncellenir.
+  const seen = new Set();
+  rows.forEach(row=>{
+    if(!row.key) return;
+    if(seen.has(row.key)) return; // aynı ürün birden fazla satırda ise tek etiket yeter
+    seen.add(row.key);
+    const item = findItem(row.key);
+    if(!item) return;
+
+    const card = document.createElement('div');
+    card.className = 'tagcard';
+
+    const qtyBadge = document.createElement('div');
+    qtyBadge.className = 'tc-qty';
+    qtyBadge.textContent = row.qty > 1 ? `×${row.qty}` : '';
+    card.appendChild(qtyBadge);
+
+    const logo = document.createElement('div');
+    logo.className = 'tc-logo';
+    logo.innerHTML = '<b>DOQU</b><small>HOME</small>';
+    card.appendChild(logo);
+
+    const name = document.createElement('div');
+    name.className = 'tc-name';
+    name.textContent = item.name;
+    card.appendChild(name);
+
+    const price = document.createElement('div');
+    price.className = 'tc-price';
+    const unit = item.disc ?? item.price;
+    price.innerHTML = (item.disc ? `<span class="tc-old">${fmtTag(item.price)}</span>` : '') + fmtTag(unit);
+    card.appendChild(price);
+
+    const qrWrap = document.createElement('div');
+    qrWrap.className = 'tc-qr';
+    const qrTarget = `https://www.google.com/search?q=${encodeURIComponent('site:doquhome.com.tr ' + item.name)}`;
+    const qrImg = document.createElement('img');
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrTarget)}`;
+    qrImg.alt = 'QR - doquhome.com.tr';
+    qrWrap.appendChild(qrImg);
+    card.appendChild(qrWrap);
+
+    const foot = document.createElement('div');
+    foot.className = 'tc-foot';
+    foot.innerHTML = `Fiyat Değişiklik Tarihi: ${todayTR()}<br>Tavsiye edilen perakende satış fiyatlarıdır. Fiyatlara KDV dahildir.`;
+    card.appendChild(foot);
+
+    const badge = document.createElement('div');
+    badge.className = 'tc-badge';
+    badge.innerHTML = 'YERLİ<br>ÜRETİM';
+    card.appendChild(badge);
+
+    wrap.appendChild(card);
+  });
+}
+
+function renderTotals(){
+  let totalList = 0, totalCash = 0, anyDisc = false;
+  const activeNames = [];
+
+  rows.forEach(row=>{
+    if(!row.key || row.optional) return;
+    const item = findItem(row.key);
+    if(!item) return;
+    const unit = item.disc ?? item.price;
+    if(item.disc) anyDisc = true;
+    totalList += item.price * row.qty;
+    totalCash += unit * row.qty;
+    activeNames.push(`${row.qty} Ad. ${item.name}`);
+  });
+
+  const totalInstall = totalCash * TAKSIT_ORANI;
+  const takim = takimSel.options[takimSel.selectedIndex] ? takimSel.options[takimSel.selectedIndex].text : '';
+
+  document.getElementById('setTitle').textContent = takim || 'Özel Seçim';
+  document.getElementById('setSub').textContent = activeNames.length ? activeNames.join(' + ') : 'Ünite seçilmedi';
+
+  if(anyDisc && totalList > totalCash){
+    document.getElementById('oldPrice').textContent = fmt(totalList);
+    const pct = Math.round((1 - totalCash/totalList) * 100);
+    document.getElementById('badge').style.display = 'inline-block';
+    document.getElementById('badge').textContent = `-%${pct}`;
+  } else {
+    document.getElementById('oldPrice').textContent = '';
+    document.getElementById('badge').style.display = 'none';
+  }
+
+  document.getElementById('cashPrice').textContent = fmt(totalCash);
+  document.getElementById('installPrice').textContent = fmt(totalInstall);
+
+  document.getElementById('chipVal1').textContent = fmt(totalCash / TAKSIT_SAYISI);
+  document.getElementById('chipN1').textContent = TAKSIT_SAYISI;
+  document.getElementById('chipVal2').textContent = fmt(totalInstall / TAKSIT_SAYISI);
+  document.getElementById('chipN2').textContent = TAKSIT_SAYISI;
+}
+
+/* ================================================================
+   MERKEZİ FİYAT KAYNAĞI (Google Sheets)
+   ------------------------------------------------------------------
+   Bu sayfa artık dosya yükleme İSTEMİYOR. Bunun yerine, aşağıdaki
+   SHEET_CSV_URL adresinden arka planda otomatik olarak fiyat verisini
+   çeker. Fiyatı güncellemek isteyen kişi SADECE Google E-Tablosu'nu
+   düzenler — bu HTML dosyasına hiç dokunmaz, sayfayı ziyaret eden
+   herkes bir sonraki sayfa açılışında güncel fiyatları görür.
+
+   KURULUM (bir kere yapılır):
+   1) Perakakende.xlsx ile AYNI sütun düzeninde bir Google E-Tablosu
+      oluşturun: İndirim Oranı, Ürün Sınıf Kodu, Ürün Adı, (boş),
+      Kampanyasız Peşin Fiyat, Peşin Fiyat, 9 Taksitli Fiyat.
+      Kategori başlıkları (YATAK ÖRTÜLERİ vb.) "Ürün Adı" sütununda,
+      "Ürün Sınıf Kodu" hücresi boş olan satırlardır (Excel ile birebir
+      aynı mantık).
+   2) Google E-Tablosu'nda: Dosya → Paylaş → Web'de yayınla →
+      "Bağlantı" sekmesinde sekme adını ve "Virgülle ayrılmış değerler
+      (.csv)" seçin → Yayınla. Size verilen linki kopyalayın.
+   3) O linki aşağıdaki SHEET_CSV_URL sabitine yapıştırın.
+   Bundan sonra fiyat güncellemek için tek yapılması gereken şey
+   Google E-Tablosu'ndaki sayıları değiştirmektir — kod hiç değişmez.
+   ================================================================ */
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3BacbeEhpiLCGdpY8c8w-wxXiadUhL6AoEWdsCXLRYvinkLh3kZPi635BjFBpwQ/pub?gid=1537430569&single=true&output=csv';
+
+const EXCEL_DISPLAY_NAMES = {
+  'YATAK ÖRTÜLERİ': 'Yatak Örtüleri', 'ÇEYİZ SETI': 'Çeyiz Seti', 'ÇEYİZ SETİ': 'Çeyiz Seti',
+  'UYKU SETLERİ': 'Uyku Setleri', 'DOQU BABY': 'Doqu Baby', 'BEBEK YATAKLAR': 'Bebek Yatakları',
+  'BAMBU YATAK PEDİ': 'Bambu Yatak Ped', 'PAMUK YATAK PEDİ': 'Pamuk Yatak Ped',
+  'YÜN YATAK PEDİ': 'Yün Yatak Ped', 'VİSCO YATAK PEDİ': 'Visco Yatak Ped',
+  'ÇARŞAFLAR': 'Çarşaflar', 'EL HAVLUSU': 'El Havlusu', 'AYAK HAVLUSU': 'Ayak Havlusu',
+  'YÜZ HAVLUSU': 'Yüz Havlusu', 'HAVLU SETLER': 'Havlu Setleri (Aile Seti)',
+  'BANYO HAVLUSU': 'Banyo Havlusu', 'BORNOZ': 'Bornoz', 'SAC BONESI': 'Saç Bonesi',
+  'HAVLU SETLERİ': 'Havlu Setleri (Helena/Ivory)', 'PANÇO': 'Panço',
+  'BANYO PASPAS': 'Banyo Paspası', 'DEKORATİF KIRLENT (DOLGULU)': 'Dekoratif Kırlent',
+  'KOLEKSIYON PİKE': 'Koleksiyon Pike', 'KOLEKSIYON PİKE TAKIMI': 'Koleksiyon Pike Takımı',
+  'KOLEKSIYON PİKE SETİ': 'Koleksiyon Pike Seti'
+};
+const LEGACY_CATS = ['Koltuklar', 'Yatak & Yatak Pedi']; // bu tabloda olmayan, elle tanımlı kategoriler
+const HEADER_MARKERS = ['ürün adı', 'ürün sınıf kodu']; // başlık satırını otomatik bulmak için
+
+function displayCatName(raw){
+  const key = String(raw).trim();
+  return EXCEL_DISPLAY_NAMES[key.toLocaleUpperCase('tr-TR')] || (key.charAt(0).toLocaleUpperCase('tr-TR') + key.slice(1).toLocaleLowerCase('tr-TR'));
+}
+
+function rebuildFlatCatalog(){
+  flatCatalog = [];
+  Object.entries(CATALOG).forEach(([cat, items])=>{
+    items.forEach(it=> flatCatalog.push({...it, cat, key: cat+'::'+it.name}));
+  });
+}
+
+// Başlık satırının kaçıncı satır olduğunu SABİT SAYMAK YERİNE, içeriğe bakarak
+// bulur. Önceki sürümdeki "ilk 4 satır başlıktır" varsayımı, tablo yapısı biraz
+// değiştiğinde (örn. bir satır eklenip çıkarıldığında) tüm veriyi kaydırıp
+// ürünlerin kaybolmasına ya da fiyatların güncellenmemesine sebep oluyordu.
+function findHeaderRowIndex(allRows){
+  for(let i=0; i<Math.min(allRows.length, 20); i++){
+    const cells = (allRows[i]||[]).map(c=> String(c ?? '').trim().toLocaleLowerCase('tr-TR'));
+    if(HEADER_MARKERS.some(marker=> cells.includes(marker))) return i;
+  }
+  return 3; // hiçbir başlık satırı bulunamazsa eski varsayılana geri dön (ilk 4 satır)
+}
+
+// Perakakende tablosu satırlarını CATALOG/PRESETS yapısına çevirir.
+// Hem dosya yüklemesinde hem de Google Sheets'ten otomatik çekmede kullanılır.
+// Google Sheets'ten CSV olarak gelen fiyat hücreleri Türkçe biçimde metin
+// olarak gelir: "2.699" gibi (nokta = binlik ayracı, 2699 anlamına gelir).
+// Bunu doğrudan Number() ile çevirmek 2.699 (neredeyse sıfır) gibi YANLIŞ bir
+// değer üretir. Bu fonksiyon binlik ayracını ve varsa ondalık virgülü doğru
+// yorumlar. Gerçek .xlsx dosyasından gelen sayısal değerleri (number tipi)
+// olduğu gibi bırakır.
+function parseTRNumber(v){
+  if(v === null || v === undefined || v === '') return null;
+  if(typeof v === 'number') return v;
+  let s = String(v).trim().replace(/[^0-9.,\-]/g, '');
+  if(s === '') return null;
+  if(s.includes(',') && s.includes('.')){
+    s = s.replace(/\./g, '').replace(',', '.'); // 1.234,56 -> 1234.56
+  } else if(s.includes(',') && !s.includes('.')){
+    s = s.replace(',', '.'); // 1234,56 -> 1234.56
+  } else if(s.includes('.')){
+    // "2.699" / "11.499" gibi binlik ayracı mı, yoksa "2968.9" gibi ondalık mı?
+    // Binlik ayracı deseni: son grup 3 haneli ve öncesindeki gruplar da 3 haneyi geçmiyor.
+    const parts = s.split('.');
+    const last = parts[parts.length - 1];
+    if(parts.length > 1 && last.length === 3 && parts.slice(0, -1).every(p => p.length <= 3)){
+      s = parts.join('');
+    }
+  }
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
+}
+
+function parseCatalogRows(allRows){
+  const headerIdx = findHeaderRowIndex(allRows);
+  const dataRows = allRows.slice(headerIdx + 1);
+
+  let currentCat = null;
+  const newCategories = {};
+  const order = [];
+  let productCount = 0;
+
+  dataRows.forEach(r=>{
+    const code = r[2], name = r[3], listPrice = r[5], cashPrice = r[6];
+    const codeEmpty = (code === null || code === undefined || String(code).trim() === '');
+    const nameTrimmed = (name === null || name === undefined) ? '' : String(name).trim();
+    if(codeEmpty){
+      // Kaynak tabloda bir kategori satırı bazen "0" ya da tire ("-") olarak
+      // görünür (orijinal Excel'de böyle biçimlendirilmiş) — bu, gerçekte
+      // "Bambu Yatak Ped" bölümünün başlangıcıdır.
+      if(nameTrimmed === '0' || /^[-–—]+$/.test(nameTrimmed)){
+        currentCat = displayCatName('BAMBU YATAK PEDİ');
+      } else if(nameTrimmed){
+        currentCat = displayCatName(nameTrimmed);
+      } else {
+        return; // tamamen boş satır
+      }
+      if(!newCategories[currentCat]){ newCategories[currentCat] = []; order.push(currentCat); }
+      return;
+    }
+    if(!currentCat){
+      currentCat = 'Diğer';
+      if(!newCategories[currentCat]){ newCategories[currentCat] = []; order.push(currentCat); }
+    }
+    const price = Math.round(parseTRNumber(listPrice));
+    const cashNum = parseTRNumber(cashPrice);
+    const cash = cashNum === null ? null : Math.round(cashNum);
+    newCategories[currentCat].push({
+      name: String(name).trim(),
+      code: String(code),
+      price,
+      disc: (cash !== null && cash !== price) ? cash : null,
+      gen:'—', der:'—', yuk:'—'
+    });
+    productCount++;
+  });
+
+  return {newCategories, order, productCount};
+}
+
+function applyCatalogUpdate({newCategories, order, productCount}){
+  if(productCount === 0) throw new Error('Tabloda ürün satırı bulunamadı — sütun düzenini kontrol edin.');
+
+  // Önceki merkezi kaynaktan gelen kategorileri temizle, sabit (Koltuklar/
+  // Yatak & Yatak Pedi) kategorileri koru.
+  Object.keys(CATALOG).forEach(cat=>{
+    if(!LEGACY_CATS.includes(cat)){ delete CATALOG[cat]; delete PRESETS[cat]; }
+  });
+  order.forEach(cat=>{
+    CATALOG[cat] = newCategories[cat];
+    PRESETS[cat] = {};
+    newCategories[cat].forEach(it=>{ PRESETS[cat][it.name] = [{name: it.name, qty:1}]; });
+  });
+
+  rebuildFlatCatalog();
+  populateKategori();
+  populateTakim();
+  applyPreset();
+}
+
+// Sayfa her açıldığında arka planda çalışır — müşteri hiçbir şey görmez/yapmaz.
+// Google E-Tablosu'ndan çekilemezse (link boş, internet yok, vb.) sayfa sessizce
+// dahili/son bilinen fiyatlarla çalışmaya devam eder.
+async function loadPricesFromSheet(){
+  const note = document.getElementById('syncNote');
+  const btn = document.getElementById('refreshBtn');
+  if(!SHEET_CSV_URL){
+    if(note) note.textContent = 'Fiyatlar dahili listeden gösteriliyor.';
+    return;
+  }
+  if(btn){ btn.disabled = true; btn.textContent = '⟳ Yenileniyor…'; }
+  try{
+    if(typeof Papa === 'undefined') throw new Error('CSV ayrıştırma kütüphanesi yüklenemedi.');
+    // Google'ın "Web'de Yayınla" CSV linki tarayıcıdan doğrudan fetch() ile
+    // çekilemiyor (Google'ın kendi sunucusu CORS izni vermiyor, barındığı yerden
+    // bağımsız olarak). Bu yüzden aradan CORS izni veren ücretsiz bir köprü
+    // servisi (allorigins.win) kullanıyoruz — sadece isteği ilettiği için veriyi
+    // değiştirmiyor.
+    const proxied = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + '_=' + Date.now());
+    const res = await fetch(proxied);
+    if(!res.ok) throw new Error('Fiyat listesine ulaşılamadı (HTTP ' + res.status + ').');
+    const csvText = await res.text();
+    const parsed = Papa.parse(csvText.trim(), {skipEmptyLines:false});
+    if(parsed.errors && parsed.errors.length){
+      console.warn('CSV ayrıştırma uyarıları:', parsed.errors);
+    }
+    const allRows = parsed.data; // dizi içinde dizi, tüm hücreler metin — sayı dönüşümünü biz kontrollü yapıyoruz
+    applyCatalogUpdate(parseCatalogRows(allRows));
+    if(note) note.textContent = 'Fiyatlar güncel (son senkronizasyon: ' + todayTR() + ').';
+  }catch(err){
+    console.warn('Fiyat senkronizasyonu başarısız, dahili veriyle devam ediliyor:', err.message);
+    if(note) note.textContent = 'Fiyatlar dahili listeden gösteriliyor.';
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = '⟳ Fiyatları Şimdi Yenile'; }
+  }
+}
+document.getElementById('refreshBtn').addEventListener('click', loadPricesFromSheet);
+
+// Önce dahili veriyle anında göster (sayfa boş kalmasın), sonra arka planda
+// merkezi kaynaktan güncel fiyatları çek ve sessizce üzerine yaz.
+populateKategori();
+populateTakim();
+applyPreset();
+loadPricesFromSheet();
+</script>
+</body>
+</html>
