@@ -248,6 +248,6 @@ def main():
         for u in unmatched:
             print(f"  - {u}", file=sys.stderr)
 
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-  if __name__ == "__main__":
+    print(json.dumps(result, ensure_ascii=False, indent=2)
+if __name__ == "__main__":
     main()
