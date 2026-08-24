@@ -1041,9 +1041,18 @@ async function loadPricesFromSheet(){
   if(btn){ btn.disabled = true; btn.textContent = '⟳ Yenileniyor…'; }
   try{
     if(typeof Papa === 'undefined') throw new Error('CSV ayrıştırma kütüphanesi yüklenemedi.');
-    const res = await fetch('./prices.csv?_=' + Date.now());
-    if(!res.ok) throw new Error('Fiyat listesine ulaşılamadı (HTTP ' + res.status + ').');
-    const csvText = await res.text();
+    const cacheBuster = '&_=' + Date.now();
+    let res, csvText;
+    try{
+      res = await fetch(SHEET_CSV_URL + cacheBuster, {cache:'no-store'});
+      if(!res.ok) throw new Error('Google Sheets\'e ulaşılamadı (HTTP ' + res.status + ').');
+      csvText = await res.text();
+    }catch(sheetErr){
+      console.warn('Canlı Sheets verisi alınamadı, yerel prices.csv deneniyor:', sheetErr.message);
+      res = await fetch('./prices.csv?_=' + Date.now());
+      if(!res.ok) throw new Error('Fiyat listesine ulaşılamadı (HTTP ' + res.status + ').');
+      csvText = await res.text();
+    }
     const parsed = Papa.parse(csvText.trim(), {skipEmptyLines:false});
     if(parsed.errors && parsed.errors.length){
       console.warn('CSV ayrıştırma uyarıları:', parsed.errors);
