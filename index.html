@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doqu Home | Fiyat Etiketi</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
@@ -135,7 +136,7 @@
   .tagcard .tc-price{font-size:28px; font-weight:800; color:var(--ink); margin-bottom:12px;}
   .tagcard .tc-price .tc-old{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); text-decoration:line-through; margin-bottom:2px;}
   .tagcard .tc-qr{width:70px; height:70px; margin:0 auto 10px;}
-  .tagcard .tc-qr img{width:100%; height:100%; display:block; border-radius:4px;}
+  .tagcard .tc-qr img, .tagcard .tc-qr canvas{width:100%; height:100%; display:block; border-radius:4px;}
   .tagcard .tc-foot{font-size:8px; color:var(--ink-soft); line-height:1.5; border-top:1px dashed var(--rule); padding-top:8px; margin-top:2px;}
   .tagcard .tc-badge{
     position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:50%;
@@ -316,10 +317,6 @@
         <div class="icon-card"><div class="glyph">🛡</div><span>24 Ay Garanti</span></div>
         <div class="icon-card"><div class="glyph">🔒</div><span>Güvenli Alışveriş</span></div>
       </div>
-    </div>
-
-    <div class="footdisc">
-      <b>Fiyat kaynağı:</b> Koltuklar &amp; Yatak/Yatak Pedi → doquhome.com.tr (19 Ağustos 2026 anlık görüntüsü). Diğer tüm kategoriler → <b>Perakakende.xlsx</b> (sayfa: EvTekstili) — sol paneldeki "Fiyat Listesi Yükle" alanından güncel dosyayı yükleyerek fiyatları tazeleyebilirsiniz. Taksitli fiyat = peşin fiyat × 1,10 (9 taksit) formülüyle hesaplanır. Opsiyonel işaretlenen üniteler toplam fiyata dahil edilmez.
     </div>
 
     <div class="tagbar">
@@ -644,11 +641,6 @@ const PRESETS = {
   },
 };
 
-/* Excel'den gelen her kategori için "Takım" = tek bir ürün (o kategorideki
-   ürünlerden biri). Kategori seçilince Takım listesi otomatik dolar; Takım
-   seçilince tablo o ürünle 1 satır olarak başlar. Alt satırlardaki
-   "— Ünite Seç —" listesi de yalnızca seçili kategorinin ürünlerini gösterir
-   (Mondi'deki gibi: önce kategori, sonra diğer seçimler açılır). */
 Object.keys(EXCEL_CATALOG).forEach(cat=>{
   PRESETS[cat] = {};
   EXCEL_CATALOG[cat].forEach(it=>{
@@ -664,12 +656,12 @@ const kategoriSel = document.getElementById('kategori');
 const takimSel = document.getElementById('takim');
 const rowsBody = document.getElementById('rowsBody');
 
-let flatCatalog = []; // {key, name, cat, price, disc, gen, der, yuk}
+let flatCatalog = [];
 Object.entries(CATALOG).forEach(([cat, items])=>{
   items.forEach(it=> flatCatalog.push({...it, cat, key: cat+'::'+it.name}));
 });
 
-let rows = []; // {key or null, qty, optional}
+let rows = [];
 
 function fmt(n){
   return Math.round(n).toLocaleString('tr-TR') + ' ₺';
@@ -684,11 +676,6 @@ function findItem(key){
 }
 
 function populateKategori(){
-  // Fiyat senkronizasyonu her tetiklendiğinde (sayfa açılışı veya elle yenileme)
-  // bu fonksiyon yeniden çağrılır. Önceden seçili kategori varsa ve yeni listede
-  // hâlâ mevcutsa onu korur — aksi halde kullanıcının baktığı ürün, senkronizasyon
-  // her olduğunda sessizce ilk kategoriye sıçrardı ve bu da "fiyat değişmiyor"
-  // izlenimi veriyordu (aslında değişen ürün, ekranda görünenden farklıydı).
   const prevSelected = kategoriSel.value;
   kategoriSel.innerHTML = '';
   Object.keys(CATALOG).forEach(cat=>{
@@ -742,9 +729,6 @@ window.addEventListener('afterprint', ()=>{
 });
 
 function buildRowSelect(rowIdx, selectedKey){
-  // Satır seçenekleri YALNIZCA panelde seçili olan Kategori'nin ürünleridir.
-  // Yani önce soldan bir Kategori seçilir, ancak ondan sonra bu satırlardaki
-  // "Ünite Seç" listeleri o kategoriye ait ürünlerle dolar (Mondi'deki gibi).
   const sel = document.createElement('select');
   const empty = document.createElement('option');
   empty.value = ''; empty.textContent = '— Ünite Seç —';
@@ -759,7 +743,6 @@ function buildRowSelect(rowIdx, selectedKey){
   });
   sel.addEventListener('change', ()=>{
     rows[rowIdx].key = sel.value || null;
-    // Bir üniteyi elle seçtiğinizde "Opsiyonel" kutusu kendiliğinden işaretlenir.
     rows[rowIdx].optional = !!sel.value;
     renderRows();
   });
@@ -836,12 +819,10 @@ function todayTR(){
 function renderTagSheet(){
   const wrap = document.getElementById('tagSheet');
   wrap.innerHTML = '';
-  // Tabloda ürünü seçilmiş her satır için ayrı bir raf etiketi (görseldeki DOQU HOME
-  // etiketi gibi) otomatik üretilir — her yeni ünite seçiminde bu alan güncellenir.
   const seen = new Set();
   rows.forEach(row=>{
     if(!row.key) return;
-    if(seen.has(row.key)) return; // aynı ürün birden fazla satırda ise tek etiket yeter
+    if(seen.has(row.key)) return;
     seen.add(row.key);
     const item = findItem(row.key);
     if(!item) return;
@@ -873,21 +854,22 @@ function renderTagSheet(){
     const qrWrap = document.createElement('div');
     qrWrap.className = 'tc-qr';
     const qrTarget = `https://www.google.com/search?q=${encodeURIComponent('site:doquhome.com.tr ' + item.name)}`;
-    const qrImg = document.createElement('img');
-    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrTarget)}`;
-    qrImg.alt = 'QR - doquhome.com.tr';
-    qrWrap.appendChild(qrImg);
+    if(typeof QRious !== 'undefined'){
+      const qrCanvas = document.createElement('canvas');
+      new QRious({element: qrCanvas, value: qrTarget, size: 140});
+      qrWrap.appendChild(qrCanvas);
+    } else {
+      const qrImg = document.createElement('img');
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrTarget)}`;
+      qrImg.alt = 'QR - doquhome.com.tr';
+      qrWrap.appendChild(qrImg);
+    }
     card.appendChild(qrWrap);
 
     const foot = document.createElement('div');
     foot.className = 'tc-foot';
     foot.innerHTML = `Fiyat Değişiklik Tarihi: ${todayTR()}<br>Tavsiye edilen perakende satış fiyatlarıdır. Fiyatlara KDV dahildir.`;
     card.appendChild(foot);
-
-    const badge = document.createElement('div');
-    badge.className = 'tc-badge';
-    badge.innerHTML = 'YERLİ<br>ÜRETİM';
-    card.appendChild(badge);
 
     wrap.appendChild(card);
   });
@@ -933,29 +915,6 @@ function renderTotals(){
   document.getElementById('chipN2').textContent = TAKSIT_SAYISI;
 }
 
-/* ================================================================
-   MERKEZİ FİYAT KAYNAĞI (Google Sheets)
-   ------------------------------------------------------------------
-   Bu sayfa artık dosya yükleme İSTEMİYOR. Bunun yerine, aşağıdaki
-   SHEET_CSV_URL adresinden arka planda otomatik olarak fiyat verisini
-   çeker. Fiyatı güncellemek isteyen kişi SADECE Google E-Tablosu'nu
-   düzenler — bu HTML dosyasına hiç dokunmaz, sayfayı ziyaret eden
-   herkes bir sonraki sayfa açılışında güncel fiyatları görür.
-
-   KURULUM (bir kere yapılır):
-   1) Perakakende.xlsx ile AYNI sütun düzeninde bir Google E-Tablosu
-      oluşturun: İndirim Oranı, Ürün Sınıf Kodu, Ürün Adı, (boş),
-      Kampanyasız Peşin Fiyat, Peşin Fiyat, 9 Taksitli Fiyat.
-      Kategori başlıkları (YATAK ÖRTÜLERİ vb.) "Ürün Adı" sütununda,
-      "Ürün Sınıf Kodu" hücresi boş olan satırlardır (Excel ile birebir
-      aynı mantık).
-   2) Google E-Tablosu'nda: Dosya → Paylaş → Web'de yayınla →
-      "Bağlantı" sekmesinde sekme adını ve "Virgülle ayrılmış değerler
-      (.csv)" seçin → Yayınla. Size verilen linki kopyalayın.
-   3) O linki aşağıdaki SHEET_CSV_URL sabitine yapıştırın.
-   Bundan sonra fiyat güncellemek için tek yapılması gereken şey
-   Google E-Tablosu'ndaki sayıları değiştirmektir — kod hiç değişmez.
-   ================================================================ */
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3BacbeEhpiLCGdpY8c8w-wxXiadUhL6AoEWdsCXLRYvinkLh3kZPi635BjFBpwQ/pub?gid=1537430569&single=true&output=csv';
 
 const EXCEL_DISPLAY_NAMES = {
@@ -971,8 +930,8 @@ const EXCEL_DISPLAY_NAMES = {
   'KOLEKSIYON PİKE': 'Koleksiyon Pike', 'KOLEKSIYON PİKE TAKIMI': 'Koleksiyon Pike Takımı',
   'KOLEKSIYON PİKE SETİ': 'Koleksiyon Pike Seti'
 };
-const LEGACY_CATS = ['Koltuklar', 'Yatak & Yatak Pedi']; // bu tabloda olmayan, elle tanımlı kategoriler
-const HEADER_MARKERS = ['ürün adı', 'ürün sınıf kodu']; // başlık satırını otomatik bulmak için
+const LEGACY_CATS = ['Koltuklar', 'Yatak & Yatak Pedi'];
+const HEADER_MARKERS = ['ürün adı', 'ürün sınıf kodu'];
 
 function displayCatName(raw){
   const key = String(raw).trim();
@@ -986,38 +945,24 @@ function rebuildFlatCatalog(){
   });
 }
 
-// Başlık satırının kaçıncı satır olduğunu SABİT SAYMAK YERİNE, içeriğe bakarak
-// bulur. Önceki sürümdeki "ilk 4 satır başlıktır" varsayımı, tablo yapısı biraz
-// değiştiğinde (örn. bir satır eklenip çıkarıldığında) tüm veriyi kaydırıp
-// ürünlerin kaybolmasına ya da fiyatların güncellenmemesine sebep oluyordu.
 function findHeaderRowIndex(allRows){
   for(let i=0; i<Math.min(allRows.length, 20); i++){
     const cells = (allRows[i]||[]).map(c=> String(c ?? '').trim().toLocaleLowerCase('tr-TR'));
     if(HEADER_MARKERS.some(marker=> cells.includes(marker))) return i;
   }
-  return 3; // hiçbir başlık satırı bulunamazsa eski varsayılana geri dön (ilk 4 satır)
+  return 3;
 }
 
-// Perakakende tablosu satırlarını CATALOG/PRESETS yapısına çevirir.
-// Hem dosya yüklemesinde hem de Google Sheets'ten otomatik çekmede kullanılır.
-// Google Sheets'ten CSV olarak gelen fiyat hücreleri Türkçe biçimde metin
-// olarak gelir: "2.699" gibi (nokta = binlik ayracı, 2699 anlamına gelir).
-// Bunu doğrudan Number() ile çevirmek 2.699 (neredeyse sıfır) gibi YANLIŞ bir
-// değer üretir. Bu fonksiyon binlik ayracını ve varsa ondalık virgülü doğru
-// yorumlar. Gerçek .xlsx dosyasından gelen sayısal değerleri (number tipi)
-// olduğu gibi bırakır.
 function parseTRNumber(v){
   if(v === null || v === undefined || v === '') return null;
   if(typeof v === 'number') return v;
   let s = String(v).trim().replace(/[^0-9.,\-]/g, '');
   if(s === '') return null;
   if(s.includes(',') && s.includes('.')){
-    s = s.replace(/\./g, '').replace(',', '.'); // 1.234,56 -> 1234.56
+    s = s.replace(/\./g, '').replace(',', '.');
   } else if(s.includes(',') && !s.includes('.')){
-    s = s.replace(',', '.'); // 1234,56 -> 1234.56
+    s = s.replace(',', '.');
   } else if(s.includes('.')){
-    // "2.699" / "11.499" gibi binlik ayracı mı, yoksa "2968.9" gibi ondalık mı?
-    // Binlik ayracı deseni: son grup 3 haneli ve öncesindeki gruplar da 3 haneyi geçmiyor.
     const parts = s.split('.');
     const last = parts[parts.length - 1];
     if(parts.length > 1 && last.length === 3 && parts.slice(0, -1).every(p => p.length <= 3)){
@@ -1042,15 +987,12 @@ function parseCatalogRows(allRows){
     const codeEmpty = (code === null || code === undefined || String(code).trim() === '');
     const nameTrimmed = (name === null || name === undefined) ? '' : String(name).trim();
     if(codeEmpty){
-      // Kaynak tabloda bir kategori satırı bazen "0" ya da tire ("-") olarak
-      // görünür (orijinal Excel'de böyle biçimlendirilmiş) — bu, gerçekte
-      // "Bambu Yatak Ped" bölümünün başlangıcıdır.
       if(nameTrimmed === '0' || /^[-–—]+$/.test(nameTrimmed)){
         currentCat = displayCatName('BAMBU YATAK PEDİ');
       } else if(nameTrimmed){
         currentCat = displayCatName(nameTrimmed);
       } else {
-        return; // tamamen boş satır
+        return;
       }
       if(!newCategories[currentCat]){ newCategories[currentCat] = []; order.push(currentCat); }
       return;
@@ -1078,8 +1020,6 @@ function parseCatalogRows(allRows){
 function applyCatalogUpdate({newCategories, order, productCount}){
   if(productCount === 0) throw new Error('Tabloda ürün satırı bulunamadı — sütun düzenini kontrol edin.');
 
-  // Önceki merkezi kaynaktan gelen kategorileri temizle, sabit (Koltuklar/
-  // Yatak & Yatak Pedi) kategorileri koru.
   Object.keys(CATALOG).forEach(cat=>{
     if(!LEGACY_CATS.includes(cat)){ delete CATALOG[cat]; delete PRESETS[cat]; }
   });
@@ -1095,25 +1035,12 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   applyPreset();
 }
 
-// Sayfa her açıldığında arka planda çalışır — müşteri hiçbir şey görmez/yapmaz.
-// Google E-Tablosu'ndan çekilemezse (link boş, internet yok, vb.) sayfa sessizce
-// dahili/son bilinen fiyatlarla çalışmaya devam eder.
 async function loadPricesFromSheet(){
   const note = document.getElementById('syncNote');
   const btn = document.getElementById('refreshBtn');
   if(btn){ btn.disabled = true; btn.textContent = '⟳ Yenileniyor…'; }
   try{
     if(typeof Papa === 'undefined') throw new Error('CSV ayrıştırma kütüphanesi yüklenemedi.');
-    // ÖNCEKİ SÜRÜMLERDE burada tarayıcıdan doğrudan Google Sheets'e (veya
-    // aradaki "köprü" servislerine) bağlanılıyordu. Google'ın CSV linki
-    // tarayıcı güvenlik politikası (CORS) yüzünden JavaScript ile çekilemiyor,
-    // ve ücretsiz köprü servisleri de sık sık kesintiye giriyor. Bunun yerine
-    // artık GitHub'ın kendisi (bir GitHub Actions otomasyonu ile) Google
-    // Sheets'i düzenli aralıklarla arka planda çekip aynı repo'daki
-    // prices.csv dosyasına yazıyor. Sayfa da SADECE bu dosyayı (kendi
-    // sunucusundan, "same-origin") okuyor — bu yüzden hiçbir CORS/köprü
-    // sorunu yaşanmaz. prices.csv'nin en güncel hâli GitHub Actions
-    // tarafından otomatik güncellenir (bkz. .github/workflows/sync-prices.yml).
     const res = await fetch('./prices.csv?_=' + Date.now());
     if(!res.ok) throw new Error('Fiyat listesine ulaşılamadı (HTTP ' + res.status + ').');
     const csvText = await res.text();
@@ -1121,7 +1048,7 @@ async function loadPricesFromSheet(){
     if(parsed.errors && parsed.errors.length){
       console.warn('CSV ayrıştırma uyarıları:', parsed.errors);
     }
-    const allRows = parsed.data; // dizi içinde dizi, tüm hücreler metin — sayı dönüşümünü biz kontrollü yapıyoruz
+    const allRows = parsed.data;
     applyCatalogUpdate(parseCatalogRows(allRows));
     if(note) note.textContent = 'Fiyatlar güncel (son senkronizasyon: ' + todayTR() + ').';
   }catch(err){
@@ -1133,13 +1060,11 @@ async function loadPricesFromSheet(){
 }
 document.getElementById('refreshBtn').addEventListener('click', loadPricesFromSheet);
 
-// Önce dahili veriyle anında göster (sayfa boş kalmasın), sonra arka planda
-// merkezi kaynaktan güncel fiyatları çek ve sessizce üzerine yaz.
 populateKategori();
 populateTakim();
 applyPreset();
 loadPricesFromSheet();
-loadSofaPrices();
+if(typeof loadSofaPrices === 'function') loadSofaPrices();
 </script>
 </body>
 </html>
