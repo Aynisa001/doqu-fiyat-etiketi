@@ -319,7 +319,7 @@
     </div>
 
     <div class="footdisc">
-      <b>Fiyat kaynağı:</b> Koltuklar &amp; Yatak/Yatak Pedi → doquhome.com.tr (19 Ağustos 2026 anlık görüntüsü). Diğer tüm kategoriler → <b>Perakakende.xlsx</b> (sayfa: EvTekstili) — sol paneldeki "Fiyat Listesi Yükle" alanından güncel dosyayı yükleyerek fiyatları tazeleyebilirsiniz. Taksitli fiyat = peşin fiyat × 1,10 (9 taksit) formülüyle hesaplanır. Opsiyonel işaretlenen üniteler toplam fiyata dahil edilmez.
+      <b>Fiyat kaynağı:</b> Koltuklar &amp; Yatak/Yatak Pedi → doquhome.com.tr (<span id="oto-tarih"></span> anlık görüntüsü). Diğer tüm kategoriler → <b>Perakakende.xlsx</b> (sayfa: EvTekstili) — sol paneldeki "Fiyat Listesi Yükle" alanından güncel dosyayı yükleyerek fiyatları tazeleyebilirsiniz. Taksitli fiyat = peşin fiyat × 1,10 (9 taksit) formülüyle hesaplanır. Opsiyonel işaretlenen üniteler toplam fiyata dahil edilmez.
     </div>
 
     <div class="tagbar">
@@ -1094,7 +1094,11 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   populateTakim();
   applyPreset();
 }
-
+// Sayfa açıldığında eski tarihi bulup her zaman bugünün tarihi yapar
+document.body.innerHTML = document.body.innerHTML.replace(
+  /\d{1,2}\s+(Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+\d{4}\s+anlık görüntüsü/g,
+  new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' anlık görüntüsü'
+);
 // Sayfa her açıldığında arka planda çalışır — müşteri hiçbir şey görmez/yapmaz.
 // Google E-Tablosu'ndan çekilemezse (link boş, internet yok, vb.) sayfa sessizce
 // dahili/son bilinen fiyatlarla çalışmaya devam eder.
