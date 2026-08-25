@@ -813,7 +813,7 @@ function renderTagSheet(){
 
     const qrWrap = document.createElement('div');
     qrWrap.className = 'tc-qr';
-    const qrTarget = `https://www.google.com/search?q=${encodeURIComponent('site:doquhome.com.tr ' + item.name)}`;
+    const qrTarget = `https://www.doquhome.com.tr/arama/${encodeURIComponent(item.name)}`;
     if(typeof QRious !== 'undefined'){
       const qrCanvas = document.createElement('canvas');
       new QRious({element: qrCanvas, value: qrTarget, size: 140});
