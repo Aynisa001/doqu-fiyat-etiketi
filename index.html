@@ -239,8 +239,6 @@
   <div class="logo"><div class="mark">D</div><b>Doqu<span>Home</span></b></div>
   <div class="navlinks">
     <a href="#" class="active">Fiyat Etiketi</a>
-    <a href="#">Koltuklar</a>
-    <a href="#">Yatak &amp; Yatak Pedi</a>
     <a href="#">Ev Tekstili</a>
     <a href="#">Banyo Tekstili</a>
   </div>
@@ -332,30 +330,7 @@
 
 <script>
 /* ---------------- CATALOG (doquhome.com.tr snapshot, 19 Ağu 2026) ---------------- */
-const CATALOG = {
-  "Koltuklar": [
-    {name:"Bohem Modüler Koltuk 200x100 - Füme", price:13990, disc:10990, gen:"200 cm", der:"100 cm", yuk:"—"},
-    {name:"Bohem Modüler Koltuk 200x100 - Gümüş", price:13990, disc:10990, gen:"200 cm", der:"100 cm", yuk:"—"},
-    {name:"Bohem Modüler Koltuk 200x100 - Kiremit", price:13990, disc:10990, gen:"200 cm", der:"100 cm", yuk:"—"},
-    {name:"Bohem Keten İkili Koltuk - Açık Gri", price:12990, disc:null, gen:"—", der:"—", yuk:"—"},
-    {name:"Bohem Uzanmalı Köşe Koltuk - Füme", price:17990, disc:15990, gen:"—", der:"—", yuk:"—"},
-    {name:"Bohem Uzanmalı Köşe Koltuk - Gümüş", price:17990, disc:15990, gen:"—", der:"—", yuk:"—"},
-    {name:"Bohem Köşe Koltuk - Füme", price:29990, disc:24990, gen:"—", der:"—", yuk:"—"},
-    {name:"Bohem Köşe Koltuk - Gümüş", price:29990, disc:24990, gen:"—", der:"—", yuk:"—"},
-    {name:"Bohem İkili Koltuk - Füme", price:14990, disc:12990, gen:"—", der:"—", yuk:"—"},
-    {name:"Bohem İkili Koltuk - Krem", price:14990, disc:12990, gen:"—", der:"—", yuk:"—"}
-  ],
-  "Yatak & Yatak Pedi": [
-    {name:"Stress Free Sleep Yatak 100x200", price:8990, disc:null, gen:"100 cm", der:"200 cm", yuk:"—"},
-    {name:"Graphene Dream Yatak 100x200", price:8990, disc:null, gen:"100 cm", der:"200 cm", yuk:"—"},
-    {name:"Prosoft Comfort Yatak 90x190", price:5990, disc:null, gen:"90 cm", der:"190 cm", yuk:"—"},
-    {name:"Bamboo Comfort Yatak 90x190", price:5490, disc:null, gen:"90 cm", der:"190 cm", yuk:"—"},
-    {name:"Naturel Hand Made Coco Wool Yatak 100x200", price:49990, disc:null, gen:"100 cm", der:"200 cm", yuk:"—"},
-    {name:"Naturel Hand Made Harmony Yatak 200x200", price:59990, disc:null, gen:"200 cm", der:"200 cm", yuk:"—"},
-    {name:"Naturel At Kılı Yatak Pedi 200x200", price:47990, disc:null, gen:"200 cm", der:"200 cm", yuk:"—"},
-    {name:"Naturel Hand Made Pamuk Yatak Pedi 200x200", price:44990, disc:null, gen:"200 cm", der:"200 cm", yuk:"—"}
-  ],
-};
+const CATALOG = {};
 
 /* ================================================================
    KAYNAK: Perakakende.xlsx  →  sayfa: EvTekstili
@@ -619,27 +594,7 @@ const EXCEL_CATALOG = {
 
 Object.assign(CATALOG, EXCEL_CATALOG);
 
-const PRESETS = {
-  "Koltuklar": {
-    "Bohem Salon Takımı": [
-      {name:"Bohem Köşe Koltuk - Füme", qty:1},
-      {name:"Bohem İkili Koltuk - Füme", qty:1}
-    ],
-    "Bohem Oturma Grubu": [
-      {name:"Bohem Modüler Koltuk 200x100 - Füme", qty:2},
-      {name:"Bohem Keten İkili Koltuk - Açık Gri", qty:1}
-    ]
-  },
-  "Yatak & Yatak Pedi": {
-    "Stress Free Uyku Seti": [
-      {name:"Stress Free Sleep Yatak 100x200", qty:1}
-    ],
-    "Graphene Dream + Pamuk Ped Seti": [
-      {name:"Graphene Dream Yatak 100x200", qty:1},
-      {name:"Naturel Hand Made Pamuk Yatak Pedi 200x200", qty:1}
-    ]
-  },
-};
+const PRESETS = {};
 
 Object.keys(EXCEL_CATALOG).forEach(cat=>{
   PRESETS[cat] = {};
@@ -930,7 +885,7 @@ const EXCEL_DISPLAY_NAMES = {
   'KOLEKSIYON PİKE': 'Koleksiyon Pike', 'KOLEKSIYON PİKE TAKIMI': 'Koleksiyon Pike Takımı',
   'KOLEKSIYON PİKE SETİ': 'Koleksiyon Pike Seti'
 };
-const LEGACY_CATS = ['Koltuklar', 'Yatak & Yatak Pedi'];
+const LEGACY_CATS = [];
 const HEADER_MARKERS = ['ürün adı', 'ürün sınıf kodu'];
 
 function displayCatName(raw){
@@ -1073,7 +1028,6 @@ populateKategori();
 populateTakim();
 applyPreset();
 loadPricesFromSheet();
-if(typeof loadSofaPrices === 'function') loadSofaPrices();
 </script>
 </body>
 </html>
