@@ -170,11 +170,13 @@
     padding:5px 12px; border-radius:20px;
   }
   .price-strip .install{font-size:38px; font-weight:800; color:var(--ink);}
-  .price-group{display:flex; flex-direction:column; gap:3px;}
+  .price-group{display:flex; flex-direction:column; gap:4px;}
   .price-label{
-    font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em;
-    font-weight:700; color:var(--ink-soft);
+    font-size:12px; text-transform:uppercase; letter-spacing:0.07em;
+    font-weight:800;
   }
+  .price-group:first-child .price-label{color:var(--petrol-deep);}
+  .price-group:last-child .price-label{color:var(--ink);}
 
   .chips{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:22px;}
   .chip{
