@@ -103,12 +103,21 @@
   }
 
   /* ---- Tag sheet (tekli ürün etiketleri) ---- */
+  :root{ --tag-w: 10cm; --tag-h: 7cm; }
+
   .tagbar{
     display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
     margin-top:36px; padding-top:18px; border-top:1px solid var(--rule);
   }
   .tagbar h2{font-size:16px; font-weight:800; margin:0 0 4px;}
   .tagbar p{font-size:12px; color:var(--ink-soft); margin:0; max-width:520px;}
+  .tagbar .tagbar-actions{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .tag-size-control{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-soft);}
+  .tag-size-control label{display:flex; align-items:center; gap:5px; font-size:11px; text-transform:none; letter-spacing:normal; color:var(--ink-soft); margin:0;}
+  .tag-size-control input{
+    width:56px; padding:6px 7px; border:1px solid var(--rule); border-radius:5px;
+    background:var(--cream); font-family:inherit; font-size:12.5px; color:var(--ink); text-align:center;
+  }
   .tagbar button{
     padding:10px 18px; border-radius:6px; border:none; background:var(--petrol-deep); color:#fff;
     font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap;
@@ -116,33 +125,48 @@
   .tagbar button:hover{background:var(--petrol);}
 
   .tag-sheet{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:22px;
+    display:flex; flex-wrap:wrap; gap:22px;
     margin-top:20px;
   }
   .tagcard{
     position:relative; background:linear-gradient(180deg,#fff,#faf8f2);
     border:1px solid var(--rule); border-radius:12px;
-    padding:30px 14px 14px; text-align:center;
+    width:var(--tag-w); height:var(--tag-h);
+    box-sizing:border-box; overflow:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:40px 14px 14px; text-align:center;
     box-shadow:0 2px 8px rgba(35,35,35,.06);
   }
-  .tagcard .tc-logo{
-    position:absolute; top:-15px; left:50%; transform:translateX(-50%);
-    background:#fff; border:1px solid var(--rule); border-radius:999px;
-    padding:5px 16px 4px; white-space:nowrap;
+  .tagcard::before{
+    content:''; position:absolute; top:-1px; left:50%; transform:translateX(-50%);
+    width:70px; height:34px; background:#fff;
+    border:1px solid var(--rule); border-top:none; border-radius:0 0 35px 35px;
   }
-  .tagcard .tc-logo b{font-size:14px; font-weight:800; letter-spacing:-0.01em;}
-  .tagcard .tc-logo small{display:block; font-size:7.5px; letter-spacing:.18em; font-weight:700; color:var(--ink-soft); margin-top:-1px;}
-  .tagcard .tc-name{font-size:12.5px; font-weight:800; text-transform:uppercase; line-height:1.35; margin:6px 0 12px; min-height:34px;}
-  .tagcard .tc-price{font-size:28px; font-weight:800; color:var(--ink); margin-bottom:12px;}
+  .tagcard .tc-logo{
+    position:absolute; top:4px; left:50%; transform:translateX(-50%);
+    line-height:1; z-index:1;
+  }
+  .tagcard .tc-logo b{font-size:13px; font-weight:800; letter-spacing:-0.01em; color:#6296AD;}
+  .tagcard .tc-logo small{display:block; font-size:6.5px; letter-spacing:.18em; font-weight:700; color:#6296AD; margin-top:-1px;}
+  .tagcard .tc-name{font-size:12.5px; font-weight:800; text-transform:uppercase; line-height:1.35; margin:6px 0 10px; max-height:2.7em; overflow:hidden;}
+  .tagcard .tc-price{font-size:26px; font-weight:800; color:var(--ink); margin-bottom:10px; line-height:1.1;}
   .tagcard .tc-price .tc-old{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); text-decoration:line-through; margin-bottom:2px;}
-  .tagcard .tc-qr{width:70px; height:70px; margin:0 auto 10px;}
+  .tagcard .tc-qr{width:60px; height:60px; margin:0 auto 8px; flex-shrink:0;}
   .tagcard .tc-qr img, .tagcard .tc-qr canvas{width:100%; height:100%; display:block; border-radius:4px;}
-  .tagcard .tc-foot{font-size:8px; color:var(--ink-soft); line-height:1.5; border-top:1px dashed var(--rule); padding-top:8px; margin-top:2px;}
-  .tagcard .tc-badge{
-    position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:50%;
-    border:1.5px solid var(--petrol); color:var(--petrol-deep);
-    display:flex; align-items:center; justify-content:center; text-align:center;
-    font-size:5.5px; font-weight:800; line-height:1.15;
+  .tagcard .tc-foot{
+    font-size:8px; color:var(--ink-soft); line-height:1.4; border-top:1px dashed var(--rule);
+    padding:6px 56px 0 0; margin-top:2px; width:100%; text-align:left; box-sizing:border-box;
+  }
+  .tagcard .tc-origin{
+    position:absolute; bottom:9px; right:9px;
+    display:flex; align-items:center; gap:5px;
+  }
+  .tagcard .tc-origin .origin-icon{
+    width:22px; height:22px; border:1.4px solid var(--ink); border-radius:4px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;
+  }
+  .tagcard .tc-origin .origin-text{
+    font-size:6.5px; font-weight:800; line-height:1.15; text-align:left; color:var(--ink);
   }
   .tagcard .tc-qty{
     position:absolute; top:8px; right:10px; font-size:10px; font-weight:700; color:var(--ink-soft);
@@ -234,7 +258,8 @@
     body.printing-tags .price-strip, body.printing-tags .chips, body.printing-tags .table-wrap,
     body.printing-tags .footdisc{ display:none !important; }
     body.printing-tags .tagbar{ display:none !important; }
-    body.printing-tags .tag-sheet{ display:grid !important; }
+    body.printing-tags .tag-sheet{ display:flex !important; }
+    body.printing-tags .tagcard{ box-shadow:none !important; break-inside:avoid; page-break-inside:avoid; }
   }
 </style>
 </head>
@@ -334,7 +359,13 @@
         <h2>Tekli Ürün Etiketleri</h2>
         <p>Tabloya eklediğiniz her ürün için ayrı bir raf etiketi otomatik oluşturulur. QR kod, ürünü doquhome.com.tr üzerinde aratır.</p>
       </div>
-      <button type="button" id="printTagsBtn">🏷 Etiketleri Yazdır</button>
+      <div class="tagbar-actions">
+        <div class="tag-size-control">
+          <label>Gen (cm) <input type="number" id="tagWidthInput" value="10" min="3" max="30" step="0.5"></label>
+          <label>Yük (cm) <input type="number" id="tagHeightInput" value="7" min="3" max="30" step="0.5"></label>
+        </div>
+        <button type="button" id="printTagsBtn">🏷 Etiketleri Yazdır</button>
+      </div>
     </div>
     <div class="tag-sheet" id="tagSheet"></div>
   </section>
@@ -695,6 +726,18 @@ window.addEventListener('afterprint', ()=>{
   document.body.classList.remove('printing-tags');
 });
 
+const tagWidthInput = document.getElementById('tagWidthInput');
+const tagHeightInput = document.getElementById('tagHeightInput');
+function applyTagSize(){
+  const w = Math.max(3, parseFloat(tagWidthInput.value) || 10);
+  const h = Math.max(3, parseFloat(tagHeightInput.value) || 7);
+  document.documentElement.style.setProperty('--tag-w', w + 'cm');
+  document.documentElement.style.setProperty('--tag-h', h + 'cm');
+}
+tagWidthInput.addEventListener('input', applyTagSize);
+tagHeightInput.addEventListener('input', applyTagSize);
+applyTagSize();
+
 function buildRowSelect(rowIdx, selectedKey){
   const sel = document.createElement('select');
   const empty = document.createElement('option');
@@ -830,6 +873,11 @@ function renderTagSheet(){
     foot.className = 'tc-foot';
     foot.innerHTML = `Fiyat Değişiklik Tarihi: ${todayTR()}<br>Tavsiye edilen perakende satış fiyatlarıdır. Fiyatlara KDV dahildir.`;
     card.appendChild(foot);
+
+    const origin = document.createElement('div');
+    origin.className = 'tc-origin';
+    origin.innerHTML = '<span class="origin-icon">🤝</span><span class="origin-text">YERLİ<br>ÜRETİM</span>';
+    card.appendChild(origin);
 
     wrap.appendChild(card);
   });
