@@ -187,7 +187,7 @@
   .chip b{color:var(--ink); font-weight:700;}
 
   .table-wrap{display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;}
-  table.units{border-collapse:collapse; flex:1; min-width:640px;}
+  table.units{border-collapse:collapse; flex:1; min-width:480px;}
   table.units th{
     background:var(--petrol); color:#fff; text-align:left; font-size:11px;
     text-transform:uppercase; letter-spacing:0.05em; padding:11px 10px; font-weight:700;
@@ -316,7 +316,6 @@
             <th>Peşin Fiyat</th>
             <th>Taksitli Fiyat</th>
             <th class="center">Opsiyonel</th>
-            <th>Gen</th><th>Der</th><th>Yük</th>
           </tr>
         </thead>
         <tbody id="rowsBody"></tbody>
@@ -764,13 +763,6 @@ function renderRows(){
       tdOpt.appendChild(flag);
     }
     tr.appendChild(tdOpt);
-
-    ['gen','der','yuk'].forEach(dim=>{
-      const td = document.createElement('td');
-      td.className = 'dim';
-      td.textContent = item ? item[dim] : '—';
-      tr.appendChild(td);
-    });
 
     rowsBody.appendChild(tr);
   });
