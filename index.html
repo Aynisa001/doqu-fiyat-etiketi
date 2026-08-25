@@ -170,6 +170,11 @@
     padding:5px 12px; border-radius:20px;
   }
   .price-strip .install{font-size:38px; font-weight:800; color:var(--ink);}
+  .price-group{display:flex; flex-direction:column; gap:3px;}
+  .price-label{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em;
+    font-weight:700; color:var(--ink-soft);
+  }
 
   .chips{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:22px;}
   .chip{
@@ -281,12 +286,18 @@
     <p class="setsub" id="setSub">—</p>
 
     <div class="price-strip">
-      <div>
-        <span class="old" id="oldPrice"></span>
-        <span class="cash" id="cashPrice">0 ₺</span>
+      <div class="price-group">
+        <span class="price-label">Peşin Fiyat</span>
+        <div>
+          <span class="old" id="oldPrice"></span>
+          <span class="cash" id="cashPrice">0 ₺</span>
+        </div>
       </div>
       <span class="badge" id="badge" style="display:none">-%0</span>
-      <span class="install" id="installPrice">0 ₺</span>
+      <div class="price-group">
+        <span class="price-label">Taksitli Fiyat</span>
+        <span class="install" id="installPrice">0 ₺</span>
+      </div>
     </div>
 
     <div class="chips">
