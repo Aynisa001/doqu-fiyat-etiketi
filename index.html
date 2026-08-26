@@ -124,6 +124,35 @@
   }
   .tagbar button:hover{background:var(--petrol);}
 
+  .tag-select-control{display:flex; align-items:center; gap:8px;}
+  .tagselect-btn{
+    padding:8px 14px !important; border-radius:20px !important; border:1px solid var(--rule) !important;
+    background:var(--card) !important; color:var(--ink-soft) !important;
+    font-weight:700; font-size:12px !important; cursor:pointer;
+  }
+  .tagselect-btn:hover{border-color:var(--petrol) !important; color:var(--petrol-deep) !important;}
+  .tag-select-hint{
+    width:100%; font-size:11.5px; color:var(--ink-soft); margin-top:10px;
+  }
+  .tag-select-count{font-weight:800; color:var(--petrol-deep);}
+
+  /* ---- İki Ürünlü Etiket Oluşturucu ---- */
+  .combo-builder{
+    margin-top:22px; padding:18px 20px; border-radius:10px; background:var(--card);
+    border:1px solid var(--rule);
+  }
+  .combo-builder h3{margin:0 0 4px; font-size:15px; font-weight:800;}
+  .combo-builder > p{margin:0 0 14px; font-size:12px; color:var(--ink-soft); line-height:1.5; max-width:640px;}
+  .combo-builder-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:12px;}
+  .combo-field{flex:1; min-width:200px;}
+  .combo-field label{margin:0 0 6px;}
+  .combo-builder button#addComboBtn{
+    padding:10px 18px; border-radius:6px; border:none; background:var(--petrol-deep); color:#fff;
+    font-weight:700; font-size:13px; cursor:pointer;
+  }
+  .combo-builder button#addComboBtn:hover{background:var(--petrol);}
+  @media print{ .combo-builder{display:none !important;} }
+
   .tag-sheet{
     display:flex; flex-wrap:wrap; gap:20px;
     margin-top:20px;
@@ -144,6 +173,83 @@
     justify-content:space-between;
     padding: calc(var(--tag-h) * 0.04) calc(var(--tag-w) * 0.04);
     box-shadow:0 3px 10px rgba(0,0,0,.08);
+    transition:opacity .15s ease, box-shadow .15s ease;
+  }
+  .tagcard.deselected{
+    opacity:.32;
+    box-shadow:none;
+  }
+
+  /* Ekranda gösterilen seçim kutusu (yazdırmada gizlenir) */
+  .tc-select-wrap{
+    position:absolute; top:8px; left:8px; z-index:6;
+    width:26px; height:26px; border-radius:6px;
+    background:rgba(255,255,255,.92); border:1.5px solid var(--rule);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 1px 4px rgba(0,0,0,.12);
+  }
+  .tc-select-wrap input{
+    width:16px; height:16px; margin:0; cursor:pointer;
+  }
+
+  /* Birleşik (iki ürünlü) etiket için silme butonu (sadece ekranda) */
+  .tc-delete{
+    position:absolute; top:8px; right:8px; z-index:6;
+    width:24px; height:24px; border-radius:50%;
+    background:rgba(255,255,255,.92); border:1.5px solid var(--rule);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:800; line-height:1; color:var(--ink-soft); cursor:pointer;
+  }
+  .tc-delete:hover{border-color:#b23; color:#b23;}
+
+  /* Birleşik etiket: iki ürün yan yana, ortada ayraç */
+  .tc-combo-body{
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+    width:100%;
+    gap: calc(var(--tag-w) * 0.03);
+    margin-top: calc(var(--tag-h) * 0.01);
+  }
+  .tc-combo-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap: calc(var(--tag-h) * 0.012);
+    padding: 0 calc(var(--tag-w) * 0.015);
+    min-width:0;
+  }
+  .tc-combo-col + .tc-combo-col{
+    border-left:1.5px solid var(--rule);
+  }
+  .tc-combo-label{
+    font-size:clamp(9px, calc(var(--tag-w) * 0.032), 15px);
+    font-weight:800;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    letter-spacing:.01em;
+    text-align:center;
+    line-height:1.2;
+  }
+  .tc-combo-price{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    font-size:clamp(19px, calc(var(--tag-w) * 0.082), 40px);
+    font-weight:900;
+    color:#000;
+    line-height:1;
+    letter-spacing:-0.02em;
+    text-align:center;
+  }
+  .tc-combo-price .tc-old{
+    font-size:clamp(10px, calc(var(--tag-w) * 0.032), 15px);
+    font-weight:700;
+    color:#777;
+    text-decoration:line-through;
   }
 
   /* ÜST BAŞLIK ALANI (LOGO + ADET) */
@@ -273,9 +379,11 @@
     flex-shrink:0;
     min-width:clamp(40px, calc(var(--tag-w) * 0.14), 65px);
   }
-  .tc-origin .origin-icon{
-    font-size:clamp(10px, calc(var(--tag-w) * 0.036), 16px); 
-    line-height:1;
+  .tc-origin .origin-icon-svg{
+    width:clamp(20px, calc(var(--tag-w) * 0.09), 34px);
+    height:auto;
+    display:block;
+    margin:0 auto;
   }
   .tc-origin .origin-text{
     font-size:clamp(6.5px, calc(var(--tag-w) * 0.021), 10px); 
@@ -373,7 +481,11 @@
     body.printing-tags .footdisc{ display:none !important; }
     body.printing-tags .tagbar{ display:none !important; }
     body.printing-tags .tag-sheet{ display:flex !important; }
-    body.printing-tags .tagcard{ box-shadow:none !important; border: 1.5px solid #000 !important; break-inside:avoid; page-break-inside:avoid; }
+    body.printing-tags .tagcard{ box-shadow:none !important; border: 1.5px solid #000 !important; break-inside:avoid; page-break-inside:avoid; opacity:1 !important; }
+    /* Seçimi kaldırılan etiketler yazdırmaya dahil edilmez */
+    body.printing-tags .tagcard.deselected{ display:none !important; }
+    body.printing-tags .tc-select-wrap{ display:none !important; }
+    body.printing-tags .tc-delete{ display:none !important; }
   }
 </style>
 </head>
@@ -471,16 +583,54 @@
     <div class="tagbar">
       <div>
         <h2>Tekli Ürün Etiketleri</h2>
-        <p>Tabloya eklediğiniz her ürün için ayrı bir raf etiketi otomatik oluşturulur. QR kod, ürünü doquhome.com.tr üzerinde aratır.</p>
+        <p>Tabloya eklediğiniz her ürün için ayrı bir raf etiketi otomatik oluşturulur. QR kod, ürünü doquhome.com.tr üzerinde aratır. Her etiketin sol üst köşesindeki kutucuğu kullanarak yazdırmak istediklerinizi seçin — sadece işaretli etiketler aynı kağıda basılır.</p>
       </div>
       <div class="tagbar-actions">
         <div class="tag-size-control">
           <label>Gen (cm) <input type="number" id="tagWidthInput" value="10" min="3" max="30" step="0.5"></label>
           <label>Yük (cm) <input type="number" id="tagHeightInput" value="7" min="3" max="30" step="0.5"></label>
         </div>
-        <button type="button" id="printTagsBtn">🏷 Etiketleri Yazdır</button>
+        <div class="tag-select-control">
+          <button type="button" id="selectAllBtn" class="tagselect-btn">Tümünü Seç</button>
+          <button type="button" id="selectNoneBtn" class="tagselect-btn">Seçimi Kaldır</button>
+        </div>
+        <button type="button" id="printTagsBtn">🏷 Seçili Etiketleri Yazdır</button>
       </div>
+      <div class="tag-select-hint">Seçili etiket: <span class="tag-select-count" id="tagSelectCount">0</span> / <span id="tagTotalCount">0</span></div>
     </div>
+
+    <div class="combo-builder">
+      <h3>İki Ürünlü Etiket Oluştur</h3>
+      <p>İki farklı ürünü (ör. aynı modelin Tek Kişilik / Çift Kişilik seçenekleri) tek bir etikette yan yana göstermek için burada seçin. Başlık ve etiket metinleri otomatik önerilir, dilerseniz elle değiştirebilirsiniz.</p>
+      <div class="combo-builder-row">
+        <div class="combo-field">
+          <label for="comboProduct1">Sol Ürün</label>
+          <select id="comboProduct1"></select>
+        </div>
+        <div class="combo-field">
+          <label for="comboProduct2">Sağ Ürün</label>
+          <select id="comboProduct2"></select>
+        </div>
+      </div>
+      <div class="combo-builder-row">
+        <div class="combo-field">
+          <label for="comboTitle">Etiket Başlığı</label>
+          <input type="text" id="comboTitle" placeholder="Ör. LERIS BOUQUET YATAK ÖRTÜSÜ">
+        </div>
+      </div>
+      <div class="combo-builder-row">
+        <div class="combo-field">
+          <label for="comboLabel1">Sol Sütun Etiketi</label>
+          <input type="text" id="comboLabel1" placeholder="Ör. TEK KİŞİLİK">
+        </div>
+        <div class="combo-field">
+          <label for="comboLabel2">Sağ Sütun Etiketi</label>
+          <input type="text" id="comboLabel2" placeholder="Ör. ÇİFT KİŞİLİK">
+        </div>
+      </div>
+      <button type="button" id="addComboBtn">+ İki Ürünlü Etiket Ekle</button>
+    </div>
+
     <div class="tag-sheet" id="tagSheet"></div>
   </section>
 </main>
@@ -765,6 +915,16 @@ Object.entries(CATALOG).forEach(([cat, items])=>{
 let rows = [];
 let sheetDate = null;
 
+/* Etiket yazdırma seçimleri: hangi etiketlerin (ürün key'lerinin) yazdırmaya dahil
+   edileceğini tutar. Yeni bir etiket görüntülendiğinde varsayılan olarak seçili sayılır. */
+let selectedTagKeys = new Set();
+let seenTagKeysEver = new Set();
+
+/* İki ürünlü (birleşik) etiketler: kullanıcı iki farklı ürünü tek bir etikette
+   yan yana göstermek istediğinde buraya eklenir. */
+let comboTags = [];
+let comboIdCounter = 1;
+
 function fmt(n){
   return Math.round(n).toLocaleString('tr-TR') + ' ₺';
 }
@@ -830,6 +990,39 @@ document.getElementById('printTagsBtn').addEventListener('click', ()=>{
 window.addEventListener('afterprint', ()=>{
   document.body.classList.remove('printing-tags');
 });
+
+/* Tümünü Seç / Seçimi Kaldır */
+document.getElementById('selectAllBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('#tagSheet .tagcard').forEach(card=>{
+    const key = card.dataset.key;
+    if(!key) return;
+    selectedTagKeys.add(key);
+    card.classList.remove('deselected');
+    const cb = card.querySelector('.tc-select-wrap input');
+    if(cb) cb.checked = true;
+  });
+  updateTagSelectCount();
+});
+document.getElementById('selectNoneBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('#tagSheet .tagcard').forEach(card=>{
+    const key = card.dataset.key;
+    if(!key) return;
+    selectedTagKeys.delete(key);
+    card.classList.add('deselected');
+    const cb = card.querySelector('.tc-select-wrap input');
+    if(cb) cb.checked = false;
+  });
+  updateTagSelectCount();
+});
+
+function updateTagSelectCount(){
+  const total = document.querySelectorAll('#tagSheet .tagcard').length;
+  const selected = document.querySelectorAll('#tagSheet .tagcard:not(.deselected)').length;
+  const countEl = document.getElementById('tagSelectCount');
+  const totalEl = document.getElementById('tagTotalCount');
+  if(countEl) countEl.textContent = selected;
+  if(totalEl) totalEl.textContent = total;
+}
 
 const tagWidthInput = document.getElementById('tagWidthInput');
 const tagHeightInput = document.getElementById('tagHeightInput');
@@ -918,16 +1111,163 @@ function renderRows(){
   renderTagSheet();
 }
 
+/* İki Ürünlü Etiket Oluşturucu: seçim kutularını doldurur */
+function populateComboSelects(){
+  const sel1 = document.getElementById('comboProduct1');
+  const sel2 = document.getElementById('comboProduct2');
+  if(!sel1 || !sel2) return;
+  [sel1, sel2].forEach(sel=>{
+    const prev = sel.value;
+    sel.innerHTML = '';
+    const empty = document.createElement('option');
+    empty.value = ''; empty.textContent = '— Ürün Seç —';
+    sel.appendChild(empty);
+    Object.entries(CATALOG).forEach(([cat, items])=>{
+      const og = document.createElement('optgroup');
+      og.label = cat;
+      items.forEach(it=>{
+        const key = cat + '::' + it.name;
+        const o = document.createElement('option');
+        o.value = key; o.textContent = it.name;
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    });
+    if(prev && [...sel.options].some(o=>o.value===prev)) sel.value = prev;
+  });
+}
+
+/* Seçilen iki ürüne göre başlık ve sütun etiketlerini önerir (kullanıcı elle değiştirebilir) */
+function suggestComboFields(){
+  const key1 = document.getElementById('comboProduct1').value;
+  const key2 = document.getElementById('comboProduct2').value;
+  if(!key1 || !key2) return;
+  const item1 = findItem(key1), item2 = findItem(key2);
+  if(!item1 || !item2) return;
+
+  const t1 = item1.name.split(/\s+/);
+  const t2 = item2.name.split(/\s+/);
+  let common = [];
+  for(let i=0; i<Math.min(t1.length, t2.length); i++){
+    if(t1[i].toLocaleUpperCase('tr-TR') === t2[i].toLocaleUpperCase('tr-TR')) common.push(t1[i]);
+    else break;
+  }
+
+  const titleInput = document.getElementById('comboTitle');
+  const label1Input = document.getElementById('comboLabel1');
+  const label2Input = document.getElementById('comboLabel2');
+
+  if(!titleInput.value.trim() || titleInput.dataset.auto === '1'){
+    titleInput.value = common.length ? common.join(' ') : item1.name;
+    titleInput.dataset.auto = '1';
+  }
+  if(!label1Input.value.trim() || label1Input.dataset.auto === '1'){
+    label1Input.value = t1.slice(common.length).join(' ') || 'Seçenek 1';
+    label1Input.dataset.auto = '1';
+  }
+  if(!label2Input.value.trim() || label2Input.dataset.auto === '1'){
+    label2Input.value = t2.slice(common.length).join(' ') || 'Seçenek 2';
+    label2Input.dataset.auto = '1';
+  }
+}
+
+/* QR kodunu verilen kutuya ekler (QRious varsa canvas, yoksa dış servis görseli) */
+function appendQr(container, target){
+  if(typeof QRious !== 'undefined'){
+    const qrCanvas = document.createElement('canvas');
+    new QRious({element: qrCanvas, value: target, size: 160});
+    container.appendChild(qrCanvas);
+  } else {
+    const qrImg = document.createElement('img');
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(target)}`;
+    qrImg.alt = 'QR - doquhome.com.tr';
+    container.appendChild(qrImg);
+  }
+}
+
+/* "Yerli Üretim" rozeti: fotoğraftaki gibi kendi çizilmiş ikonuyla (bayrak emojisi değil) */
+function buildOriginBadge(){
+  const origin = document.createElement('div');
+  origin.className = 'tc-origin';
+  origin.innerHTML = `<svg class="origin-icon-svg" viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M4 20 L20 20 L26 14 Q28 12 30 14 L34 18" fill="none" stroke="#000" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M60 20 L44 20 L38 14 Q36 12 34 14 L30 18" fill="none" stroke="#000" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M20 20 Q26 27 32 20 Q38 27 44 20" fill="none" stroke="#000" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg><span class="origin-text">YERLİ<br>ÜRETİM</span>`;
+  return origin;
+}
+
+/* Etiket kartının üzerine, yazdırmaya dahil et/etme seçim kutucuğunu ekler */
+function buildSelectCheckboxWrap(key, isSelected, card){
+  const selectWrap = document.createElement('div');
+  selectWrap.className = 'tc-select-wrap';
+  const selectChk = document.createElement('input');
+  selectChk.type = 'checkbox';
+  selectChk.checked = isSelected;
+  selectChk.title = 'Bu etiketi yazdırmaya dahil et';
+  selectChk.addEventListener('change', ()=>{
+    if(selectChk.checked){
+      selectedTagKeys.add(key);
+      card.classList.remove('deselected');
+    } else {
+      selectedTagKeys.delete(key);
+      card.classList.add('deselected');
+    }
+    updateTagSelectCount();
+  });
+  selectWrap.appendChild(selectChk);
+  return selectWrap;
+}
+
+document.getElementById('comboProduct1').addEventListener('change', suggestComboFields);
+document.getElementById('comboProduct2').addEventListener('change', suggestComboFields);
+['comboTitle','comboLabel1','comboLabel2'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', function(){ this.dataset.auto = ''; });
+});
+
+document.getElementById('addComboBtn').addEventListener('click', ()=>{
+  const key1 = document.getElementById('comboProduct1').value;
+  const key2 = document.getElementById('comboProduct2').value;
+  if(!key1 || !key2){ alert('Lütfen iki ürün seçin.'); return; }
+  if(key1 === key2){ alert('Lütfen birbirinden farklı iki ürün seçin.'); return; }
+  const item1 = findItem(key1), item2 = findItem(key2);
+  if(!item1 || !item2) return;
+
+  const title = document.getElementById('comboTitle').value.trim() || item1.name;
+  const label1 = document.getElementById('comboLabel1').value.trim() || 'Seçenek 1';
+  const label2 = document.getElementById('comboLabel2').value.trim() || 'Seçenek 2';
+
+  const id = 'combo' + (comboIdCounter++);
+  comboTags.push({
+    id, title,
+    col1: {label: label1, price: item1.price, disc: item1.disc, code: item1.code},
+    col2: {label: label2, price: item2.price, disc: item2.disc, code: item2.code}
+  });
+  selectedTagKeys.add('combo:' + id);
+  seenTagKeysEver.add('combo:' + id);
+
+  document.getElementById('comboProduct1').value = '';
+  document.getElementById('comboProduct2').value = '';
+  document.getElementById('comboTitle').value = '';
+  document.getElementById('comboLabel1').value = '';
+  document.getElementById('comboLabel2').value = '';
+  ['comboTitle','comboLabel1','comboLabel2'].forEach(id=> document.getElementById(id).dataset.auto = '');
+
+  renderTagSheet();
+});
+
 function todayTR(){
   const d = new Date();
   const pad = n => String(n).padStart(2,'0');
   return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`;
 }
 
-/* YENİ NESİL DOLU VE BÜYÜK ETİKET ÇIKTISI */
+/* YENİ NESİL DOLU VE BÜYÜK ETİKET ÇIKTISI (+ Yazdırma İçin Seçim Kutucuğu) */
 function renderTagSheet(){
   const wrap = document.getElementById('tagSheet');
   wrap.innerHTML = '';
+
+  // --- Tekli ürün etiketleri (tablodaki ünitelerden otomatik) ---
   const seen = new Set();
   rows.forEach(row=>{
     if(!row.key) return;
@@ -936,8 +1276,18 @@ function renderTagSheet(){
     const item = findItem(row.key);
     if(!item) return;
 
+    // Yeni görülen bir ürün etiketi varsayılan olarak seçili başlar
+    if(!seenTagKeysEver.has(row.key)){
+      seenTagKeysEver.add(row.key);
+      selectedTagKeys.add(row.key);
+    }
+
+    const isSelected = selectedTagKeys.has(row.key);
+
     const card = document.createElement('div');
-    card.className = 'tagcard';
+    card.className = 'tagcard' + (isSelected ? '' : ' deselected');
+    card.dataset.key = row.key;
+    card.appendChild(buildSelectCheckboxWrap(row.key, isSelected, card));
 
     // 1. Üst Kısım: Logo ve Adet Bilgisi
     const head = document.createElement('div');
@@ -973,23 +1323,14 @@ function renderTagSheet(){
 
     card.appendChild(body);
 
-    // 3. Alt Kısım: QR Kod + Açıklama/Tarih + Yerli Üretim Damgası
+    // 3. Alt Kısım: QR Kod + Açıklama/Tarih + Yerli Üretim Rozeti
     const botWrap = document.createElement('div');
     botWrap.className = 'tc-bottom-wrap';
 
     const qrWrap = document.createElement('div');
     qrWrap.className = 'tc-qr';
     const qrTarget = `https://www.doquhome.com.tr/arama/${encodeURIComponent(item.code || item.name)}`;
-    if(typeof QRious !== 'undefined'){
-      const qrCanvas = document.createElement('canvas');
-      new QRious({element: qrCanvas, value: qrTarget, size: 160});
-      qrWrap.appendChild(qrCanvas);
-    } else {
-      const qrImg = document.createElement('img');
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTarget)}`;
-      qrImg.alt = 'QR - doquhome.com.tr';
-      qrWrap.appendChild(qrImg);
-    }
+    appendQr(qrWrap, qrTarget);
     botWrap.appendChild(qrWrap);
 
     const footText = document.createElement('div');
@@ -997,14 +1338,100 @@ function renderTagSheet(){
     footText.innerHTML = `Fiyat Değişiklik Tarihi: <b>${sheetDate || todayTR()}</b><br>Tavsiye edilen perakende satış fiyatıdır.<br>Fiyatlarımıza KDV dahildir.`;
     botWrap.appendChild(footText);
 
-    const origin = document.createElement('div');
-    origin.className = 'tc-origin';
-    origin.innerHTML = '<span class="origin-icon">🇹🇷</span><span class="origin-text">YERLİ<br>ÜRETİM</span>';
-    botWrap.appendChild(origin);
+    botWrap.appendChild(buildOriginBadge());
 
     card.appendChild(botWrap);
     wrap.appendChild(card);
   });
+
+  // --- İki ürünlü (birleşik) etiketler ---
+  comboTags.forEach(combo=>{
+    const key = 'combo:' + combo.id;
+    if(!seenTagKeysEver.has(key)){
+      seenTagKeysEver.add(key);
+      selectedTagKeys.add(key);
+    }
+    const isSelected = selectedTagKeys.has(key);
+
+    const card = document.createElement('div');
+    card.className = 'tagcard' + (isSelected ? '' : ' deselected');
+    card.dataset.key = key;
+    card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
+
+    const delBtn = document.createElement('div');
+    delBtn.className = 'tc-delete';
+    delBtn.textContent = '×';
+    delBtn.title = 'Bu birleşik etiketi kaldır';
+    delBtn.addEventListener('click', ()=>{
+      comboTags = comboTags.filter(c=> c.id !== combo.id);
+      selectedTagKeys.delete(key);
+      renderTagSheet();
+    });
+    card.appendChild(delBtn);
+
+    // 1. Üst Kısım: Logo
+    const head = document.createElement('div');
+    head.className = 'tc-head';
+    const logo = document.createElement('div');
+    logo.className = 'tc-logo';
+    logo.innerHTML = '<b>DOQU</b><small>HOME</small>';
+    head.appendChild(logo);
+    card.appendChild(head);
+
+    // 2. Orta Kısım: Ortak Başlık + İki Sütun (Sol/Sağ Ürün)
+    const body = document.createElement('div');
+    body.className = 'tc-body';
+
+    const name = document.createElement('div');
+    name.className = 'tc-name';
+    name.textContent = combo.title;
+    body.appendChild(name);
+
+    const comboBody = document.createElement('div');
+    comboBody.className = 'tc-combo-body';
+    [combo.col1, combo.col2].forEach(col=>{
+      const colEl = document.createElement('div');
+      colEl.className = 'tc-combo-col';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'tc-combo-label';
+      lbl.textContent = col.label;
+      colEl.appendChild(lbl);
+
+      const pr = document.createElement('div');
+      pr.className = 'tc-combo-price';
+      const unit = col.disc ?? col.price;
+      pr.innerHTML = (col.disc ? `<span class="tc-old">${fmtTag(col.price)}</span>` : '') + fmtTag(unit);
+      colEl.appendChild(pr);
+
+      comboBody.appendChild(colEl);
+    });
+    body.appendChild(comboBody);
+
+    card.appendChild(body);
+
+    // 3. Alt Kısım: QR Kod + Açıklama/Tarih + Yerli Üretim Rozeti
+    const botWrap = document.createElement('div');
+    botWrap.className = 'tc-bottom-wrap';
+
+    const qrWrap = document.createElement('div');
+    qrWrap.className = 'tc-qr';
+    const qrTarget = `https://www.doquhome.com.tr/arama/${encodeURIComponent(combo.title || combo.col1.code || '')}`;
+    appendQr(qrWrap, qrTarget);
+    botWrap.appendChild(qrWrap);
+
+    const footText = document.createElement('div');
+    footText.className = 'tc-foot-text';
+    footText.innerHTML = `Fiyat Değişiklik Tarihi: <b>${sheetDate || todayTR()}</b><br>Tavsiye edilen perakende satış fiyatıdır.<br>Fiyatlarımıza KDV dahildir.`;
+    botWrap.appendChild(footText);
+
+    botWrap.appendChild(buildOriginBadge());
+
+    card.appendChild(botWrap);
+    wrap.appendChild(card);
+  });
+
+  updateTagSelectCount();
 }
 
 function renderTotals(){
@@ -1164,6 +1591,7 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   rebuildFlatCatalog();
   populateKategori();
   populateTakim();
+  populateComboSelects();
   applyPreset();
 }
 
@@ -1205,6 +1633,7 @@ document.getElementById('refreshBtn').addEventListener('click', loadPricesFromSh
 
 populateKategori();
 populateTakim();
+populateComboSelects();
 applyPreset();
 loadPricesFromSheet();
 </script>
