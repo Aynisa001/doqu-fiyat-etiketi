@@ -918,6 +918,71 @@ let seenTagKeysEver = new Set();
 let comboTags = [];
 let comboIdCounter = 1;
 
+/* ---- Veri kalıcılığı: tabloya eklenen ürünler, etiket seçimleri ve birleşik
+   etiketler tarayıcının localStorage'ına kaydedilir; sayfa yenilense veya
+   kapatılıp tekrar açılsa bile aynı cihazda geri yüklenir. ---- */
+const STORAGE_KEY = 'doquFiyatEtiketiState_v1';
+
+function saveState(){
+  try{
+    const state = {
+      kategori: kategoriSel.value,
+      takim: takimSel.value,
+      rows,
+      selectedTagKeys: [...selectedTagKeys],
+      seenTagKeysEver: [...seenTagKeysEver],
+      comboTags,
+      comboIdCounter
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    console.warn('Durum kaydedilemedi:', e);
+  }
+}
+
+function readSavedStateSnapshot(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    console.warn('Kaydedilmiş durum okunamadı:', e);
+    return null;
+  }
+}
+
+/* Not: bu fonksiyon localStorage'dan DEĞİL, sayfa açılırken canlı fiyatlar
+   yüklenmeden önce alınmış bir "snapshot"tan (saved parametresi) çalışır.
+   Çünkü loadPricesFromSheet() -> applyCatalogUpdate() kendi içinde applyPreset()
+   çağırıp satırları sıfırlıyor ve bu da localStorage'ı ezip kaydediyor; snapshot
+   almadan doğrudan localStorage'ı okusaydık kullanıcının verisi kaybolurdu. */
+function applySavedState(saved){
+  if(!saved) return;
+
+  if(saved.kategori && CATALOG[saved.kategori]){
+    kategoriSel.value = saved.kategori;
+    populateTakim();
+    if(saved.takim && (PRESETS[saved.kategori]||{})[saved.takim] !== undefined){
+      takimSel.value = saved.takim;
+    }
+  }
+
+  if(Array.isArray(saved.rows) && saved.rows.length){
+    rows = saved.rows.map(r=> ({
+      key: (r && r.key && findItem(r.key)) ? r.key : null,
+      qty: (r && r.qty) || 1,
+      optional: !!(r && r.optional)
+    }));
+    while(rows.length < ROW_COUNT) rows.push({key:null, qty:1, optional:false});
+  }
+
+  if(Array.isArray(saved.comboTags)) comboTags = saved.comboTags;
+  if(typeof saved.comboIdCounter === 'number') comboIdCounter = saved.comboIdCounter;
+  if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
+  if(Array.isArray(saved.seenTagKeysEver)) seenTagKeysEver = new Set(saved.seenTagKeysEver);
+
+  renderRows();
+}
+
 function fmt(n){
   return Math.round(n).toLocaleString('tr-TR') + ' ₺';
 }
@@ -995,6 +1060,7 @@ document.getElementById('selectAllBtn').addEventListener('click', ()=>{
     if(cb) cb.checked = true;
   });
   updateTagSelectCount();
+  saveState();
 });
 document.getElementById('selectNoneBtn').addEventListener('click', ()=>{
   document.querySelectorAll('#tagSheet .tagcard').forEach(card=>{
@@ -1006,6 +1072,7 @@ document.getElementById('selectNoneBtn').addEventListener('click', ()=>{
     if(cb) cb.checked = false;
   });
   updateTagSelectCount();
+  saveState();
 });
 
 function updateTagSelectCount(){
@@ -1063,7 +1130,7 @@ function renderRows(){
     tdQty.className = 'center';
     const qtyInput = document.createElement('input');
     qtyInput.type = 'number'; qtyInput.min = 1; qtyInput.value = row.qty;
-    qtyInput.addEventListener('input', ()=>{ rows[idx].qty = Math.max(1, parseInt(qtyInput.value)||1); renderTotals(); });
+    qtyInput.addEventListener('input', ()=>{ rows[idx].qty = Math.max(1, parseInt(qtyInput.value)||1); renderTotals(); saveState(); });
     tdQty.appendChild(qtyInput);
     tr.appendChild(tdQty);
 
@@ -1089,7 +1156,7 @@ function renderRows(){
     tdOpt.className = 'center';
     const cb = document.createElement('input');
     cb.type = 'checkbox'; cb.checked = row.optional;
-    cb.addEventListener('change', ()=>{ rows[idx].optional = cb.checked; renderTotals(); });
+    cb.addEventListener('change', ()=>{ rows[idx].optional = cb.checked; renderTotals(); saveState(); });
     tdOpt.appendChild(cb);
     if(row.optional){
       const flag = document.createElement('div');
@@ -1103,6 +1170,7 @@ function renderRows(){
   renderTotals();
   renderTagSheet();
   populateComboSelects();
+  saveState();
 }
 
 /* İkili Etiket Oluşturucu: seçim kutularını SADECE yukarıdaki tabloya eklenmiş
@@ -1266,6 +1334,7 @@ function buildSelectCheckboxWrap(key, isSelected, card){
       card.classList.add('deselected');
     }
     updateTagSelectCount();
+    saveState();
   });
   selectWrap.appendChild(selectChk);
   return selectWrap;
@@ -1306,6 +1375,7 @@ document.getElementById('addComboBtn').addEventListener('click', ()=>{
   ['comboTitle','comboLabel1','comboLabel2'].forEach(id=> document.getElementById(id).dataset.auto = '');
 
   renderTagSheet();
+  saveState();
 });
 
 function todayTR(){
@@ -1336,6 +1406,7 @@ function buildComboCard(key, combo, isAuto){
       comboTags = comboTags.filter(c=> ('combo:' + c.id) !== key);
       selectedTagKeys.delete(key);
       renderTagSheet();
+      saveState();
     });
     card.appendChild(delBtn);
   }
@@ -1709,11 +1780,12 @@ async function loadPricesFromSheet(){
 }
 document.getElementById('refreshBtn').addEventListener('click', loadPricesFromSheet);
 
+const initialSavedStateSnapshot = readSavedStateSnapshot();
 populateKategori();
 populateTakim();
 populateComboSelects();
 applyPreset();
-loadPricesFromSheet();
+loadPricesFromSheet().then(()=> applySavedState(initialSavedStateSnapshot));
 </script>
 </body>
 </html>
