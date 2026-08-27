@@ -1741,7 +1741,12 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   populateKategori();
   populateTakim();
   populateComboSelects();
-  applyPreset();
+  /* ÖNEMLİ: burada artık applyPreset() ÇAĞRILMIYOR. Eskiden her fiyat
+     yenilemesinde (otomatik veya "Fiyatları Şimdi Yenile" ile) tablo sessizce
+     varsayılan pakete sıfırlanıyor, kullanıcının eklediği ürünler ve seçtiği
+     etiketler kayboluyordu. Artık sadece mevcut satırlar güncel fiyat/katalog
+     verisiyle yeniden çiziliyor — kullanıcının seçimleri korunuyor. */
+  renderRows();
 }
 
 async function loadPricesFromSheet(){
