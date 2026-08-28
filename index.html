@@ -98,6 +98,7 @@
   }
   .takim-combo-option mark{background:transparent; color:var(--petrol-deep); font-weight:800;}
   .takim-combo-option:hover, .takim-combo-option.active{background:var(--cream); color:var(--petrol-deep);}
+  .takim-combo-clear{font-weight:700; color:var(--ink-soft); border-bottom:1px solid var(--rule);}
   .takim-combo-empty{padding:9px 11px; font-size:12px; color:var(--ink-soft); font-style:italic;}
   @media print{ .takim-combo-list{display:none !important;} }
 
@@ -1097,6 +1098,16 @@ function getTakimMatches(query){
 function renderTakimComboList(query){
   const matches = getTakimMatches(query);
   takimComboList.innerHTML = '';
+
+  const clearOpt = document.createElement('div');
+  clearOpt.className = 'takim-combo-option takim-combo-clear';
+  clearOpt.textContent = '— Takım Seç — (temizle)';
+  clearOpt.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    selectTakimOption('');
+  });
+  takimComboList.appendChild(clearOpt);
+
   if(matches.length === 0){
     const empty = document.createElement('div');
     empty.className = 'takim-combo-empty';
