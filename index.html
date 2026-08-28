@@ -1040,12 +1040,16 @@ function findItem(key){
 function populateKategori(){
   const prevSelected = kategoriSel.value;
   kategoriSel.innerHTML = '';
+  const empty = document.createElement('option');
+  empty.value = ''; empty.textContent = '— Kategori Seç —';
+  kategoriSel.appendChild(empty);
   Object.keys(CATALOG).forEach(cat=>{
     const o = document.createElement('option');
     o.value = cat; o.textContent = cat;
     kategoriSel.appendChild(o);
   });
   if(prevSelected && CATALOG[prevSelected]) kategoriSel.value = prevSelected;
+  else kategoriSel.value = '';
 }
 
 function populateTakim(){
@@ -1193,7 +1197,28 @@ function applyPreset(){
 
 kategoriSel.addEventListener('change', ()=>{ populateTakim(); applyPreset(); });
 takimSel.addEventListener('change', applyPreset);
-document.getElementById('resetBtn').addEventListener('click', applyPreset);
+
+/* "Varsayılana Dön": sadece tablo satırlarını değil, Kategori/Takım seçimlerini,
+   işaretli etiketleri ve eklenmiş özel (ikili) etiketleri de tamamen temizler —
+   sayfa ilk açıldığındaki boş haline döner. Kayıtlı localStorage durumu da silinir. */
+function resetAll(){
+  kategoriSel.value = '';
+  populateTakim();
+  takimSel.value = '';
+  syncTakimDisplay();
+
+  rows = [];
+  while(rows.length < ROW_COUNT) rows.push({key:null, qty:1, optional:false});
+
+  selectedTagKeys = new Set();
+  seenTagKeysEver = new Set();
+  comboTags = [];
+  comboIdCounter = 1;
+
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  renderRows();
+}
+document.getElementById('resetBtn').addEventListener('click', resetAll);
 document.getElementById('printBtn').addEventListener('click', ()=> window.print());
 
 document.getElementById('printTagsBtn').addEventListener('click', ()=>{
