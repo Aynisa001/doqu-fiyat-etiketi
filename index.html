@@ -498,11 +498,11 @@
     <label for="takim">Takım</label>
     <select id="takim"></select>
 
-    <button type="button" class="reset" id="resetBtn">↺ Varsayılana Dön</button>
-
     <button type="button" class="print-big" id="printBtn">🖨 Yazdır</button>
 
     <button type="button" class="reset" id="refreshBtn" style="margin-top:16px;">⟳ Fiyatları Şimdi Yenile</button>
+
+    <button type="button" class="reset" id="resetBtn" style="margin-top:10px;">↺ Varsayılana Dön</button>
 
     <div class="catalog-note" id="syncNote">
       Fiyatlar merkezi listeden otomatik güncellenir.
@@ -533,7 +533,7 @@
     </div>
 
     <div class="chips">
-      <div class="chip"><span class="dot"></span>Peşin Fiyat 1+4, Word Kart <b id="chipTaksit1">9</b> Taksitli Fiyat / <b id="chipVal1">0 ₺</b> x <span id="chipN1">9</span></div>
+      <div class="chip"><span class="dot"></span>Peşin Fiyat 1+4, <span id="cardNameChip">Word Kart</span> <b id="chipTaksit1">9</b> Taksitli Fiyat / <b id="chipVal1">0 ₺</b> x <span id="chipN1">9</span></div>
       <div class="chip"><span class="dot"></span>Diğer Kredi Kartlarına <b id="chipTaksit2">9</b> Taksitli Fiyat / <b id="chipVal2">0 ₺</b> x <span id="chipN2">9</span></div>
     </div>
 
@@ -1590,6 +1590,7 @@ function renderTotals(){
   document.getElementById('chipN1').textContent = TAKSIT_SAYISI;
   document.getElementById('chipVal2').textContent = fmt(totalInstall / TAKSIT_SAYISI);
   document.getElementById('chipN2').textContent = TAKSIT_SAYISI;
+  document.getElementById('cardNameChip').textContent = cardInfo || 'Word Kart';
 }
 
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3BacbeEhpiLCGdpY8c8w-wxXiadUhL6AoEWdsCXLRYvinkLh3kZPi635BjFBpwQ/pub?gid=1537430569&single=true&output=csv';
