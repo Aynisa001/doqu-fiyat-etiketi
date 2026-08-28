@@ -533,8 +533,8 @@
     </div>
 
     <div class="chips">
-      <div class="chip"><span class="dot"></span>Peşin Fiyat 1+4, <span id="cardNameChip">Word Kart</span> <b id="chipTaksit1">9</b> Taksitli Fiyat / <b id="chipVal1">0 ₺</b> x <span id="chipN1">9</span></div>
-      <div class="chip"><span class="dot"></span>Diğer Kredi Kartlarına <b id="chipTaksit2">9</b> Taksitli Fiyat / <b id="chipVal2">0 ₺</b> x <span id="chipN2">9</span></div>
+      <div class="chip"><span class="dot"></span><span id="cardNameChip1">İş bankasına Özel 7 Taksit</span>: <b id="chipVal1">0 ₺</b></div>
+      <div class="chip"><span class="dot"></span><span id="cardNameChip2">Diğer Kartlar</span>: <b id="chipVal2">0 ₺</b></div>
     </div>
 
     <div class="table-wrap">
@@ -879,8 +879,6 @@ Object.keys(EXCEL_CATALOG).forEach(cat=>{
 });
 
 const ROW_COUNT = 9;
-const TAKSIT_ORANI = 1.10;
-const TAKSIT_SAYISI = 9;
 
 const kategoriSel = document.getElementById('kategori');
 const takimSel = document.getElementById('takim');
@@ -893,7 +891,8 @@ Object.entries(CATALOG).forEach(([cat, items])=>{
 
 let rows = [];
 let sheetDate = null;
-let cardInfo = null;
+let cardInfo1 = null;
+let cardInfo2 = null;
 
 /* Etiket yazdırma seçimleri: hangi etiketlerin (ürün key'lerinin) yazdırmaya dahil
    edileceğini tutar. Yeni bir etiket görüntülendiğinde varsayılan olarak seçili sayılır. */
@@ -1129,9 +1128,8 @@ function renderRows(){
 
     const tdInstall = document.createElement('td');
     tdInstall.className = 'price';
-    if(item){
-      const unit = item.disc ?? item.price;
-      tdInstall.textContent = fmt(unit * TAKSIT_ORANI);
+    if(item && item.install !== null && item.install !== undefined){
+      tdInstall.textContent = fmt(item.install);
     } else { tdInstall.textContent = '—'; }
     tr.appendChild(tdInstall);
 
@@ -1553,7 +1551,7 @@ function renderTagSheet(){
 }
 
 function renderTotals(){
-  let totalList = 0, totalCash = 0, anyDisc = false;
+  let totalList = 0, totalCash = 0, totalInstall = 0, anyDisc = false;
   const activeNames = [];
 
   rows.forEach(row=>{
@@ -1564,10 +1562,10 @@ function renderTotals(){
     if(item.disc) anyDisc = true;
     totalList += item.price * row.qty;
     totalCash += unit * row.qty;
+    totalInstall += (item.install ?? unit) * row.qty;
     activeNames.push(`${row.qty} Ad. ${item.name}`);
   });
 
-  const totalInstall = totalCash * TAKSIT_ORANI;
   const takim = takimSel.options[takimSel.selectedIndex] ? takimSel.options[takimSel.selectedIndex].text : '';
 
   document.getElementById('setTitle').textContent = takim || 'Özel Seçim';
@@ -1586,11 +1584,10 @@ function renderTotals(){
   document.getElementById('cashPrice').textContent = fmt(totalCash);
   document.getElementById('installPrice').textContent = fmt(totalInstall);
 
-  document.getElementById('chipVal1').textContent = fmt(totalCash / TAKSIT_SAYISI);
-  document.getElementById('chipN1').textContent = TAKSIT_SAYISI;
-  document.getElementById('chipVal2').textContent = fmt(totalInstall / TAKSIT_SAYISI);
-  document.getElementById('chipN2').textContent = TAKSIT_SAYISI;
-  document.getElementById('cardNameChip').textContent = cardInfo || 'Word Kart';
+  document.getElementById('chipVal1').textContent = fmt(totalInstall);
+  document.getElementById('chipVal2').textContent = fmt(totalInstall);
+  document.getElementById('cardNameChip1').textContent = cardInfo1 || 'İş bankasına Özel 7 Taksit';
+  document.getElementById('cardNameChip2').textContent = cardInfo2 || 'Diğer Kartlar';
 }
 
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3BacbeEhpiLCGdpY8c8w-wxXiadUhL6AoEWdsCXLRYvinkLh3kZPi635BjFBpwQ/pub?gid=1537430569&single=true&output=csv';
@@ -1672,7 +1669,7 @@ function parseCatalogRows(allRows){
   let productCount = 0;
 
   dataRows.forEach(r=>{
-    const code = r[1], name = r[2], listPrice = r[4], cashPrice = r[5];
+    const code = r[1], name = r[2], listPrice = r[4], cashPrice = r[5], installPrice = r[6];
     const codeEmpty = (code === null || code === undefined || String(code).trim() === '');
     const nameTrimmed = (name === null || name === undefined) ? '' : String(name).trim();
     if(codeEmpty){
@@ -1693,6 +1690,8 @@ function parseCatalogRows(allRows){
     const price = Math.round(parseTRNumber(listPrice));
     const cashNum = parseTRNumber(cashPrice);
     const cash = cashNum === null ? null : Math.round(cashNum);
+    const installNum = parseTRNumber(installPrice);
+    const install = installNum === null ? null : Math.round(installNum);
     const originCell = (originColIdx >= 0) ? String(r[originColIdx] ?? '').trim().toLocaleLowerCase('tr-TR') : '';
     const imported = originColIdx >= 0 && /ithal/.test(originCell);
     newCategories[currentCat].push({
@@ -1700,6 +1699,7 @@ function parseCatalogRows(allRows){
       code: String(code),
       price,
       disc: (cash !== null && cash !== price) ? cash : null,
+      install,
       imported,
       gen:'—', der:'—', yuk:'—'
     });
@@ -1759,12 +1759,15 @@ async function loadPricesFromSheet(){
     const b2 = (allRows[1] && allRows[1][1] !== undefined) ? String(allRows[1][1]).trim() : '';
     sheetDate = b2 ? b2 : null;
     const f4 = (allRows[3] && allRows[3][5] !== undefined) ? String(allRows[3][5]).trim() : '';
-    cardInfo = f4 ? f4 : null;
+    cardInfo1 = f4 ? f4 : null;
+    const g4 = (allRows[3] && allRows[3][6] !== undefined) ? String(allRows[3][6]).trim() : '';
+    const g5 = (allRows[4] && allRows[4][6] !== undefined) ? String(allRows[4][6]).trim() : '';
+    cardInfo2 = [g4, g5].filter(Boolean).join(' ') || null;
     applyCatalogUpdate(parseCatalogRows(allRows));
     if(note){
       let noteHtml = 'Fiyatlar güncel (son senkronizasyon: ' + todayTR() + ').';
       if(sheetDate) noteHtml += '<br>Fiyat Geçerlilik Tarihi: <b>' + sheetDate + '</b>';
-      if(cardInfo) noteHtml += '<br>Kart Bilgisi: <b>' + cardInfo + '</b>';
+      if(cardInfo1) noteHtml += '<br>Kart Bilgisi: <b>' + cardInfo1 + '</b>';
       note.innerHTML = noteHtml;
     }
   }catch(err){
