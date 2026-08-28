@@ -452,6 +452,30 @@
   table.units tr:nth-child(even) td{background:var(--row-alt);}
   table.units select{padding:8px 9px; font-size:12.5px;}
   table.units input[type=number]{padding:8px 6px; text-align:center; width:52px;}
+
+  /* ---- Aranabilir Ünite Seçimi (Takım ile aynı stil) ---- */
+  .unite-combo{position:relative; min-width:200px;}
+  .unite-combo-input{
+    width:100%; cursor:text; padding:8px 9px; border:1px solid var(--rule); border-radius:6px;
+    background:var(--cream); font-family:inherit; font-size:12.5px; color:var(--ink);
+  }
+  .unite-combo-input:focus{outline:2px solid var(--petrol); outline-offset:1px;}
+  .unite-combo-list{
+    position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:45;
+    background:var(--card); border:1px solid var(--rule); border-radius:6px;
+    max-height:230px; overflow-y:auto; box-shadow:0 6px 18px rgba(0,0,0,.14);
+    display:none;
+  }
+  .unite-combo-list.open{display:block;}
+  .unite-combo-option{
+    padding:8px 10px; font-size:12.5px; color:var(--ink); cursor:pointer; line-height:1.35;
+  }
+  .unite-combo-option mark{background:transparent; color:var(--petrol-deep); font-weight:800;}
+  .unite-combo-option:hover, .unite-combo-option.active{background:var(--cream); color:var(--petrol-deep);}
+  .unite-combo-clear{font-weight:700; color:var(--ink-soft); border-bottom:1px solid var(--rule);}
+  .unite-combo-empty{padding:8px 10px; font-size:11.5px; color:var(--ink-soft); font-style:italic;}
+  @media print{ .unite-combo-list{display:none !important;} }
+
   td.price{white-space:nowrap;}
   td.price .strike{display:block; font-size:10.5px; color:var(--ink-soft); text-decoration:line-through;}
   td.dim{font-size:12px; color:var(--ink-soft); white-space:nowrap;}
@@ -1026,6 +1050,9 @@ function populateKategori(){
 function populateTakim(){
   const prevSelected = takimSel.value;
   takimSel.innerHTML = '';
+  const empty = document.createElement('option');
+  empty.value = ''; empty.textContent = '— Takım Seç —';
+  takimSel.appendChild(empty);
   const presets = PRESETS[kategoriSel.value] || {};
   Object.keys(presets).forEach(name=>{
     const o = document.createElement('option');
@@ -1033,6 +1060,7 @@ function populateTakim(){
     takimSel.appendChild(o);
   });
   if(prevSelected && presets[prevSelected]) takimSel.value = prevSelected;
+  else takimSel.value = '';
   syncTakimDisplay();
 }
 
@@ -1050,12 +1078,12 @@ function highlightMatch(text, query){
 
 function syncTakimDisplay(){
   const selectedOption = takimSel.options[takimSel.selectedIndex];
-  takimSearchInput.value = selectedOption ? selectedOption.textContent : '';
+  takimSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
 }
 
 function getTakimMatches(query){
   const q = trLower(query).trim();
-  const options = Array.from(takimSel.options);
+  const options = Array.from(takimSel.options).filter(o=> o.value !== '');
   if(!q) return options;
   const starts = [], contains = [];
   options.forEach(o=>{
@@ -1213,25 +1241,105 @@ tagHeightInput.addEventListener('input', applyTagSize);
 applyTagSize();
 
 function buildRowSelect(rowIdx, selectedKey){
-  const sel = document.createElement('select');
-  const empty = document.createElement('option');
-  empty.value = ''; empty.textContent = '— Ünite Seç —';
-  sel.appendChild(empty);
   const cat = kategoriSel.value;
-  (CATALOG[cat] || []).forEach(it=>{
-    const key = cat+'::'+it.name;
-    const o = document.createElement('option');
-    o.value = key; o.textContent = it.name;
-    if(key === selectedKey) o.selected = true;
-    sel.appendChild(o);
-  });
-  sel.addEventListener('change', ()=>{
-    rows[rowIdx].key = sel.value || null;
-    rows[rowIdx].optional = !!sel.value;
+  const items = CATALOG[cat] || [];
+  const selectedItem = selectedKey ? items.find(it=> (cat+'::'+it.name) === selectedKey) : null;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'unite-combo';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'unite-combo-input';
+  input.placeholder = 'Ünite seçin veya arayın…';
+  input.autocomplete = 'off';
+  input.value = selectedItem ? selectedItem.name : '';
+
+  const list = document.createElement('div');
+  list.className = 'unite-combo-list';
+
+  function getMatches(query){
+    const q = trLower(query).trim();
+    if(!q) return items;
+    const starts = [], contains = [];
+    items.forEach(it=>{
+      const label = trLower(it.name);
+      if(label.startsWith(q)) starts.push(it);
+      else if(label.includes(q)) contains.push(it);
+    });
+    return starts.concat(contains);
+  }
+
+  function selectItem(it){
+    rows[rowIdx].key = it ? (cat+'::'+it.name) : null;
+    rows[rowIdx].optional = !!it;
     renderRows();
+  }
+
+  function renderList(query){
+    list.innerHTML = '';
+    const clearOpt = document.createElement('div');
+    clearOpt.className = 'unite-combo-option unite-combo-clear';
+    clearOpt.textContent = '— Ünite Seç — (temizle)';
+    clearOpt.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectItem(null); });
+    list.appendChild(clearOpt);
+
+    const matches = getMatches(query);
+    if(matches.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'unite-combo-empty';
+      empty.textContent = 'Eşleşen ünite bulunamadı';
+      list.appendChild(empty);
+      return;
+    }
+    matches.forEach(it=>{
+      const key = cat+'::'+it.name;
+      const opt = document.createElement('div');
+      opt.className = 'unite-combo-option' + (key === selectedKey ? ' active' : '');
+      opt.innerHTML = highlightMatch(it.name, query);
+      opt.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectItem(it); });
+      list.appendChild(opt);
+    });
+  }
+
+  input.addEventListener('focus', ()=>{
+    input.select();
+    list.classList.add('open');
+    renderList('');
   });
-  return sel;
+  input.addEventListener('input', ()=>{
+    list.classList.add('open');
+    renderList(input.value);
+  });
+  input.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){
+      input.value = selectedItem ? selectedItem.name : '';
+      list.classList.remove('open');
+      input.blur();
+    } else if(e.key === 'Enter'){
+      e.preventDefault();
+      const matches = getMatches(input.value);
+      if(input.value.trim() && matches.length){ selectItem(matches[0]); }
+    }
+  });
+  input.addEventListener('blur', ()=>{
+    setTimeout(()=>{
+      input.value = selectedItem ? selectedItem.name : '';
+      list.classList.remove('open');
+    }, 120);
+  });
+
+  wrap.appendChild(input);
+  wrap.appendChild(list);
+  return wrap;
 }
+
+document.addEventListener('click', (e)=>{
+  document.querySelectorAll('.unite-combo-list.open').forEach(list=>{
+    const wrap = list.closest('.unite-combo');
+    if(wrap && !wrap.contains(e.target)) list.classList.remove('open');
+  });
+});
 
 function renderRows(){
   rowsBody.innerHTML = '';
