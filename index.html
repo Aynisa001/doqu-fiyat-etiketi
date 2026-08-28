@@ -79,6 +79,28 @@
   }
   select:focus, input:focus{outline:2px solid var(--petrol); outline-offset:1px;}
 
+  /* ---- Aranabilir Takım Seçimi (searchable combobox) ---- */
+  .takim-combo{position:relative;}
+  .takim-combo-input{cursor:text;}
+  .takim-combo-native{
+    position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  .takim-combo-list{
+    position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:40;
+    background:var(--card); border:1px solid var(--rule); border-radius:6px;
+    max-height:230px; overflow-y:auto; box-shadow:0 6px 18px rgba(0,0,0,.14);
+    display:none;
+  }
+  .takim-combo-list.open{display:block;}
+  .takim-combo-option{
+    padding:9px 11px; font-size:13.5px; color:var(--ink); cursor:pointer; line-height:1.35;
+  }
+  .takim-combo-option mark{background:transparent; color:var(--petrol-deep); font-weight:800;}
+  .takim-combo-option:hover, .takim-combo-option.active{background:var(--cream); color:var(--petrol-deep);}
+  .takim-combo-empty{padding:9px 11px; font-size:12px; color:var(--ink-soft); font-style:italic;}
+  @media print{ .takim-combo-list{display:none !important;} }
+
   button.reset{
     width:100%; margin-top:16px; padding:11px; border-radius:6px;
     border:1px solid var(--rule); background:var(--card); color:var(--ink);
@@ -495,8 +517,12 @@
     <label for="kategori">Kategori</label>
     <select id="kategori"></select>
 
-    <label for="takim">Takım</label>
-    <select id="takim"></select>
+    <label for="takimSearch">Takım</label>
+    <div class="takim-combo" id="takimCombo">
+      <input type="text" id="takimSearch" class="takim-combo-input" placeholder="Takım seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="takimComboList">
+      <div class="takim-combo-list" id="takimComboList" role="listbox"></div>
+      <select id="takim" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
+    </div>
 
     <button type="button" class="print-big" id="printBtn">🖨 Yazdır</button>
 
@@ -882,6 +908,9 @@ const ROW_COUNT = 9;
 
 const kategoriSel = document.getElementById('kategori');
 const takimSel = document.getElementById('takim');
+const takimSearchInput = document.getElementById('takimSearch');
+const takimComboList = document.getElementById('takimComboList');
+const takimCombo = document.getElementById('takimCombo');
 const rowsBody = document.getElementById('rowsBody');
 
 let flatCatalog = [];
@@ -951,6 +980,7 @@ function applySavedState(saved){
     if(saved.takim && (PRESETS[saved.kategori]||{})[saved.takim] !== undefined){
       takimSel.value = saved.takim;
     }
+    syncTakimDisplay();
   }
 
   if(Array.isArray(saved.rows) && saved.rows.length){
@@ -1003,7 +1033,111 @@ function populateTakim(){
     takimSel.appendChild(o);
   });
   if(prevSelected && presets[prevSelected]) takimSel.value = prevSelected;
+  syncTakimDisplay();
 }
+
+/* ---- Takım için aranabilir combobox (searchable select) ---- */
+function trLower(s){ return String(s ?? '').toLocaleLowerCase('tr-TR'); }
+
+function highlightMatch(text, query){
+  if(!query) return text;
+  const lower = trLower(text);
+  const q = trLower(query);
+  const idx = lower.indexOf(q);
+  if(idx === -1) return text;
+  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + q.length) + '</mark>' + text.slice(idx + q.length);
+}
+
+function syncTakimDisplay(){
+  const selectedOption = takimSel.options[takimSel.selectedIndex];
+  takimSearchInput.value = selectedOption ? selectedOption.textContent : '';
+}
+
+function getTakimMatches(query){
+  const q = trLower(query).trim();
+  const options = Array.from(takimSel.options);
+  if(!q) return options;
+  const starts = [], contains = [];
+  options.forEach(o=>{
+    const label = trLower(o.textContent);
+    if(label.startsWith(q)) starts.push(o);
+    else if(label.includes(q)) contains.push(o);
+  });
+  return starts.concat(contains);
+}
+
+function renderTakimComboList(query){
+  const matches = getTakimMatches(query);
+  takimComboList.innerHTML = '';
+  if(matches.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'takim-combo-empty';
+    empty.textContent = 'Eşleşen takım bulunamadı';
+    takimComboList.appendChild(empty);
+    return;
+  }
+  matches.forEach(o=>{
+    const item = document.createElement('div');
+    item.className = 'takim-combo-option' + (o.value === takimSel.value ? ' active' : '');
+    item.setAttribute('role', 'option');
+    item.innerHTML = highlightMatch(o.textContent, query);
+    item.addEventListener('mousedown', (e)=>{
+      e.preventDefault();
+      selectTakimOption(o.value);
+    });
+    takimComboList.appendChild(item);
+  });
+}
+
+function openTakimCombo(query){
+  takimComboList.classList.add('open');
+  takimSearchInput.setAttribute('aria-expanded', 'true');
+  renderTakimComboList(query || '');
+}
+
+function closeTakimCombo(){
+  takimComboList.classList.remove('open');
+  takimSearchInput.setAttribute('aria-expanded', 'false');
+}
+
+function selectTakimOption(value){
+  takimSel.value = value;
+  syncTakimDisplay();
+  closeTakimCombo();
+  takimSel.dispatchEvent(new Event('change'));
+}
+
+takimSearchInput.addEventListener('focus', ()=>{
+  takimSearchInput.select();
+  openTakimCombo('');
+});
+
+takimSearchInput.addEventListener('input', ()=>{
+  openTakimCombo(takimSearchInput.value);
+});
+
+takimSearchInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    syncTakimDisplay();
+    closeTakimCombo();
+    takimSearchInput.blur();
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    const matches = getTakimMatches(takimSearchInput.value);
+    if(matches.length){ selectTakimOption(matches[0].value); }
+  }
+});
+
+takimSearchInput.addEventListener('blur', ()=>{
+  setTimeout(()=>{
+    syncTakimDisplay();
+    closeTakimCombo();
+  }, 120);
+});
+
+document.addEventListener('click', (e)=>{
+  if(takimCombo && !takimCombo.contains(e.target)) closeTakimCombo();
+});
 
 function applyPreset(){
   const cat = kategoriSel.value;
