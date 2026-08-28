@@ -86,18 +86,12 @@
   }
   button.reset:hover{border-color:var(--petrol); color:var(--petrol-deep);}
 
-  .support-box{
-    margin-top:26px; padding:16px; border-radius:8px; background:var(--cream);
-    border:1px solid var(--rule);
+  .print-big{
+    width:100%; margin-top:26px; padding:18px; border-radius:8px; border:none;
+    background:var(--petrol-deep); color:#fff; font-weight:800; font-size:17px;
+    cursor:pointer; letter-spacing:0.02em;
   }
-  .support-box h3{margin:0 0 6px; font-size:13px; font-weight:800;}
-  .support-box p{margin:0 0 12px; font-size:12px; color:var(--ink-soft); line-height:1.5;}
-  .support-box .btnrow{display:flex; gap:8px;}
-  .support-box button{
-    flex:1; padding:10px 8px; border-radius:6px; border:none; font-size:12px; font-weight:700; cursor:pointer;
-  }
-  .btn-dark{background:var(--petrol-deep); color:#fff;}
-  .btn-light{background:var(--card); color:var(--ink); border:1px solid var(--rule) !important;}
+  .print-big:hover{background:var(--petrol);}
 
   .catalog-note{
     margin-top:20px; font-size:11px; color:var(--ink-soft); line-height:1.6;
@@ -506,16 +500,9 @@
 
     <button type="button" class="reset" id="resetBtn">↺ Varsayılana Dön</button>
 
-    <div class="support-box">
-      <h3>Destek İçin Bize Ulaşın</h3>
-      <p>Seçtiğiniz takım bilgileriyle destek talebi oluşturabilirsiniz.</p>
-      <div class="btnrow">
-        <button class="btn-dark" id="mailBtn">✉ E-Posta Gönder</button>
-        <button class="btn-light" id="printBtn">🖨 Yazdır</button>
-      </div>
-    </div>
+    <button type="button" class="print-big" id="printBtn">🖨 Yazdır</button>
 
-    <button type="button" class="reset" id="refreshBtn" style="margin-top:10px;">⟳ Fiyatları Şimdi Yenile</button>
+    <button type="button" class="reset" id="refreshBtn" style="margin-top:16px;">⟳ Fiyatları Şimdi Yenile</button>
 
     <div class="catalog-note" id="syncNote">
       Fiyatlar merkezi listeden otomatik güncellenir.
@@ -906,6 +893,7 @@ Object.entries(CATALOG).forEach(([cat, items])=>{
 
 let rows = [];
 let sheetDate = null;
+let cardInfo = null;
 
 /* Etiket yazdırma seçimleri: hangi etiketlerin (ürün key'lerinin) yazdırmaya dahil
    edileceğini tutar. Yeni bir etiket görüntülendiğinde varsayılan olarak seçili sayılır. */
@@ -1035,11 +1023,6 @@ kategoriSel.addEventListener('change', ()=>{ populateTakim(); applyPreset(); });
 takimSel.addEventListener('change', applyPreset);
 document.getElementById('resetBtn').addEventListener('click', applyPreset);
 document.getElementById('printBtn').addEventListener('click', ()=> window.print());
-document.getElementById('mailBtn').addEventListener('click', ()=>{
-  const subject = encodeURIComponent('Doqu Home Fiyat Etiketi - ' + (takimSel.value||''));
-  const body = encodeURIComponent(document.getElementById('setSub').textContent + '\n\nToplam Peşin: ' + document.getElementById('cashPrice').textContent + '\nToplam Taksitli: ' + document.getElementById('installPrice').textContent);
-  window.location.href = `mailto:?subject=${subject}&body=${body}`;
-});
 
 document.getElementById('printTagsBtn').addEventListener('click', ()=>{
   document.body.classList.add('printing-tags');
@@ -1688,7 +1671,7 @@ function parseCatalogRows(allRows){
   let productCount = 0;
 
   dataRows.forEach(r=>{
-    const code = r[2], name = r[3], listPrice = r[5], cashPrice = r[6];
+    const code = r[1], name = r[2], listPrice = r[4], cashPrice = r[5];
     const codeEmpty = (code === null || code === undefined || String(code).trim() === '');
     const nameTrimmed = (name === null || name === undefined) ? '' : String(name).trim();
     if(codeEmpty){
@@ -1772,10 +1755,17 @@ async function loadPricesFromSheet(){
       console.warn('CSV ayrıştırma uyarıları:', parsed.errors);
     }
     const allRows = parsed.data;
-    const a1 = (allRows[0] && allRows[0][0] !== undefined) ? String(allRows[0][0]).trim() : '';
-    sheetDate = a1 ? a1 : null;
+    const b2 = (allRows[1] && allRows[1][1] !== undefined) ? String(allRows[1][1]).trim() : '';
+    sheetDate = b2 ? b2 : null;
+    const f4 = (allRows[3] && allRows[3][5] !== undefined) ? String(allRows[3][5]).trim() : '';
+    cardInfo = f4 ? f4 : null;
     applyCatalogUpdate(parseCatalogRows(allRows));
-    if(note) note.textContent = 'Fiyatlar güncel (son senkronizasyon: ' + todayTR() + ').';
+    if(note){
+      let noteHtml = 'Fiyatlar güncel (son senkronizasyon: ' + todayTR() + ').';
+      if(sheetDate) noteHtml += '<br>Fiyat Geçerlilik Tarihi: <b>' + sheetDate + '</b>';
+      if(cardInfo) noteHtml += '<br>Kart Bilgisi: <b>' + cardInfo + '</b>';
+      note.innerHTML = noteHtml;
+    }
   }catch(err){
     console.warn('Fiyat senkronizasyonu başarısız, dahili veriyle devam ediliyor:', err.message);
     if(note) note.textContent = 'Fiyatlar dahili listeden gösteriliyor.';
