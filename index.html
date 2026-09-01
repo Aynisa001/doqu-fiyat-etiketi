@@ -53,6 +53,27 @@
   .navlinks a.active{color:var(--petrol-deep);}
   @media (max-width:880px){ .navlinks{display:none;} }
 
+  /* ---- Sayfa Sekmeleri ---- */
+  .pagetabs{
+    display:flex; gap:10px; padding:16px 32px; background:var(--card);
+    border-bottom:1px solid var(--rule); flex-wrap:wrap;
+  }
+  .pagetab{
+    padding:10px 18px; border-radius:22px; border:1px solid var(--rule);
+    background:var(--cream); color:var(--ink-soft); font-family:inherit;
+    font-weight:700; font-size:13px; cursor:pointer; transition:all .12s ease;
+  }
+  .pagetab:hover{border-color:var(--petrol); color:var(--petrol-deep);}
+  .pagetab.active{background:var(--petrol-deep); border-color:var(--petrol-deep); color:#fff;}
+  @media print{ .pagetabs{display:none !important;} }
+
+  /* ---- Sayfa Görünürlüğü ---- */
+  .app-page{display:none;}
+  .app-page.active{display:block;}
+  main.app-page.active{display:grid;}
+  .page-single{max-width:1320px; margin:0 auto;}
+  .page-single > .content{padding:30px 34px 50px;}
+
   main{
     display:grid; grid-template-columns: 300px 1fr;
     gap:0;
@@ -535,7 +556,13 @@
   </div>
 </nav>
 
-<main>
+<div class="pagetabs">
+  <button type="button" class="pagetab active" data-page="basim">🏷 Etiket Basımı</button>
+  <button type="button" class="pagetab" data-page="ikili">🔗 İkili Etiket Oluşturucu</button>
+  <button type="button" class="pagetab" data-page="manuel">✍️ Manuel Etiket</button>
+</div>
+
+<main class="app-page active" id="page-basim" data-page="basim">
   <aside class="panel">
     <h2>Seçim Paneli</h2>
 
@@ -629,9 +656,22 @@
       <div class="tag-select-hint">Seçili etiket: <span class="tag-select-count" id="tagSelectCount">0</span> / <span id="tagTotalCount">0</span></div>
     </div>
 
+    <div class="tag-sheet" id="tagSheet"></div>
+  </section>
+</main>
+
+<!-- ================= SAYFA 2: İKİLİ ETİKET OLUŞTURUCU ================= -->
+<div class="app-page page-single" id="page-ikili" data-page="ikili">
+  <section class="content">
+    <div class="head-row">
+      <div class="brandbig"><div class="mark">D</div><b>Doqu Home</b></div>
+    </div>
+    <h1 class="settitle">İkili Etiket Oluşturucu</h1>
+    <p class="setsub">"Etiket Basımı" sayfasındaki tabloya eklediğiniz ürünler arasından iki tanesini seçip yan yana tek bir etikette gösterin. Standart TEK/ÇİFT eşleşmeleri zaten otomatik tespit edilip aşağıda listelenir.</p>
+
     <div class="combo-builder">
-      <h3>İkili Etiket Oluşturucu</h3>
-      <p>Yukarıdaki tabloya eklediğiniz ürünler arasından iki tanesini seçip yan yana tek bir etikette gösterin. Standart TEK/ÇİFT eşleşmeleri zaten otomatik önerilir; burası farklı bir eşleşme istediğinizde kullanılır.</p>
+      <h3>Yeni İkili Etiket</h3>
+      <p>Farklı bir eşleşme istediğinizde (standart TEK/ÇİFT dışında) burayı kullanın. Ürünlerin önce "Etiket Basımı" sayfasındaki tabloya eklenmiş olması gerekir.</p>
       <div class="combo-builder-row">
         <div class="combo-field">
           <label for="comboProduct1">Sol Ürün</label>
@@ -661,9 +701,95 @@
       <button type="button" id="addComboBtn">+ İki Ürünlü Etiket Ekle</button>
     </div>
 
-    <div class="tag-sheet" id="tagSheet"></div>
+    <div class="tagbar">
+      <div>
+        <h2>Oluşturulan İkili Etiketler</h2>
+        <p>Otomatik tespit edilen TEK/ÇİFT eşleşmeleri ve elle eklediğiniz ikili etiketler burada listelenir. Sol üstteki kutucukla yazdırılacakları seçin.</p>
+      </div>
+      <div class="tagbar-actions">
+        <div class="tag-select-control">
+          <button type="button" id="comboSelectAllBtn" class="tagselect-btn">Tümünü Seç</button>
+          <button type="button" id="comboSelectNoneBtn" class="tagselect-btn">Seçimi Kaldır</button>
+        </div>
+        <button type="button" id="printComboTagsBtn">🏷 Seçili Etiketleri Yazdır</button>
+      </div>
+      <div class="tag-select-hint">Seçili etiket: <span class="tag-select-count" id="comboTagSelectCount">0</span> / <span id="comboTagTotalCount">0</span></div>
+    </div>
+
+    <div class="tag-sheet" id="comboTagSheet"></div>
   </section>
-</main>
+</div>
+
+<!-- ================= SAYFA 3: MANUEL ETİKET ================= -->
+<div class="app-page page-single" id="page-manuel" data-page="manuel">
+  <section class="content">
+    <div class="head-row">
+      <div class="brandbig"><div class="mark">D</div><b>Doqu Home</b></div>
+    </div>
+    <h1 class="settitle">Manuel Etiket</h1>
+    <p class="setsub">Ürün listesinde olmayan ya da fiyatını doğrudan kendinizin gireceği ürünler için buradan etiket oluşturun.</p>
+
+    <div class="combo-builder">
+      <h3>Yeni Manuel Etiket</h3>
+      <p>Ürünü, "Etiket Basımı" sayfasındaki ile aynı mantıkla Kategori ve Takım'dan seçin — sadece fiyatı siz gireceksiniz.</p>
+      <div class="combo-builder-row">
+        <div class="combo-field">
+          <label for="manualKategori">Kategori</label>
+          <select id="manualKategori"></select>
+        </div>
+        <div class="combo-field">
+          <label for="manualTakimSearch">Takım</label>
+          <div class="takim-combo" id="manualTakimCombo">
+            <input type="text" id="manualTakimSearch" class="takim-combo-input" placeholder="Takım seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="manualTakimComboList">
+            <div class="takim-combo-list" id="manualTakimComboList" role="listbox"></div>
+            <select id="manualTakim" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
+          </div>
+        </div>
+      </div>
+      <div class="combo-builder-row">
+        <div class="combo-field">
+          <label for="manualCode">Ürün Kodu (QR için, listeden seçilince otomatik dolar)</label>
+          <input type="text" id="manualCode" placeholder="Ör. 2Q9YTOLRBT0010">
+        </div>
+      </div>
+      <div class="combo-builder-row">
+        <div class="combo-field">
+          <label for="manualPrice">Satış Fiyatı (₺) — elle girin</label>
+          <input type="number" id="manualPrice" min="0" step="0.01" placeholder="Ör. 2699">
+        </div>
+        <div class="combo-field">
+          <label for="manualOldPrice">Eski Fiyat (opsiyonel, üzeri çizili gösterilir)</label>
+          <input type="number" id="manualOldPrice" min="0" step="0.01" placeholder="Ör. 3199">
+        </div>
+      </div>
+      <div class="combo-builder-row">
+        <div class="combo-field" style="display:flex; align-items:center; gap:8px; flex:0 0 auto;">
+          <input type="checkbox" id="manualImported" style="width:16px;height:16px;">
+          <label for="manualImported" style="margin:0; text-transform:none; letter-spacing:normal; font-size:12.5px;">İthal Ürün (Yerli Üretim rozeti gösterilmesin)</label>
+        </div>
+      </div>
+      <button type="button" id="addManualBtn">+ Etiket Ekle</button>
+      <button type="button" id="manualResetBtn" class="tagselect-btn" style="margin-left:10px;">↺ Varsayılana Dön</button>
+    </div>
+
+    <div class="tagbar">
+      <div>
+        <h2>Oluşturulan Manuel Etiketler</h2>
+        <p>Eklediğiniz her manuel etiket burada listelenir. Sol üstteki kutucukla yazdırılacakları seçin, sağ üstteki × ile kaldırın.</p>
+      </div>
+      <div class="tagbar-actions">
+        <div class="tag-select-control">
+          <button type="button" id="manualSelectAllBtn" class="tagselect-btn">Tümünü Seç</button>
+          <button type="button" id="manualSelectNoneBtn" class="tagselect-btn">Seçimi Kaldır</button>
+        </div>
+        <button type="button" id="printManualTagsBtn">🏷 Seçili Etiketleri Yazdır</button>
+      </div>
+      <div class="tag-select-hint">Seçili etiket: <span class="tag-select-count" id="manualTagSelectCount">0</span> / <span id="manualTagTotalCount">0</span></div>
+    </div>
+
+    <div class="tag-sheet" id="manualTagSheet"></div>
+  </section>
+</div>
 
 <script>
 const CATALOG = {};
@@ -973,7 +1099,9 @@ function saveState(){
       selectedTagKeys: [...selectedTagKeys],
       seenTagKeysEver: [...seenTagKeysEver],
       comboTags,
-      comboIdCounter
+      comboIdCounter,
+      manualTags,
+      manualIdCounter
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){
@@ -1019,10 +1147,13 @@ function applySavedState(saved){
 
   if(Array.isArray(saved.comboTags)) comboTags = saved.comboTags;
   if(typeof saved.comboIdCounter === 'number') comboIdCounter = saved.comboIdCounter;
+  if(Array.isArray(saved.manualTags)) manualTags = saved.manualTags;
+  if(typeof saved.manualIdCounter === 'number') manualIdCounter = saved.manualIdCounter;
   if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
   if(Array.isArray(saved.seenTagKeysEver)) seenTagKeysEver = new Set(saved.seenTagKeysEver);
 
   renderRows();
+  renderManualTagSheet();
 }
 
 function fmt(n){
@@ -1263,6 +1394,76 @@ function updateTagSelectCount(){
   if(countEl) countEl.textContent = selected;
   if(totalEl) totalEl.textContent = total;
 }
+
+/* İkili Etiket Oluşturucu ve Manuel Etiket sayfaları için ortak yardımcılar:
+   seçili/toplam sayaç güncelleme ve Tümünü Seç / Seçimi Kaldır kablolaması.
+   sheetIds tek bir id veya birden fazla id içeren bir dizi olabilir (Manuel
+   Etiket sayfasında hem elle eklenen etiketler hem de otomatik ikili öneriler
+   aynı sayaca ve butonlara dahil edilsin diye). */
+function tagCardSelector(sheetIds, extra){
+  const ids = Array.isArray(sheetIds) ? sheetIds : [sheetIds];
+  return ids.map(id=> '#'+id+' .tagcard'+(extra||'')).join(', ');
+}
+function makeTagCountUpdater(sheetIds, countId, totalId){
+  return function(){
+    const total = document.querySelectorAll(tagCardSelector(sheetIds)).length;
+    const selected = document.querySelectorAll(tagCardSelector(sheetIds, ':not(.deselected)')).length;
+    const countEl = document.getElementById(countId);
+    const totalEl = document.getElementById(totalId);
+    if(countEl) countEl.textContent = selected;
+    if(totalEl) totalEl.textContent = total;
+  };
+}
+const updateComboTagSelectCount = makeTagCountUpdater('comboTagSheet', 'comboTagSelectCount', 'comboTagTotalCount');
+const updateManualTagSelectCount = makeTagCountUpdater('manualTagSheet', 'manualTagSelectCount', 'manualTagTotalCount');
+
+function wireTagSelectButtons(selectAllId, selectNoneId, sheetIds, countUpdateFn){
+  const allBtn = document.getElementById(selectAllId);
+  const noneBtn = document.getElementById(selectNoneId);
+  if(allBtn) allBtn.addEventListener('click', ()=>{
+    document.querySelectorAll(tagCardSelector(sheetIds)).forEach(card=>{
+      const key = card.dataset.key;
+      if(!key) return;
+      selectedTagKeys.add(key);
+      card.classList.remove('deselected');
+      const cb = card.querySelector('.tc-select-wrap input');
+      if(cb) cb.checked = true;
+    });
+    countUpdateFn();
+    saveState();
+  });
+  if(noneBtn) noneBtn.addEventListener('click', ()=>{
+    document.querySelectorAll(tagCardSelector(sheetIds)).forEach(card=>{
+      const key = card.dataset.key;
+      if(!key) return;
+      selectedTagKeys.delete(key);
+      card.classList.add('deselected');
+      const cb = card.querySelector('.tc-select-wrap input');
+      if(cb) cb.checked = false;
+    });
+    countUpdateFn();
+    saveState();
+  });
+}
+wireTagSelectButtons('comboSelectAllBtn', 'comboSelectNoneBtn', 'comboTagSheet', updateComboTagSelectCount);
+wireTagSelectButtons('manualSelectAllBtn', 'manualSelectNoneBtn', 'manualTagSheet', updateManualTagSelectCount);
+
+['printComboTagsBtn', 'printManualTagsBtn'].forEach(id=>{
+  const btn = document.getElementById(id);
+  if(btn) btn.addEventListener('click', ()=>{
+    document.body.classList.add('printing-tags');
+    window.print();
+  });
+});
+
+/* Sayfa sekmeleri arasında geçiş */
+document.querySelectorAll('.pagetab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const target = btn.dataset.page;
+    document.querySelectorAll('.pagetab').forEach(b=> b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.app-page').forEach(p=> p.classList.toggle('active', p.dataset.page === target));
+  });
+});
 
 const tagWidthInput = document.getElementById('tagWidthInput');
 const tagHeightInput = document.getElementById('tagHeightInput');
@@ -1547,6 +1748,38 @@ function detectAutoPairs(){
   return pairs;
 }
 
+/* Manuel Etiket sayfasında eklenen ürünler arasında TEK/ÇİFT gibi eşleşen
+   çiftleri otomatik bulur — mantığı detectAutoPairs() ile birebir aynı,
+   sadece fiyat tablosu yerine manualTags üzerinde çalışır. */
+function detectManualAutoPairs(){
+  const activeItems = manualTags.map(t=> ({key: 'manual:' + t.id, item: t}));
+
+  const pairs = [];
+  const used = new Set();
+  for(let i=0; i<activeItems.length; i++){
+    if(used.has(activeItems[i].key)) continue;
+    for(let j=i+1; j<activeItems.length; j++){
+      if(used.has(activeItems[j].key)) continue;
+      const a = activeItems[i].item, b = activeItems[j].item;
+      const common = commonPrefixWords(a.name, b.name);
+      const t1 = a.name.split(/\s+/), t2 = b.name.split(/\s+/);
+      const rest1 = t1.slice(common.length).join(' ').trim();
+      const rest2 = t2.slice(common.length).join(' ').trim();
+      if(common.length >= 2 && rest1 && rest2 && rest1 !== rest2 && rest1.split(/\s+/).length <= 4 && rest2.split(/\s+/).length <= 4){
+        pairs.push({
+          id: 'automanual:' + activeItems[i].key + '::' + activeItems[j].key,
+          title: common.join(' '),
+          col1: {label: rest1, price: a.price, disc: a.disc, code: a.code, imported: !!a.imported},
+          col2: {label: rest2, price: b.price, disc: b.disc, code: b.code, imported: !!b.imported}
+        });
+        used.add(activeItems[i].key); used.add(activeItems[j].key);
+        break;
+      }
+    }
+  }
+  return pairs;
+}
+
 /* QR kodunu verilen kutuya ekler (QRious varsa canvas, yoksa dış servis görseli) */
 function appendQr(container, target){
   if(typeof QRious !== 'undefined'){
@@ -1732,6 +1965,11 @@ function buildComboCard(key, combo, isAuto){
 
 /* YENİ NESİL DOLU VE BÜYÜK ETİKET ÇIKTISI (+ Yazdırma İçin Seçim Kutucuğu) */
 function renderTagSheet(){
+  renderSingleTagSheet();
+  renderComboTagSheet();
+}
+
+function renderSingleTagSheet(){
   const wrap = document.getElementById('tagSheet');
   wrap.innerHTML = '';
 
@@ -1813,8 +2051,28 @@ function renderTagSheet(){
     wrap.appendChild(card);
   });
 
-  // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiket önerileri ---
+  // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiketler doğrudan burada da gösterilir ---
   detectAutoPairs().forEach(pair=>{
+    wrap.appendChild(buildComboCard(pair.id, pair, true));
+  });
+
+  updateTagSelectCount();
+}
+
+/* Sadece ikili (otomatik TEK/ÇİFT eşleşmeleri + elle eklenmiş) etiketler — İkili Etiket Oluşturucu sayfası */
+function renderComboTagSheet(){
+  const wrap = document.getElementById('comboTagSheet');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiket önerileri (tablo) ---
+  detectAutoPairs().forEach(pair=>{
+    const key = pair.id;
+    wrap.appendChild(buildComboCard(key, pair, true));
+  });
+
+  // --- Otomatik tespit edilen ikili etiket önerileri (Manuel Etiket sayfası) ---
+  detectManualAutoPairs().forEach(pair=>{
     const key = pair.id;
     wrap.appendChild(buildComboCard(key, pair, true));
   });
@@ -1825,8 +2083,294 @@ function renderTagSheet(){
     wrap.appendChild(buildComboCard(key, combo, false));
   });
 
-  updateTagSelectCount();
+  updateComboTagSelectCount();
 }
+
+/* ================= MANUEL ETİKET ================= */
+let manualTags = [];
+let manualIdCounter = 1;
+
+function buildManualCard(key, tag){
+  if(!seenTagKeysEver.has(key)){
+    seenTagKeysEver.add(key);
+    selectedTagKeys.add(key);
+  }
+  const isSelected = selectedTagKeys.has(key);
+
+  const card = document.createElement('div');
+  card.className = 'tagcard' + (isSelected ? '' : ' deselected');
+  card.dataset.key = key;
+  card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
+
+  const delBtn = document.createElement('div');
+  delBtn.className = 'tc-delete';
+  delBtn.textContent = '×';
+  delBtn.title = 'Bu etiketi kaldır';
+  delBtn.addEventListener('click', ()=>{
+    manualTags = manualTags.filter(t=> t.id !== tag.id);
+    selectedTagKeys.delete(key);
+    renderManualTagSheet();
+    renderComboTagSheet();
+    saveState();
+  });
+  card.appendChild(delBtn);
+
+  const head = document.createElement('div');
+  head.className = 'tc-head';
+  const logo = document.createElement('div');
+  logo.className = 'tc-logo';
+  logo.innerHTML = '<b>DOQU</b><small>HOME</small>';
+  head.appendChild(logo);
+  card.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'tc-body';
+
+  const name = document.createElement('div');
+  name.className = 'tc-name';
+  name.textContent = tag.name;
+  body.appendChild(name);
+
+  const price = document.createElement('div');
+  price.className = 'tc-price';
+  const unit = tag.disc ?? tag.price;
+  price.innerHTML = (tag.disc ? `<span class="tc-old">${fmtTag(tag.price)}</span>` : '') + fmtTag(unit);
+  body.appendChild(price);
+
+  card.appendChild(body);
+
+  const botWrap = document.createElement('div');
+  botWrap.className = 'tc-bottom-wrap';
+
+  const qrWrap = document.createElement('div');
+  qrWrap.className = 'tc-qr';
+  const qrTarget = `https://www.doquhome.com.tr/arama/${encodeURIComponent(tag.code || tag.name)}`;
+  appendQr(qrWrap, qrTarget);
+  botWrap.appendChild(qrWrap);
+
+  const footText = document.createElement('div');
+  footText.className = 'tc-foot-text';
+  footText.innerHTML = `Fiyat Geçerlilik Tarihi: <b>${sheetDate || todayTR()}</b><br>Tavsiye edilen perakende satış fiyatıdır.<br>Fiyatlarımıza KDV dahildir.`;
+  botWrap.appendChild(footText);
+
+  const originBadge = buildOriginBadge(!tag.imported);
+  if(originBadge) botWrap.appendChild(originBadge);
+
+  card.appendChild(botWrap);
+  return card;
+}
+
+function renderManualTagSheet(){
+  const wrap = document.getElementById('manualTagSheet');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  manualTags.forEach(tag=>{
+    const key = 'manual:' + tag.id;
+    wrap.appendChild(buildManualCard(key, tag));
+  });
+
+  // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiketler doğrudan burada da gösterilir ---
+  detectManualAutoPairs().forEach(pair=>{
+    wrap.appendChild(buildComboCard(pair.id, pair, true));
+  });
+
+  updateManualTagSelectCount();
+}
+
+/* Manuel Etiket sayfası: Kategori + Takım seçimi, "Etiket Basımı" sayfasındaki
+   aside panelle birebir aynı mantık. Seçim yapılınca ürün adı ve kodu otomatik
+   dolar; fiyat her zaman elle girilir, adet kullanılmaz. */
+const manualKategoriSel = document.getElementById('manualKategori');
+const manualTakimSel = document.getElementById('manualTakim');
+const manualTakimSearchInput = document.getElementById('manualTakimSearch');
+const manualTakimCombo = document.getElementById('manualTakimCombo');
+const manualTakimComboList = document.getElementById('manualTakimComboList');
+const manualCodeInput = document.getElementById('manualCode');
+const manualImportedInput = document.getElementById('manualImported');
+
+function populateManualKategori(){
+  const prevSelected = manualKategoriSel.value;
+  manualKategoriSel.innerHTML = '';
+  const empty = document.createElement('option');
+  empty.value = ''; empty.textContent = '— Kategori Seç —';
+  manualKategoriSel.appendChild(empty);
+  Object.keys(CATALOG).forEach(cat=>{
+    const o = document.createElement('option');
+    o.value = cat; o.textContent = cat;
+    manualKategoriSel.appendChild(o);
+  });
+  if(prevSelected && CATALOG[prevSelected]) manualKategoriSel.value = prevSelected;
+  else manualKategoriSel.value = '';
+  populateManualTakim();
+}
+
+function populateManualTakim(){
+  manualTakimSel.innerHTML = '';
+  const empty = document.createElement('option');
+  empty.value = ''; empty.textContent = '— Takım Seç —';
+  manualTakimSel.appendChild(empty);
+  const presets = PRESETS[manualKategoriSel.value] || {};
+  Object.keys(presets).forEach(name=>{
+    const o = document.createElement('option');
+    o.value = name; o.textContent = name;
+    manualTakimSel.appendChild(o);
+  });
+  manualTakimSel.value = '';
+  syncManualTakimDisplay();
+  manualCodeInput.value = '';
+  manualImportedInput.checked = false;
+}
+
+function syncManualTakimDisplay(){
+  const selectedOption = manualTakimSel.options[manualTakimSel.selectedIndex];
+  manualTakimSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+}
+
+function getManualTakimMatches(query){
+  const q = trLower(query).trim();
+  const options = Array.from(manualTakimSel.options).filter(o=> o.value !== '');
+  if(!q) return options;
+  const starts = [], contains = [];
+  options.forEach(o=>{
+    const label = trLower(o.textContent);
+    if(label.startsWith(q)) starts.push(o);
+    else if(label.includes(q)) contains.push(o);
+  });
+  return starts.concat(contains);
+}
+
+function renderManualTakimComboList(query){
+  const matches = getManualTakimMatches(query);
+  manualTakimComboList.innerHTML = '';
+
+  const clearOpt = document.createElement('div');
+  clearOpt.className = 'takim-combo-option takim-combo-clear';
+  clearOpt.textContent = '— Takım Seç — (temizle)';
+  clearOpt.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectManualTakimOption(''); });
+  manualTakimComboList.appendChild(clearOpt);
+
+  if(matches.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'takim-combo-empty';
+    empty.textContent = 'Eşleşen takım bulunamadı';
+    manualTakimComboList.appendChild(empty);
+    return;
+  }
+  matches.forEach(o=>{
+    const item = document.createElement('div');
+    item.className = 'takim-combo-option' + (o.value === manualTakimSel.value ? ' active' : '');
+    item.setAttribute('role', 'option');
+    item.innerHTML = highlightMatch(o.textContent, query);
+    item.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectManualTakimOption(o.value); });
+    manualTakimComboList.appendChild(item);
+  });
+}
+
+function openManualTakimCombo(query){
+  manualTakimComboList.classList.add('open');
+  manualTakimSearchInput.setAttribute('aria-expanded', 'true');
+  renderManualTakimComboList(query || '');
+}
+
+function closeManualTakimCombo(){
+  manualTakimComboList.classList.remove('open');
+  manualTakimSearchInput.setAttribute('aria-expanded', 'false');
+}
+
+function selectManualTakimOption(value){
+  manualTakimSel.value = value;
+  syncManualTakimDisplay();
+  closeManualTakimCombo();
+
+  const item = value ? (CATALOG[manualKategoriSel.value] || []).find(it=> it.name === value) : null;
+  manualCodeInput.value = item ? (item.code || '') : '';
+  manualImportedInput.checked = item ? !!item.imported : false;
+}
+
+manualKategoriSel.addEventListener('change', populateManualTakim);
+
+manualTakimSearchInput.addEventListener('focus', ()=>{
+  manualTakimSearchInput.select();
+  openManualTakimCombo('');
+});
+manualTakimSearchInput.addEventListener('input', ()=>{
+  openManualTakimCombo(manualTakimSearchInput.value);
+});
+manualTakimSearchInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    syncManualTakimDisplay();
+    closeManualTakimCombo();
+    manualTakimSearchInput.blur();
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    const matches = getManualTakimMatches(manualTakimSearchInput.value);
+    if(matches.length){ selectManualTakimOption(matches[0].value); }
+  }
+});
+manualTakimSearchInput.addEventListener('blur', ()=>{
+  setTimeout(()=>{
+    syncManualTakimDisplay();
+    closeManualTakimCombo();
+  }, 120);
+});
+document.addEventListener('click', (e)=>{
+  if(manualTakimCombo && !manualTakimCombo.contains(e.target)) closeManualTakimCombo();
+});
+
+document.getElementById('addManualBtn').addEventListener('click', ()=>{
+  const priceEl = document.getElementById('manualPrice');
+  const oldPriceEl = document.getElementById('manualOldPrice');
+
+  const name = manualTakimSearchInput.value.trim();
+  const code = manualCodeInput.value.trim();
+  const priceVal = parseFloat(priceEl.value);
+  const oldVal = parseFloat(oldPriceEl.value);
+  const imported = manualImportedInput.checked;
+
+  if(!name){ alert('Lütfen Kategori ve Takım seçin.'); return; }
+  if(!priceVal || priceVal <= 0){ alert('Lütfen geçerli bir satış fiyatı girin.'); return; }
+
+  const hasOld = !isNaN(oldVal) && oldVal > priceVal;
+  const id = 'm' + (manualIdCounter++);
+  manualTags.push({
+    id, name, code,
+    price: hasOld ? oldVal : priceVal,
+    disc: hasOld ? priceVal : null,
+    imported
+  });
+  selectedTagKeys.add('manual:' + id);
+  seenTagKeysEver.add('manual:' + id);
+
+  manualTakimSel.value = '';
+  syncManualTakimDisplay();
+  manualCodeInput.value = '';
+  priceEl.value = '';
+  oldPriceEl.value = '';
+  manualImportedInput.checked = false;
+
+  renderManualTagSheet();
+  renderComboTagSheet();
+  saveState();
+});
+
+/* Manuel Etiket sayfasını (formu ve eklenmiş etiketleri) sıfırlar — diğer
+   sayfaların (Etiket Basımı, İkili Etiket) kaydedilmiş durumuna dokunmaz. */
+function resetManual(){
+  manualKategoriSel.value = '';
+  populateManualTakim();
+
+  document.getElementById('manualPrice').value = '';
+  document.getElementById('manualOldPrice').value = '';
+
+  manualTags = [];
+  [...selectedTagKeys].forEach(k=>{ if(k.startsWith('manual:')) selectedTagKeys.delete(k); });
+  [...seenTagKeysEver].forEach(k=>{ if(k.startsWith('manual:')) seenTagKeysEver.delete(k); });
+
+  renderManualTagSheet();
+  renderComboTagSheet();
+  saveState();
+}
+document.getElementById('manualResetBtn').addEventListener('click', resetManual);
 
 function renderTotals(){
   let totalList = 0, totalCash = 0, totalInstall = 0, anyDisc = false;
@@ -2002,6 +2546,7 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   rebuildFlatCatalog();
   populateKategori();
   populateTakim();
+  populateManualKategori();
   populateComboSelects();
   /* ÖNEMLİ: burada artık applyPreset() ÇAĞRILMIYOR. Eskiden her fiyat
      yenilemesinde (otomatik veya "Fiyatları Şimdi Yenile" ile) tablo sessizce
@@ -2060,6 +2605,7 @@ document.getElementById('refreshBtn').addEventListener('click', loadPricesFromSh
 const initialSavedStateSnapshot = readSavedStateSnapshot();
 populateKategori();
 populateTakim();
+populateManualKategori();
 populateComboSelects();
 applyPreset();
 loadPricesFromSheet().then(()=> applySavedState(initialSavedStateSnapshot));
