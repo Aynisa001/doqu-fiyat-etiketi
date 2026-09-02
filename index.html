@@ -202,6 +202,9 @@
   .combo-builder-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:12px;}
   .combo-field{flex:1; min-width:200px;}
   .combo-field label{margin:0 0 6px;}
+  #manualCode:read-only{
+    background:var(--row-alt); color:var(--ink-soft); cursor:not-allowed;
+  }
   .combo-builder button#addComboBtn{
     padding:10px 18px; border-radius:6px; border:none; background:var(--petrol-deep); color:#fff;
     font-weight:700; font-size:13px; cursor:pointer;
@@ -752,13 +755,6 @@
         </thead>
         <tbody id="rowsBody"></tbody>
       </table>
-
-      <div class="icon-grid">
-        <div class="icon-card"><div class="glyph">✓</div><span>Ücretsiz Kargo</span></div>
-        <div class="icon-card"><div class="glyph">↺</div><span>14 Gün İçinde Kolay İade</span></div>
-        <div class="icon-card"><div class="glyph">🛡</div><span>24 Ay Garanti</span></div>
-        <div class="icon-card"><div class="glyph">🔒</div><span>Güvenli Alışveriş</span></div>
-      </div>
     </div>
 
     <div class="tagbar">
@@ -871,7 +867,7 @@
         </div>
       </div>
       <div class="combo-builder-row">
-        <div class="combo-field">
+        <div class="combo-field" style="flex:0 0 260px; min-width:200px;">
           <label for="manualCode">Ürün Kodu (QR için, listeden seçilince otomatik dolar)</label>
           <input type="text" id="manualCode" placeholder="Ör. 2Q9YTOLRBT0010">
         </div>
@@ -2551,6 +2547,7 @@ function populateManualTakim(){
   manualTakimSel.value = '';
   syncManualTakimDisplay();
   manualCodeInput.value = '';
+  manualCodeInput.readOnly = false;
   manualImportedInput.checked = false;
 }
 
@@ -2618,6 +2615,9 @@ function selectManualTakimOption(value){
   const item = value ? (CATALOG[manualKategoriSel.value] || []).find(it=> it.name === value) : null;
   manualCodeInput.value = item ? (item.code || '') : '';
   manualImportedInput.checked = item ? !!item.imported : false;
+  /* Listeden ürün seçilince kod otomatik dolar ve alan kilitlenir (elle
+     değiştirilemez); seçim boşaltılırsa alan tekrar elle yazılabilir olur. */
+  manualCodeInput.readOnly = !!item;
 }
 
 manualKategoriSel.addEventListener('change', populateManualTakim);
@@ -2677,6 +2677,7 @@ document.getElementById('addManualBtn').addEventListener('click', ()=>{
   manualTakimSel.value = '';
   syncManualTakimDisplay();
   manualCodeInput.value = '';
+  manualCodeInput.readOnly = false;
   priceEl.value = '';
   oldPriceEl.value = '';
   manualImportedInput.checked = false;
