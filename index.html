@@ -553,17 +553,28 @@
     object-fit:contain;
   }
 
-  /* ---- SERİ SONU ÜRÜNLERİ ETİKETİ: renkli köşe rozeti + renkli çerçeve ---- */
+  /* ---- SERİ SONU ÜRÜNLERİ ETİKETİ: etiketin tamamı seçilen renkte ---- */
   .tagcard.ss-card{
-    border-color: var(--ss-card-color, #C0392B);
+    background: var(--ss-card-color, #C0392B);
+    border-color: rgba(255,255,255,.85);
     border-width:3px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .tagcard.ss-card .tc-name{ color:#fff; }
+  .tagcard.ss-card .tc-price{ color:#fff; }
+  .tagcard.ss-card .tc-price .tc-old{ color:rgba(255,255,255,.75); }
+  .tagcard.ss-card .tc-bottom-wrap{ border-top-color: rgba(255,255,255,.55); }
+  .tagcard.ss-card .tc-foot-text{ color:#fff; }
+  .tagcard.ss-card .tc-qr{
+    background:#fff; padding:4px; border-radius:4px; box-sizing:border-box;
   }
   .tc-ss-ribbon{
     position:absolute;
     top:0; left:0;
     z-index:6;
-    background: var(--ss-card-color, #C0392B);
-    color:#fff;
+    background:#fff;
+    color: var(--ss-card-color, #C0392B);
     font-weight:900;
     letter-spacing:.03em;
     text-transform:uppercase;
@@ -699,8 +710,14 @@
     body.printing-tags .tagcard.deselected{ display:none !important; }
     body.printing-tags .tc-select-wrap{ display:none !important; }
     body.printing-tags .tc-delete{ display:none !important; }
-    /* Seri Sonu etiketlerinde seçilen renk yazdırmada da korunur */
-    body.printing-tags .tagcard.ss-card{ border-color: var(--ss-card-color, #C0392B) !important; border-width:3px !important; }
+    /* Seri Sonu etiketlerinde seçilen renk (tüm etiket arka planı) yazdırmada da korunur */
+    body.printing-tags .tagcard.ss-card{
+      background: var(--ss-card-color, #C0392B) !important;
+      border-color: rgba(255,255,255,.85) !important;
+      border-width:3px !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
   }
 </style>
 </head>
@@ -3318,6 +3335,7 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   populateKategori();
   populateTakim();
   populateManualKategori();
+  populateSsKategori();
   populateComboSelects();
   /* ÖNEMLİ: burada artık applyPreset() ÇAĞRILMIYOR. Eskiden her fiyat
      yenilemesinde (otomatik veya "Fiyatları Şimdi Yenile" ile) tablo sessizce
@@ -3377,6 +3395,7 @@ const initialSavedStateSnapshot = readSavedStateSnapshot();
 populateKategori();
 populateTakim();
 populateManualKategori();
+populateSsKategori();
 populateComboSelects();
 applyPreset();
 loadPricesFromSheet().then(()=> applySavedState(initialSavedStateSnapshot));
