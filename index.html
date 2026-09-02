@@ -276,7 +276,7 @@
     font-weight:900;
     line-height:1.05;
     letter-spacing:.005em;
-    font-size:clamp(6px, calc(var(--tag-w) * 0.021), 10px);
+    font-size:clamp(6px, calc(var(--tag-w) * 0.021), 24px);
     text-shadow:0 1px 1px rgba(0,0,0,.25);
     white-space:normal;
   }
@@ -401,7 +401,7 @@
     border-left:1.5px solid var(--rule);
   }
   .tc-combo-label{
-    font-size:clamp(9px, calc(var(--tag-w) * 0.032), 15px);
+    font-size:clamp(9px, min(calc(var(--tag-w) * 0.032), calc(var(--tag-h) * 0.0457)), 40px);
     font-weight:800;
     text-transform:uppercase;
     color:var(--ink-soft);
@@ -414,7 +414,7 @@
     flex-direction:column;
     align-items:center;
     gap:2px;
-    font-size:clamp(19px, calc(var(--tag-w) * 0.082), 40px);
+    font-size:clamp(19px, min(calc(var(--tag-w) * 0.082), calc(var(--tag-h) * 0.1171)), 95px);
     font-weight:900;
     color:#000;
     line-height:1;
@@ -422,7 +422,7 @@
     text-align:center;
   }
   .tc-combo-price .tc-old{
-    font-size:clamp(13px, calc(var(--tag-w) * 0.042), 20px);
+    font-size:clamp(13px, min(calc(var(--tag-w) * 0.042), calc(var(--tag-h) * 0.06)), 50px);
     font-weight:700;
     color:#777;
     text-decoration:line-through;
@@ -443,7 +443,7 @@
     line-height:1;
   }
   .tc-logo-img{
-    width:clamp(70px, calc(var(--tag-w) * 0.34), 140px);
+    width:clamp(70px, min(calc(var(--tag-w) * 0.34), calc(var(--tag-h) * 0.4857)), 385px);
     height:auto;
     display:block;
     margin:0 auto;
@@ -453,7 +453,7 @@
     right:0; 
     top:50%;
     transform:translateY(-50%);
-    font-size:clamp(11px, calc(var(--tag-w) * 0.04), 18px); 
+    font-size:clamp(11px, min(calc(var(--tag-w) * 0.04), calc(var(--tag-h) * 0.0571)), 46px); 
     font-weight:800; 
     color:#fff;
     background:var(--petrol-deep);
@@ -474,7 +474,7 @@
   }
 
   .tc-name{
-    font-size:clamp(13px, calc(var(--tag-w) * 0.046), 22px); 
+    font-size:clamp(13px, min(calc(var(--tag-w) * 0.046), calc(var(--tag-h) * 0.0657)), 54px); 
     font-weight:800; 
     text-transform:uppercase; 
     line-height:1.18; 
@@ -492,14 +492,14 @@
     align-items:baseline;
     justify-content:center;
     gap:10px;
-    font-size:clamp(26px, calc(var(--tag-w) * 0.12), 58px); 
+    font-size:clamp(26px, min(calc(var(--tag-w) * 0.12), calc(var(--tag-h) * 0.1714)), 140px); 
     font-weight:900; 
     color:#000; 
     line-height:1;
     letter-spacing:-0.03em;
   }
   .tc-price .tc-old{
-    font-size:clamp(16px, calc(var(--tag-w) * 0.06), 30px); 
+    font-size:clamp(16px, min(calc(var(--tag-w) * 0.06), calc(var(--tag-h) * 0.0857)), 70px); 
     font-weight:700; 
     color:#777; 
     text-decoration:line-through;
@@ -517,8 +517,8 @@
   }
 
   .tc-qr{
-    width:clamp(45px, calc(var(--tag-w) * 0.17), 75px); 
-    height:clamp(45px, calc(var(--tag-w) * 0.17), 75px); 
+    width:clamp(45px, min(calc(var(--tag-w) * 0.17), calc(var(--tag-h) * 0.2429)), 195px); 
+    height:clamp(45px, min(calc(var(--tag-w) * 0.17), calc(var(--tag-h) * 0.2429)), 195px); 
     flex-shrink:0;
   }
   .tc-qr img, .tc-qr canvas{
@@ -528,7 +528,7 @@
   }
 
   .tc-foot-text{
-    font-size:clamp(7.5px, calc(var(--tag-w) * 0.025), 11.5px); 
+    font-size:clamp(7.5px, min(calc(var(--tag-w) * 0.025), calc(var(--tag-h) * 0.0357)), 30px); 
     color:#2e2a25; 
     line-height:1.25; 
     text-align:left;
@@ -543,10 +543,10 @@
     padding:3px 5px;
     background:transparent;
     flex-shrink:0;
-    min-width:clamp(48px, calc(var(--tag-w) * 0.18), 82px);
+    min-width:clamp(48px, min(calc(var(--tag-w) * 0.18), calc(var(--tag-h) * 0.2571)), 205px);
   }
   .tc-origin .origin-icon-img{
-    width:clamp(34px, calc(var(--tag-w) * 0.16), 60px);
+    width:clamp(34px, min(calc(var(--tag-w) * 0.16), calc(var(--tag-h) * 0.2286)), 185px);
     height:auto;
     display:block;
     margin:0 auto;
@@ -827,6 +827,10 @@
         <p>Otomatik tespit edilen TEK/ÇİFT eşleşmeleri ve elle eklediğiniz ikili etiketler burada listelenir. Sol üstteki kutucukla yazdırılacakları seçin.</p>
       </div>
       <div class="tagbar-actions">
+        <div class="tag-size-control">
+          <label>Gen (cm) <input type="number" id="comboTagWidthInput" value="10" min="3" max="30" step="0.5"></label>
+          <label>Yük (cm) <input type="number" id="comboTagHeightInput" value="7" min="3" max="30" step="0.5"></label>
+        </div>
         <div class="tag-select-control">
           <button type="button" id="comboSelectAllBtn" class="tagselect-btn">Tümünü Seç</button>
           <button type="button" id="comboSelectNoneBtn" class="tagselect-btn">Seçimi Kaldır</button>
@@ -898,6 +902,10 @@
         <p>Eklediğiniz her manuel etiket burada listelenir. Sol üstteki kutucukla yazdırılacakları seçin, sağ üstteki × ile kaldırın.</p>
       </div>
       <div class="tagbar-actions">
+        <div class="tag-size-control">
+          <label>Gen (cm) <input type="number" id="manualTagWidthInput" value="10" min="3" max="30" step="0.5"></label>
+          <label>Yük (cm) <input type="number" id="manualTagHeightInput" value="7" min="3" max="30" step="0.5"></label>
+        </div>
         <div class="tag-select-control">
           <button type="button" id="manualSelectAllBtn" class="tagselect-btn">Tümünü Seç</button>
           <button type="button" id="manualSelectNoneBtn" class="tagselect-btn">Seçimi Kaldır</button>
@@ -1738,17 +1746,31 @@ document.querySelectorAll('.pagetab').forEach(btn=>{
   });
 });
 
-const tagWidthInput = document.getElementById('tagWidthInput');
-const tagHeightInput = document.getElementById('tagHeightInput');
-function applyTagSize(){
-  const w = Math.max(3, parseFloat(tagWidthInput.value) || 10);
-  const h = Math.max(3, parseFloat(tagHeightInput.value) || 7);
+/* Etiket boyutu (Gen/Yük) tek bir ortak CSS değişkenine yazılır, bu yüzden
+   Etiket Basımı, İkili Etiket ve Manuel Etiket sayfalarındaki üç ayrı
+   girdi grubu da aynı anda senkron kalır — hangisinden değiştirirseniz
+   değiştirin, tüm sayfalardaki etiketler aynı boyuta güncellenir. */
+const tagSizeInputPairs = [
+  [document.getElementById('tagWidthInput'), document.getElementById('tagHeightInput')],
+  [document.getElementById('comboTagWidthInput'), document.getElementById('comboTagHeightInput')],
+  [document.getElementById('manualTagWidthInput'), document.getElementById('manualTagHeightInput')]
+].filter(([w,h])=> w && h);
+
+function applyTagSize(sourceW, sourceH){
+  const w = Math.max(3, parseFloat(sourceW.value) || 10);
+  const h = Math.max(3, parseFloat(sourceH.value) || 7);
   document.documentElement.style.setProperty('--tag-w', w + 'cm');
   document.documentElement.style.setProperty('--tag-h', h + 'cm');
+  tagSizeInputPairs.forEach(([wInput, hInput])=>{
+    if(wInput !== sourceW) wInput.value = w;
+    if(hInput !== sourceH) hInput.value = h;
+  });
 }
-tagWidthInput.addEventListener('input', applyTagSize);
-tagHeightInput.addEventListener('input', applyTagSize);
-applyTagSize();
+tagSizeInputPairs.forEach(([wInput, hInput])=>{
+  wInput.addEventListener('input', ()=> applyTagSize(wInput, hInput));
+  hInput.addEventListener('input', ()=> applyTagSize(wInput, hInput));
+});
+if(tagSizeInputPairs.length) applyTagSize(tagSizeInputPairs[0][0], tagSizeInputPairs[0][1]);
 
 function buildRowSelect(rowIdx, selectedKey){
   const cat = kategoriSel.value;
