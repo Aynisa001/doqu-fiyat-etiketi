@@ -21,6 +21,12 @@
     --row-alt:#FBF9F3;
     --tag-w: 10cm; 
     --tag-h: 7cm;
+
+    /* ---- Flaş İndirim Rozeti: konum/boyut buradan ayarlanır ---- */
+    --flash-badge-top: 6%;
+    --flash-badge-right: 4%;
+    --flash-badge-width: 22%;
+    --flash-badge-transform: rotate(0deg);
   }
   *{box-sizing:border-box;}
   body{
@@ -59,6 +65,25 @@
   .pagetab:hover{border-color:var(--petrol); color:var(--petrol-deep);}
   .pagetab.active{background:var(--petrol-deep); border-color:var(--petrol-deep); color:#fff;}
   @media print{ .pagetabs{display:none !important;} }
+
+  /* ---- Flaş İndirim Rozeti alt kontrol barı ---- */
+  .flash-badge-footer{
+    display:flex; justify-content:center; padding:18px 32px 34px;
+  }
+  .flash-badge-toggle{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 18px; border-radius:22px; border:1px solid var(--rule);
+    background:var(--card); color:var(--ink-soft);
+    font-weight:700; font-size:13px; cursor:pointer;
+  }
+  .flash-badge-toggle input{ width:16px; height:16px; cursor:pointer; }
+  .flash-badge-text-input{
+    padding:8px 12px; border-radius:20px; border:1px solid var(--rule);
+    background:var(--cream); color:var(--ink); font-family:inherit;
+    font-weight:600; font-size:12.5px; width:150px;
+  }
+  .flash-badge-text-input:focus{ outline:none; border-color:var(--petrol); background:var(--card); }
+  @media print{ .flash-badge-footer{display:none !important;} }
 
   /* ---- Sayfa Görünürlüğü ---- */
   .app-page{display:none;}
@@ -214,6 +239,77 @@
   }
   .tagcard{ cursor:pointer; }
   .tagcard:hover{ box-shadow:0 5px 16px rgba(0,0,0,.16); }
+
+  /* ---- FLAŞ İNDİRİM ROZETİ ----
+     Bağımsız overlay katmanı: .tagcard zaten position:relative olduğu için
+     bu rozet position:absolute ile konumlanır ve normal layout akışına
+     (logo, isim, fiyat, QR, alt bilgiler) HİÇ dahil olmaz, hiçbirini kaydırmaz.
+     Varsayılan olarak gizlidir; sadece <body> üzerinde
+     "show-flash-badge" class'ı varken görünür (checkbox kontrolü). */
+  .flash-discount-badge{
+    display:none;
+    position:absolute;
+    top: var(--flash-badge-top);
+    right: var(--flash-badge-right);
+    width: var(--flash-badge-width);
+    max-width:26%;
+    transform: var(--flash-badge-transform);
+    z-index:5;
+    pointer-events:none;
+
+    aspect-ratio:2.1 / 1;
+    background: radial-gradient(circle at 35% 30%, #ff5a4d, #d81f1f 70%);
+    border:1.5px solid #a10f0f;
+    border-radius:50% / 45%;
+    box-shadow:0 2px 5px rgba(0,0,0,.25);
+
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 2% 5%;
+  }
+  .flash-discount-badge-text{
+    color:#fff;
+    font-weight:900;
+    line-height:1.05;
+    letter-spacing:.005em;
+    font-size:clamp(6px, calc(var(--tag-w) * 0.021), 10px);
+    text-shadow:0 1px 1px rgba(0,0,0,.25);
+    white-space:normal;
+  }
+  /* Checkbox açıkken tüm etiket kartlarında rozeti göster */
+  body.show-flash-badge .flash-discount-badge{
+    display:flex;
+  }
+  /* Bu etikette rozet tek tek kapatılmışsa (kendi küçük kutucuğuyla) gizle */
+  .tagcard.flash-badge-off .flash-discount-badge{
+    display:none !important;
+  }
+  /* Yazdırma/PDF çıktısında da checkbox durumuna göre görünsün */
+  @media print{
+    .flash-discount-badge{ display:none; }
+    body.show-flash-badge .flash-discount-badge{ display:flex; }
+    .tagcard.flash-badge-off .flash-discount-badge{ display:none !important; }
+  }
+
+  /* Her etikette rozeti tek tek açıp kapatan küçük kutucuk (sadece ekranda) */
+  .tc-badge-select-wrap{
+    display:none;
+    position:absolute;
+    top: var(--flash-badge-top);
+    right: var(--flash-badge-right);
+    transform: translate(35%, -35%);
+    width:17px; height:17px; border-radius:50%;
+    background:rgba(255,255,255,.95); border:1.5px solid var(--rule);
+    align-items:center; justify-content:center;
+    box-shadow:0 1px 3px rgba(0,0,0,.18);
+    z-index:7;
+  }
+  .tc-badge-select-wrap input{
+    width:11px; height:11px; margin:0; cursor:pointer;
+  }
+  body.show-flash-badge .tc-badge-select-wrap{ display:flex; }
+  @media print{ .tc-badge-select-wrap{ display:none !important; } }
 
   /* ---- Ürün Özellikleri Modalı ---- */
   .pd-overlay{
@@ -819,6 +915,14 @@
   </section>
 </div>
 
+<div class="flash-badge-footer">
+  <label class="flash-badge-toggle">
+    <input type="checkbox" id="flashBadgeToggle">
+    Flaş İndirim Rozetini Göster
+  </label>
+  <input type="text" id="flashBadgeTextInput" class="flash-badge-text-input" placeholder="Rozet yazısı" maxlength="40" value="⚡ FLAŞ İNDİRİM">
+</div>
+
 <div class="pd-overlay" id="productDetailOverlay">
   <div class="pd-modal" id="productDetailModal" role="dialog" aria-modal="true">
     <button type="button" class="pd-close" id="productDetailClose" aria-label="Kapat">×</button>
@@ -1198,6 +1302,12 @@ let seenTagKeysEver = new Set();
 let comboTags = [];
 let comboIdCounter = 1;
 
+/* Flaş İndirim rozeti, genel checkbox açıkken varsayılan olarak TÜM etiketlerde
+   görünür; kullanıcı her etiketin kendi küçük rozet kutucuğuyla, o etiketi
+   diğerlerini etkilemeden tek tek kapatabilir/açabilir. Burada sadece
+   "kapatılmış" (gizlenmiş) etiket anahtarları tutulur. */
+let flashBadgeHiddenKeys = new Set();
+
 /* ---- Veri kalıcılığı: tabloya eklenen ürünler, etiket seçimleri ve birleşik
    etiketler tarayıcının localStorage'ına kaydedilir; sayfa yenilense veya
    kapatılıp tekrar açılsa bile aynı cihazda geri yüklenir. ---- */
@@ -1214,7 +1324,8 @@ function saveState(){
       comboTags,
       comboIdCounter,
       manualTags,
-      manualIdCounter
+      manualIdCounter,
+      flashBadgeHiddenKeys: [...flashBadgeHiddenKeys]
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){
@@ -1264,6 +1375,7 @@ function applySavedState(saved){
   if(typeof saved.manualIdCounter === 'number') manualIdCounter = saved.manualIdCounter;
   if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
   if(Array.isArray(saved.seenTagKeysEver)) seenTagKeysEver = new Set(saved.seenTagKeysEver);
+  if(Array.isArray(saved.flashBadgeHiddenKeys)) flashBadgeHiddenKeys = new Set(saved.flashBadgeHiddenKeys);
 
   renderRows();
   renderManualTagSheet();
@@ -1464,6 +1576,58 @@ function resetAll(){
 }
 document.getElementById('resetBtn').addEventListener('click', resetAll);
 document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+
+/* ---- Flaş İndirim Rozeti: göster/gizle checkbox'ı ----
+   Rozet elemanları etiket kartlarında her zaman DOM'da bulunur; görünürlük
+   sadece <body class="show-flash-badge"> ile CSS üzerinden kontrol edilir.
+   Böylece checkbox anında tüm sayfalardaki (Etiket Basımı, İkili Etiket,
+   Manuel Etiket) etiketleri, yeniden çizim gerekmeden etkiler. */
+const FLASH_BADGE_STORAGE_KEY = 'doquFlashBadgeEnabled_v1';
+const FLASH_BADGE_TEXT_STORAGE_KEY = 'doquFlashBadgeText_v1';
+const FLASH_BADGE_DEFAULT_TEXT = '⚡ FLAŞ İNDİRİM';
+const flashBadgeToggle = document.getElementById('flashBadgeToggle');
+const flashBadgeTextInput = document.getElementById('flashBadgeTextInput');
+let flashBadgeText = FLASH_BADGE_DEFAULT_TEXT;
+
+function applyFlashBadgeVisibility(enabled){
+  document.body.classList.toggle('show-flash-badge', enabled);
+  if(flashBadgeToggle) flashBadgeToggle.checked = enabled;
+}
+
+/* Rozet yazısı değiştiğinde, o an ekranda çizili tüm etiketlerdeki
+   rozet metnini de anında günceller (yeniden çizim gerekmeden). */
+function applyFlashBadgeText(text){
+  flashBadgeText = text && text.trim() ? text : FLASH_BADGE_DEFAULT_TEXT;
+  document.querySelectorAll('.flash-discount-badge-text').forEach(el=>{
+    el.textContent = flashBadgeText;
+  });
+}
+
+(function initFlashBadgeToggle(){
+  let enabled = false;
+  try{ enabled = localStorage.getItem(FLASH_BADGE_STORAGE_KEY) === '1'; }catch(e){}
+  applyFlashBadgeVisibility(enabled);
+
+  let savedText = '';
+  try{ savedText = localStorage.getItem(FLASH_BADGE_TEXT_STORAGE_KEY) || ''; }catch(e){}
+  flashBadgeText = savedText.trim() ? savedText : FLASH_BADGE_DEFAULT_TEXT;
+  if(flashBadgeTextInput) flashBadgeTextInput.value = flashBadgeText;
+})();
+
+if(flashBadgeToggle){
+  flashBadgeToggle.addEventListener('change', ()=>{
+    const enabled = flashBadgeToggle.checked;
+    applyFlashBadgeVisibility(enabled);
+    try{ localStorage.setItem(FLASH_BADGE_STORAGE_KEY, enabled ? '1' : '0'); }catch(e){}
+  });
+}
+
+if(flashBadgeTextInput){
+  flashBadgeTextInput.addEventListener('input', ()=>{
+    applyFlashBadgeText(flashBadgeTextInput.value);
+    try{ localStorage.setItem(FLASH_BADGE_TEXT_STORAGE_KEY, flashBadgeTextInput.value); }catch(e){}
+  });
+}
 
 document.getElementById('printTagsBtn').addEventListener('click', ()=>{
   document.body.classList.add('printing-tags');
@@ -1922,6 +2086,53 @@ function buildOriginBadge(isDomestic){
   return origin;
 }
 
+/* Etiket kartına bağımsız "Flaş İndirim" rozet overlay'ini ekler.
+   Rozet normal layout akışına dahil olmaz (position:absolute), mevcut
+   hiçbir elementi kaydırmaz. Görünürlüğü tamamen <body class="show-flash-badge">
+   ile CSS üzerinden kontrol edilir; checkbox kapalıyken .flash-discount-badge
+   DOM'da bulunur ama display:none olduğu için hiçbir etkisi olmaz. */
+/* Etiket kartına bağımsız "Flaş İndirim" rozet overlay'ini ekler.
+   Rozet normal layout akışına dahil olmaz (position:absolute), mevcut
+   hiçbir elementi kaydırmaz. Görünürlüğü genel checkbox ile kontrol edilir,
+   AMA her etiketin kendi küçük kutucuğuyla, o etiket diğerlerini
+   etkilemeden ayrı ayrı açılıp kapatılabilir (flashBadgeHiddenKeys). */
+function appendFlashBadge(card, key){
+  if(flashBadgeHiddenKeys.has(key)) card.classList.add('flash-badge-off');
+
+  const badge = document.createElement('div');
+  badge.className = 'flash-discount-badge';
+  const badgeText = document.createElement('div');
+  badgeText.className = 'flash-discount-badge-text';
+  badgeText.textContent = flashBadgeText;
+  badge.appendChild(badgeText);
+  card.appendChild(badge);
+
+  card.appendChild(buildFlashBadgeSelectWrap(key, card));
+}
+
+/* Bu etikette Flaş İndirim rozetini tek başına göster/gizle kutucuğu */
+function buildFlashBadgeSelectWrap(key, card){
+  const wrap = document.createElement('div');
+  wrap.className = 'tc-badge-select-wrap';
+  wrap.title = 'Bu etikette rozeti göster/gizle';
+  wrap.addEventListener('click', e=> e.stopPropagation());
+  const chk = document.createElement('input');
+  chk.type = 'checkbox';
+  chk.checked = !flashBadgeHiddenKeys.has(key);
+  chk.addEventListener('change', ()=>{
+    if(chk.checked){
+      flashBadgeHiddenKeys.delete(key);
+      card.classList.remove('flash-badge-off');
+    } else {
+      flashBadgeHiddenKeys.add(key);
+      card.classList.add('flash-badge-off');
+    }
+    saveState();
+  });
+  wrap.appendChild(chk);
+  return wrap;
+}
+
 /* Etiket kartının üzerine, yazdırmaya dahil et/etme seçim kutucuğunu ekler */
 function buildSelectCheckboxWrap(key, isSelected, card){
   const selectWrap = document.createElement('div');
@@ -2002,6 +2213,7 @@ function buildComboCard(key, combo, isAuto){
   card.className = 'tagcard' + (isSelected ? '' : ' deselected') + (isAuto ? ' tc-auto' : '');
   card.dataset.key = key;
   card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
+  appendFlashBadge(card, key);
 
   if(!isAuto){
     const delBtn = document.createElement('div');
@@ -2110,6 +2322,7 @@ function renderSingleTagSheet(){
     card.className = 'tagcard' + (isSelected ? '' : ' deselected');
     card.dataset.key = row.key;
     card.appendChild(buildSelectCheckboxWrap(row.key, isSelected, card));
+    appendFlashBadge(card, row.key);
 
     // 1. Üst Kısım: Logo ve Adet Bilgisi
     const head = document.createElement('div');
@@ -2218,6 +2431,7 @@ function buildManualCard(key, tag){
   card.className = 'tagcard' + (isSelected ? '' : ' deselected');
   card.dataset.key = key;
   card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
+  appendFlashBadge(card, key);
 
   const delBtn = document.createElement('div');
   delBtn.className = 'tc-delete';
