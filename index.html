@@ -176,6 +176,8 @@
   .combo-builder > p{margin:0 0 14px; font-size:12px; color:var(--ink-soft); line-height:1.5; max-width:640px;}
   .combo-builder-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:12px;}
   .combo-field{flex:1; min-width:200px;}
+  .combo-field-sm{flex:0 0 200px; min-width:160px;}
+  #manualCode[readonly]{background:var(--row-alt); color:var(--ink-soft); cursor:not-allowed;}
   .combo-field label{margin:0 0 6px;}
   .combo-builder button#addComboBtn{
     padding:10px 18px; border-radius:6px; border:none; background:var(--petrol-deep); color:#fff;
@@ -212,6 +214,50 @@
     opacity:.32;
     box-shadow:none;
   }
+  .tagcard{ cursor:pointer; }
+  .tagcard:hover{ box-shadow:0 5px 16px rgba(0,0,0,.16); }
+
+  /* ---- Ürün Özellikleri Modalı ---- */
+  .pd-overlay{
+    display:none; position:fixed; inset:0; z-index:200;
+    background:rgba(20,18,14,.55);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .pd-overlay.open{ display:flex; }
+  .pd-modal{
+    background:var(--card); border-radius:14px; max-width:440px; width:100%;
+    max-height:86vh; overflow-y:auto; box-shadow:0 18px 50px rgba(0,0,0,.28);
+    padding:26px 26px 22px; position:relative;
+  }
+  .pd-close{
+    position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
+    border:1px solid var(--rule); background:var(--cream); color:var(--ink-soft);
+    font-size:16px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .pd-close:hover{ border-color:var(--petrol); color:var(--petrol-deep); }
+  .pd-title{ font-size:17px; font-weight:800; margin:0 26px 4px 0; line-height:1.35; }
+  .pd-sub{ font-size:12px; color:var(--ink-soft); margin:0 0 18px; }
+  .pd-section{ margin-bottom:16px; }
+  .pd-section:last-child{ margin-bottom:0; }
+  .pd-section h4{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft);
+    margin:0 0 8px; border-bottom:1px dashed var(--rule); padding-bottom:6px;
+  }
+  .pd-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 0; font-size:13.5px;
+  }
+  .pd-row + .pd-row{ border-top:1px solid var(--row-alt); }
+  .pd-row .pd-label{ color:var(--ink-soft); }
+  .pd-row .pd-value{ font-weight:700; text-align:right; }
+  .pd-price-old{ text-decoration:line-through; color:var(--ink-soft); font-weight:500; margin-right:6px; }
+  .pd-price-new{ color:var(--petrol-deep); }
+  .pd-badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700;
+    color:var(--petrol-deep); background:var(--cream); border:1px solid var(--rule);
+    border-radius:20px; padding:5px 12px; margin-top:2px;
+  }
+  @media print{ .pd-overlay{ display:none !important; } }
 
   /* Ekranda gösterilen seçim kutusu (yazdırmada gizlenir) */
   .tc-select-wrap{
@@ -234,6 +280,42 @@
     font-size:14px; font-weight:800; line-height:1; color:var(--ink-soft); cursor:pointer;
   }
   .tc-delete:hover{border-color:#b23; color:#b23;}
+
+  /* ---- "Flaş Ürün" rozeti (isteğe bağlı, etiket bazında açılıp kapanır) ---- */
+  .tc-flash-badge{
+    position:absolute; top:-14%; right:-10%; z-index:4;
+    width:32%; aspect-ratio:1/1;
+    border-radius:50%;
+    background:radial-gradient(circle at 50% 28%, #ff4d4d 0%, #e01c5b 55%, #7b2ff7 100%);
+    box-shadow:0 3px 8px rgba(0,0,0,.28);
+    transform:rotate(-10deg);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:4%;
+  }
+  .tc-flash-badge .bolt{
+    font-size:clamp(10px, calc(var(--tag-w) * 0.045), 20px);
+    line-height:1; margin-bottom:1px;
+  }
+  .tc-flash-badge .flash-text{
+    color:#fff; font-weight:900; text-align:center; text-transform:uppercase;
+    font-size:clamp(6px, calc(var(--tag-w) * 0.021), 10.5px);
+    line-height:1.05;
+    text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    word-break:break-word;
+  }
+  /* Ekranda gösterilen Flaş Ürün aç/kapa + metin kutusu (yazdırmada gizlenir) */
+  .tc-flash-ctrl{
+    position:absolute; top:40px; left:8px; right:8px; z-index:6;
+    display:flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.94); border:1.5px solid var(--rule); border-radius:6px;
+    padding:4px 6px; box-shadow:0 1px 4px rgba(0,0,0,.12);
+  }
+  .tc-flash-ctrl input[type="checkbox"]{ width:15px; height:15px; margin:0; cursor:pointer; flex:0 0 auto; }
+  .tc-flash-ctrl .tc-flash-label{ font-size:10.5px; font-weight:700; color:var(--ink-soft); white-space:nowrap; }
+  .tc-flash-ctrl input[type="text"]{
+    flex:1; min-width:0; font-family:inherit; font-size:11px; padding:3px 6px;
+    border:1px solid var(--rule); border-radius:4px; background:#fff;
+  }
 
   /* Birleşik etiket: iki ürün yan yana, ortada ayraç */
   .tc-combo-body{
@@ -524,6 +606,7 @@
     body.printing-tags .tagcard.deselected{ display:none !important; }
     body.printing-tags .tc-select-wrap{ display:none !important; }
     body.printing-tags .tc-delete{ display:none !important; }
+    body.printing-tags .tc-flash-ctrl{ display:none !important; }
   }
 </style>
 </head>
@@ -612,13 +695,6 @@
         </thead>
         <tbody id="rowsBody"></tbody>
       </table>
-
-      <div class="icon-grid">
-        <div class="icon-card"><div class="glyph">✓</div><span>Ücretsiz Kargo</span></div>
-        <div class="icon-card"><div class="glyph">↺</div><span>14 Gün İçinde Kolay İade</span></div>
-        <div class="icon-card"><div class="glyph">🛡</div><span>24 Ay Garanti</span></div>
-        <div class="icon-card"><div class="glyph">🔒</div><span>Güvenli Alışveriş</span></div>
-      </div>
     </div>
 
     <div class="tagbar">
@@ -731,7 +807,7 @@
         </div>
       </div>
       <div class="combo-builder-row">
-        <div class="combo-field">
+        <div class="combo-field combo-field-sm">
           <label for="manualCode">Ürün Kodu (QR için, listeden seçilince otomatik dolar)</label>
           <input type="text" id="manualCode" placeholder="Ör. 2Q9YTOLRBT0010">
         </div>
@@ -775,7 +851,104 @@
   </section>
 </div>
 
+<div class="pd-overlay" id="productDetailOverlay">
+  <div class="pd-modal" id="productDetailModal" role="dialog" aria-modal="true">
+    <button type="button" class="pd-close" id="productDetailClose" aria-label="Kapat">×</button>
+    <div id="productDetailBody"></div>
+  </div>
+</div>
+
 <script>
+/* ================= ÜRÜN ÖZELLİKLERİ MODALI ================= */
+const productDetailOverlay = document.getElementById('productDetailOverlay');
+const productDetailBody = document.getElementById('productDetailBody');
+
+function pdRow(label, value){
+  return `<div class="pd-row"><span class="pd-label">${label}</span><span class="pd-value">${value}</span></div>`;
+}
+
+function pdPriceRow(label, price, disc){
+  const unit = disc ?? price;
+  const html = (disc ? `<span class="pd-price-old">${fmtTag(price)}</span>` : '') + `<span class="pd-price-new">${fmtTag(unit)}</span>`;
+  return `<div class="pd-row"><span class="pd-label">${label}</span><span class="pd-value">${html}</span></div>`;
+}
+
+function openProductDetailRaw(html){
+  productDetailBody.innerHTML = html;
+  productDetailOverlay.classList.add('open');
+}
+
+function closeProductDetail(){
+  productDetailOverlay.classList.remove('open');
+}
+
+document.getElementById('productDetailClose').addEventListener('click', closeProductDetail);
+productDetailOverlay.addEventListener('click', (e)=>{
+  if(e.target === productDetailOverlay) closeProductDetail();
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') closeProductDetail();
+});
+
+/* Tekli ürün etiketine tıklanınca özellikleri gösterir */
+function openProductDetail(item, qty){
+  let rows = '';
+  if(item.code) rows += pdRow('Ürün Kodu', item.code);
+  if(item.cat) rows += pdRow('Kategori', item.cat);
+  if(qty && qty > 1) rows += pdRow('Adet', `×${qty}`);
+  rows += pdRow('Menşei', item.imported ? 'İthal' : 'Yerli Üretim');
+  if(item.gen && item.gen !== '—') rows += pdRow('Genişlik', item.gen);
+  if(item.der && item.der !== '—') rows += pdRow('Derinlik', item.der);
+  if(item.yuk && item.yuk !== '—') rows += pdRow('Yükseklik', item.yuk);
+
+  // Kumaş/dolgu özellikleri (Google Sheets'te ilgili sütun varsa gösterilir)
+  let specRows = '';
+  if(item.kilif) specRows += pdRow('Dış Kılıf', item.kilif);
+  if(item.dolgu) specRows += pdRow('İç Dolgu', item.dolgu);
+  if(item.gramaj) specRows += pdRow('Gramaj', item.gramaj);
+  if(item.ebat) specRows += pdRow('Ebat', item.ebat);
+
+  let priceRows = pdPriceRow('Satış Fiyatı', item.price, item.disc);
+  if(item.install) priceRows += pdRow('Taksitli Fiyat', fmtTag(item.install));
+
+  const html = `
+    <h3 class="pd-title">${item.name}</h3>
+    <p class="pd-sub">Ürün Özellikleri</p>
+    <div class="pd-section">
+      <h4>Genel Bilgiler</h4>
+      ${rows}
+    </div>
+    ${specRows ? `<div class="pd-section"><h4>Ürün Detayı</h4>${specRows}</div>` : ''}
+    <div class="pd-section">
+      <h4>Fiyat Bilgisi</h4>
+      ${priceRows}
+    </div>
+  `;
+  openProductDetailRaw(html);
+}
+
+/* Birleşik (ikili) etikete tıklanınca her iki ürünün özelliklerini gösterir */
+function openComboDetail(combo){
+  const buildCol = (col)=>{
+    let rows = '';
+    if(col.code) rows += pdRow('Ürün Kodu', col.code);
+    rows += pdRow('Menşei', col.imported ? 'İthal' : 'Yerli Üretim');
+    if(col.kilif) rows += pdRow('Dış Kılıf', col.kilif);
+    if(col.dolgu) rows += pdRow('İç Dolgu', col.dolgu);
+    if(col.gramaj) rows += pdRow('Gramaj', col.gramaj);
+    if(col.ebat) rows += pdRow('Ebat', col.ebat);
+    rows += pdPriceRow('Satış Fiyatı', col.price, col.disc);
+    return `<div class="pd-section"><h4>${col.label}</h4>${rows}</div>`;
+  };
+  const html = `
+    <h3 class="pd-title">${combo.title}</h3>
+    <p class="pd-sub">Ürün Özellikleri</p>
+    ${buildCol(combo.col1)}
+    ${buildCol(combo.col2)}
+  `;
+  openProductDetailRaw(html);
+}
+
 const CATALOG = {};
 
 const EXCEL_CATALOG = {
@@ -1063,6 +1236,11 @@ let cardInfo2 = null;
 let selectedTagKeys = new Set();
 let seenTagKeysEver = new Set();
 
+/* "Flaş Ürün" rozeti: hangi etiketlerde açık olduğu ve her birinin (varsa)
+   özel metni. Varsayılan metin boşsa kartta "FLAŞ ÜRÜN" gösterilir. */
+let flashTagKeys = new Set();
+let flashTagTexts = {};
+
 /* İki ürünlü (birleşik) etiketler: kullanıcının "İstisnai Durumlar İçin" bölümünden
    elle eklediği birleşik etiketler. Standart TEK/ÇİFT eşleşmeleri artık otomatik
    olarak tespit edilip aşağıda ayrıca gösterilir (detectAutoPairs). */
@@ -1085,7 +1263,9 @@ function saveState(){
       comboTags,
       comboIdCounter,
       manualTags,
-      manualIdCounter
+      manualIdCounter,
+      flashTagKeys: [...flashTagKeys],
+      flashTagTexts
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){
@@ -1135,6 +1315,8 @@ function applySavedState(saved){
   if(typeof saved.manualIdCounter === 'number') manualIdCounter = saved.manualIdCounter;
   if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
   if(Array.isArray(saved.seenTagKeysEver)) seenTagKeysEver = new Set(saved.seenTagKeysEver);
+  if(Array.isArray(saved.flashTagKeys)) flashTagKeys = new Set(saved.flashTagKeys);
+  if(saved.flashTagTexts && typeof saved.flashTagTexts === 'object') flashTagTexts = saved.flashTagTexts;
 
   renderRows();
   renderManualTagSheet();
@@ -1327,6 +1509,8 @@ function resetAll(){
 
   selectedTagKeys = new Set();
   seenTagKeysEver = new Set();
+  flashTagKeys = new Set();
+  flashTagTexts = {};
   comboTags = [];
   comboIdCounter = 1;
 
@@ -1721,8 +1905,8 @@ function detectAutoPairs(){
         pairs.push({
           id: 'auto:' + activeItems[i].key + '::' + activeItems[j].key,
           title: common.join(' '),
-          col1: {label: rest1, price: a.price, disc: a.disc, code: a.code, imported: !!a.imported},
-          col2: {label: rest2, price: b.price, disc: b.disc, code: b.code, imported: !!b.imported}
+          col1: {label: rest1, price: a.price, disc: a.disc, code: a.code, imported: !!a.imported, kilif: a.kilif, dolgu: a.dolgu, gramaj: a.gramaj, ebat: a.ebat},
+          col2: {label: rest2, price: b.price, disc: b.disc, code: b.code, imported: !!b.imported, kilif: b.kilif, dolgu: b.dolgu, gramaj: b.gramaj, ebat: b.ebat}
         });
         used.add(activeItems[i].key); used.add(activeItems[j].key);
         break;
@@ -1753,8 +1937,8 @@ function detectManualAutoPairs(){
         pairs.push({
           id: 'automanual:' + activeItems[i].key + '::' + activeItems[j].key,
           title: common.join(' '),
-          col1: {label: rest1, price: a.price, disc: a.disc, code: a.code, imported: !!a.imported},
-          col2: {label: rest2, price: b.price, disc: b.disc, code: b.code, imported: !!b.imported}
+          col1: {label: rest1, price: a.price, disc: a.disc, code: a.code, imported: !!a.imported, kilif: a.kilif, dolgu: a.dolgu, gramaj: a.gramaj, ebat: a.ebat},
+          col2: {label: rest2, price: b.price, disc: b.disc, code: b.code, imported: !!b.imported, kilif: b.kilif, dolgu: b.dolgu, gramaj: b.gramaj, ebat: b.ebat}
         });
         used.add(activeItems[i].key); used.add(activeItems[j].key);
         break;
@@ -1797,6 +1981,7 @@ function buildOriginBadge(isDomestic){
 function buildSelectCheckboxWrap(key, isSelected, card){
   const selectWrap = document.createElement('div');
   selectWrap.className = 'tc-select-wrap';
+  selectWrap.addEventListener('click', e=> e.stopPropagation());
   const selectChk = document.createElement('input');
   selectChk.type = 'checkbox';
   selectChk.checked = isSelected;
@@ -1814,6 +1999,65 @@ function buildSelectCheckboxWrap(key, isSelected, card){
   });
   selectWrap.appendChild(selectChk);
   return selectWrap;
+}
+
+/* İsteğe bağlı "Flaş Ürün" rozeti: kartın altına ekrandaki aç/kapa kutucuğu ve
+   özel metin kutusunu ekler; işaretlenirse kartın köşesine gerçek rozet
+   (yazdırmada da görünür) yerleştirir. Metin boş bırakılırsa "FLAŞ ÜRÜN" yazar. */
+function buildFlashControl(key, card){
+  const ctrl = document.createElement('div');
+  ctrl.className = 'tc-flash-ctrl';
+  ctrl.addEventListener('click', e=> e.stopPropagation());
+
+  const chk = document.createElement('input');
+  chk.type = 'checkbox';
+  chk.checked = flashTagKeys.has(key);
+  chk.title = 'Flaş Ürün rozeti ekle';
+
+  const label = document.createElement('span');
+  label.className = 'tc-flash-label';
+  label.textContent = 'Flaş Ürün';
+
+  const textInput = document.createElement('input');
+  textInput.type = 'text';
+  textInput.maxLength = 40;
+  textInput.placeholder = 'FLAŞ ÜRÜN';
+  textInput.value = flashTagTexts[key] || '';
+  textInput.style.display = chk.checked ? '' : 'none';
+
+  function renderBadge(){
+    let badge = card.querySelector('.tc-flash-badge');
+    if(chk.checked){
+      if(!badge){
+        badge = document.createElement('div');
+        badge.className = 'tc-flash-badge';
+        badge.innerHTML = '<span class="bolt">⚡</span><span class="flash-text"></span>';
+        card.appendChild(badge);
+      }
+      badge.querySelector('.flash-text').textContent = (flashTagTexts[key] || 'FLAŞ ÜRÜN').toLocaleUpperCase('tr-TR');
+    } else if(badge){
+      badge.remove();
+    }
+  }
+
+  chk.addEventListener('change', ()=>{
+    if(chk.checked){ flashTagKeys.add(key); } else { flashTagKeys.delete(key); }
+    textInput.style.display = chk.checked ? '' : 'none';
+    renderBadge();
+    saveState();
+  });
+  textInput.addEventListener('input', ()=>{
+    flashTagTexts[key] = textInput.value;
+    renderBadge();
+  });
+  textInput.addEventListener('blur', ()=> saveState());
+  textInput.addEventListener('keydown', e=> e.stopPropagation());
+
+  ctrl.appendChild(chk);
+  ctrl.appendChild(label);
+  ctrl.appendChild(textInput);
+  renderBadge();
+  return ctrl;
 }
 
 document.getElementById('comboProduct1').addEventListener('change', suggestComboFields);
@@ -1837,8 +2081,8 @@ document.getElementById('addComboBtn').addEventListener('click', ()=>{
   const id = 'combo' + (comboIdCounter++);
   comboTags.push({
     id, title,
-    col1: {label: label1, price: item1.price, disc: item1.disc, code: item1.code, imported: !!item1.imported},
-    col2: {label: label2, price: item2.price, disc: item2.disc, code: item2.code, imported: !!item2.imported}
+    col1: {label: label1, price: item1.price, disc: item1.disc, code: item1.code, imported: !!item1.imported, kilif: item1.kilif, dolgu: item1.dolgu, gramaj: item1.gramaj, ebat: item1.ebat},
+    col2: {label: label2, price: item2.price, disc: item2.disc, code: item2.code, imported: !!item2.imported, kilif: item2.kilif, dolgu: item2.dolgu, gramaj: item2.gramaj, ebat: item2.ebat}
   });
   selectedTagKeys.add('combo:' + id);
   seenTagKeysEver.add('combo:' + id);
@@ -1872,15 +2116,19 @@ function buildComboCard(key, combo, isAuto){
   card.className = 'tagcard' + (isSelected ? '' : ' deselected') + (isAuto ? ' tc-auto' : '');
   card.dataset.key = key;
   card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
+  card.appendChild(buildFlashControl(key, card));
 
   if(!isAuto){
     const delBtn = document.createElement('div');
     delBtn.className = 'tc-delete';
     delBtn.textContent = '×';
     delBtn.title = 'Bu birleşik etiketi kaldır';
-    delBtn.addEventListener('click', ()=>{
+    delBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
       comboTags = comboTags.filter(c=> ('combo:' + c.id) !== key);
       selectedTagKeys.delete(key);
+      flashTagKeys.delete(key);
+      delete flashTagTexts[key];
       renderTagSheet();
       saveState();
     });
@@ -1944,6 +2192,7 @@ function buildComboCard(key, combo, isAuto){
   if(originBadge1) botWrap.appendChild(originBadge1);
 
   card.appendChild(botWrap);
+  card.addEventListener('click', ()=> openComboDetail(combo));
   return card;
 }
 
@@ -1978,6 +2227,7 @@ function renderSingleTagSheet(){
     card.className = 'tagcard' + (isSelected ? '' : ' deselected');
     card.dataset.key = row.key;
     card.appendChild(buildSelectCheckboxWrap(row.key, isSelected, card));
+    card.appendChild(buildFlashControl(row.key, card));
 
     // 1. Üst Kısım: Logo ve Adet Bilgisi
     const head = document.createElement('div');
@@ -2032,6 +2282,7 @@ function renderSingleTagSheet(){
     if(originBadge) botWrap.appendChild(originBadge);
 
     card.appendChild(botWrap);
+    card.addEventListener('click', ()=> openProductDetail(item, row.qty));
     wrap.appendChild(card);
   });
 
@@ -2085,14 +2336,18 @@ function buildManualCard(key, tag){
   card.className = 'tagcard' + (isSelected ? '' : ' deselected');
   card.dataset.key = key;
   card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
+  card.appendChild(buildFlashControl(key, card));
 
   const delBtn = document.createElement('div');
   delBtn.className = 'tc-delete';
   delBtn.textContent = '×';
   delBtn.title = 'Bu etiketi kaldır';
-  delBtn.addEventListener('click', ()=>{
+  delBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
     manualTags = manualTags.filter(t=> t.id !== tag.id);
     selectedTagKeys.delete(key);
+    flashTagKeys.delete(key);
+    delete flashTagTexts[key];
     renderManualTagSheet();
     renderComboTagSheet();
     saveState();
@@ -2141,6 +2396,7 @@ function buildManualCard(key, tag){
   if(originBadge) botWrap.appendChild(originBadge);
 
   card.appendChild(botWrap);
+  card.addEventListener('click', ()=> openProductDetail(tag));
   return card;
 }
 
@@ -2202,6 +2458,7 @@ function populateManualTakim(){
   manualTakimSel.value = '';
   syncManualTakimDisplay();
   manualCodeInput.value = '';
+  manualCodeInput.readOnly = false;
   manualImportedInput.checked = false;
 }
 
@@ -2269,6 +2526,9 @@ function selectManualTakimOption(value){
   const item = value ? (CATALOG[manualKategoriSel.value] || []).find(it=> it.name === value) : null;
   manualCodeInput.value = item ? (item.code || '') : '';
   manualImportedInput.checked = item ? !!item.imported : false;
+  // Listeden bir ürün seçilince kod otomatik dolar ve kilitlenir — yanlışlıkla
+  // değiştirilemesin. Seçim temizlenirse (fully custom ürün) tekrar elle girilebilir.
+  manualCodeInput.readOnly = !!item;
 }
 
 manualKategoriSel.addEventListener('change', populateManualTakim);
@@ -2316,11 +2576,18 @@ document.getElementById('addManualBtn').addEventListener('click', ()=>{
 
   const hasOld = !isNaN(oldVal) && oldVal > priceVal;
   const id = 'm' + (manualIdCounter++);
+  // Kategoride eşleşen bir ürün varsa (kılıf/dolgu/gramaj/ebat gibi) detay
+  // bilgilerini de etikete taşı — kullanıcı listeden seçtiği için genelde eşleşir.
+  const matchedItem = (CATALOG[manualKategoriSel.value] || []).find(it=> it.name === name);
   manualTags.push({
     id, name, code,
     price: hasOld ? oldVal : priceVal,
     disc: hasOld ? priceVal : null,
-    imported
+    imported,
+    kilif: matchedItem ? matchedItem.kilif : '',
+    dolgu: matchedItem ? matchedItem.dolgu : '',
+    gramaj: matchedItem ? matchedItem.gramaj : '',
+    ebat: matchedItem ? matchedItem.ebat : ''
   });
   selectedTagKeys.add('manual:' + id);
   seenTagKeysEver.add('manual:' + id);
@@ -2328,6 +2595,7 @@ document.getElementById('addManualBtn').addEventListener('click', ()=>{
   manualTakimSel.value = '';
   syncManualTakimDisplay();
   manualCodeInput.value = '';
+  manualCodeInput.readOnly = false;
   priceEl.value = '';
   oldPriceEl.value = '';
   manualImportedInput.checked = false;
@@ -2345,10 +2613,14 @@ function resetManual(){
 
   document.getElementById('manualPrice').value = '';
   document.getElementById('manualOldPrice').value = '';
+  manualCodeInput.value = '';
+  manualCodeInput.readOnly = false;
 
   manualTags = [];
   [...selectedTagKeys].forEach(k=>{ if(k.startsWith('manual:')) selectedTagKeys.delete(k); });
   [...seenTagKeysEver].forEach(k=>{ if(k.startsWith('manual:')) seenTagKeysEver.delete(k); });
+  [...flashTagKeys].forEach(k=>{ if(k.startsWith('manual:') || k.startsWith('automanual:')) flashTagKeys.delete(k); });
+  Object.keys(flashTagTexts).forEach(k=>{ if(k.startsWith('manual:') || k.startsWith('automanual:')) delete flashTagTexts[k]; });
 
   renderManualTagSheet();
   renderComboTagSheet();
@@ -2414,12 +2686,30 @@ const EXCEL_DISPLAY_NAMES = {
 const LEGACY_CATS = [];
 const HEADER_MARKERS = ['ürün adı', 'ürün sınıf kodu'];
 const ORIGIN_HEADER_MARKERS = ['menşe', 'mense', 'üretim yeri', 'uretim yeri', 'ithal/yerli', 'ithal / yerli', 'ithalat', 'ithal'];
+/* Ürün detay popup'ında gösterilecek ek özellik sütunları (Dış Kılıf, İç Dolgu,
+   Gramaj, Ebat). Google Sheets'te bu başlıklardan biriyle bir sütun varsa
+   otomatik olarak bulunur; yoksa ilgili alan popup'ta gösterilmez. */
+const KILIF_HEADER_MARKERS = ['dış kılıf', 'dis kilif', 'dış kilif', 'kılıf', 'kilif'];
+const DOLGU_HEADER_MARKERS = ['iç dolgu', 'ic dolgu', 'iç dolgu', 'dolgu'];
+const GRAMAJ_HEADER_MARKERS = ['gramaj'];
+const EBAT_HEADER_MARKERS = ['ebat', 'ölçü', 'olcu', 'boyut ölçüsü'];
 
 function findOriginColumnIndex(headerRow){
   if(!headerRow) return -1;
   const cells = headerRow.map(c=> String(c ?? '').trim().toLocaleLowerCase('tr-TR'));
   for(let i=0; i<cells.length; i++){
     if(ORIGIN_HEADER_MARKERS.some(marker=> cells[i].includes(marker))) return i;
+  }
+  return -1;
+}
+
+/* Genel amaçlı sütun bulucu: başlık satırında verilen anahtar kelimelerden
+   birini içeren ilk sütunun index'ini döner, bulamazsa -1. */
+function findColumnIndexByMarkers(headerRow, markers){
+  if(!headerRow) return -1;
+  const cells = headerRow.map(c=> String(c ?? '').trim().toLocaleLowerCase('tr-TR'));
+  for(let i=0; i<cells.length; i++){
+    if(markers.some(marker=> cells[i].includes(marker))) return i;
   }
   return -1;
 }
@@ -2467,6 +2757,10 @@ function parseTRNumber(v){
 function parseCatalogRows(allRows){
   const headerIdx = findHeaderRowIndex(allRows);
   const originColIdx = findOriginColumnIndex(allRows[headerIdx]);
+  const kilifColIdx = findColumnIndexByMarkers(allRows[headerIdx], KILIF_HEADER_MARKERS);
+  const dolguColIdx = findColumnIndexByMarkers(allRows[headerIdx], DOLGU_HEADER_MARKERS);
+  const gramajColIdx = findColumnIndexByMarkers(allRows[headerIdx], GRAMAJ_HEADER_MARKERS);
+  const ebatColIdx = findColumnIndexByMarkers(allRows[headerIdx], EBAT_HEADER_MARKERS);
   const dataRows = allRows.slice(headerIdx + 1);
 
   let currentCat = null;
@@ -2500,6 +2794,10 @@ function parseCatalogRows(allRows){
     const install = installNum === null ? null : Math.round(installNum);
     const originCell = (originColIdx >= 0) ? String(r[originColIdx] ?? '').trim().toLocaleLowerCase('tr-TR') : '';
     const imported = originColIdx >= 0 && /ithal/.test(originCell);
+    const kilif = kilifColIdx >= 0 ? String(r[kilifColIdx] ?? '').trim() : '';
+    const dolgu = dolguColIdx >= 0 ? String(r[dolguColIdx] ?? '').trim() : '';
+    const gramaj = gramajColIdx >= 0 ? String(r[gramajColIdx] ?? '').trim() : '';
+    const ebat = ebatColIdx >= 0 ? String(r[ebatColIdx] ?? '').trim() : '';
     newCategories[currentCat].push({
       name: String(name).trim(),
       code: String(code),
@@ -2507,7 +2805,8 @@ function parseCatalogRows(allRows){
       disc: (cash !== null && cash !== price) ? cash : null,
       install,
       imported,
-      gen:'—', der:'—', yuk:'—'
+      gen:'—', der:'—', yuk:'—',
+      kilif, dolgu, gramaj, ebat
     });
     productCount++;
   });
