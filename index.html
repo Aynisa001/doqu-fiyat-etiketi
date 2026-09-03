@@ -219,6 +219,21 @@
     margin-top:20px;
   }
 
+  /* Etiket kartını, o karta özel "İndirim Rozeti" küçük kutucuğuyla birlikte
+     saran dış kapsayıcı. Kutucuk kartın DIŞINDA (altında) durur, kartın
+     kendisine hiçbir şey eklemez. Yazdırmada gizlenir. */
+  .tagcard-slot{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .tc-badge-toggle-row{
+    display:none; align-items:center; gap:5px;
+    font-size:10.5px; font-weight:700; color:var(--ink-soft);
+    cursor:pointer; user-select:none;
+  }
+  .tc-badge-toggle-row input{ width:13px; height:13px; margin:0; cursor:pointer; }
+  body.show-flash-badge .tc-badge-toggle-row{ display:inline-flex; }
+  @media print{ .tc-badge-toggle-row{ display:none !important; } }
+
   /* ETİKET KARTI ANA GÖVDE */
   .tagcard{
     position:relative; 
@@ -284,7 +299,7 @@
   body.show-flash-badge .flash-discount-badge{
     display:flex;
   }
-  /* Bu etikette rozet tek tek kapatılmışsa (kendi küçük kutucuğuyla) gizle */
+  /* Bu etikette rozet, yanındaki küçük kutucukla tek tek kapatılmışsa gizle */
   .tagcard.flash-badge-off .flash-discount-badge{
     display:none !important;
   }
@@ -294,25 +309,6 @@
     body.show-flash-badge .flash-discount-badge{ display:flex; }
     .tagcard.flash-badge-off .flash-discount-badge{ display:none !important; }
   }
-
-  /* Her etikette rozeti tek tek açıp kapatan küçük kutucuk (sadece ekranda) */
-  .tc-badge-select-wrap{
-    display:none;
-    position:absolute;
-    top: var(--flash-badge-top);
-    right: var(--flash-badge-right);
-    transform: translate(35%, -35%);
-    width:17px; height:17px; border-radius:50%;
-    background:rgba(255,255,255,.95); border:1.5px solid var(--rule);
-    align-items:center; justify-content:center;
-    box-shadow:0 1px 3px rgba(0,0,0,.18);
-    z-index:7;
-  }
-  .tc-badge-select-wrap input{
-    width:11px; height:11px; margin:0; cursor:pointer;
-  }
-  body.show-flash-badge .tc-badge-select-wrap{ display:flex; }
-  @media print{ .tc-badge-select-wrap{ display:none !important; } }
 
   /* ---- Ürün Özellikleri Modalı ---- */
   .pd-overlay{
@@ -555,17 +551,17 @@
 
   /* ---- SERİ SONU ÜRÜNLERİ ETİKETİ: etiketin tamamı seçilen renkte ---- */
   .tagcard.ss-card{
-    background: var(--ss-card-color, #C0392B);
-    border-color: rgba(255,255,255,.85);
+    background: var(--ss-card-color, #F9D5D9);
+    border-color: var(--ss-card-border, #C0392B);
     border-width:3px;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .tagcard.ss-card .tc-name{ color:#fff; }
-  .tagcard.ss-card .tc-price{ color:#fff; }
-  .tagcard.ss-card .tc-price .tc-old{ color:rgba(255,255,255,.75); }
-  .tagcard.ss-card .tc-bottom-wrap{ border-top-color: rgba(255,255,255,.55); }
-  .tagcard.ss-card .tc-foot-text{ color:#fff; }
+  .tagcard.ss-card .tc-name{ color:var(--ink); }
+  .tagcard.ss-card .tc-price{ color:var(--ink); }
+  .tagcard.ss-card .tc-price .tc-old{ color:var(--ink-soft); }
+  .tagcard.ss-card .tc-bottom-wrap{ border-top-color: var(--ss-card-border, rgba(0,0,0,.2)); }
+  .tagcard.ss-card .tc-foot-text{ color:var(--ink-soft); }
   .tagcard.ss-card .tc-qr{
     background:#fff; padding:4px; border-radius:4px; box-sizing:border-box;
   }
@@ -574,7 +570,7 @@
     top:0; left:0;
     z-index:6;
     background:#fff;
-    color: var(--ss-card-color, #C0392B);
+    color: var(--ss-card-border, #C0392B);
     font-weight:900;
     letter-spacing:.03em;
     text-transform:uppercase;
@@ -591,10 +587,12 @@
     display:flex; align-items:center; gap:6px; font-size:11px; text-transform:none;
     letter-spacing:normal; color:var(--ink-soft); margin:0;
   }
-  .ss-color-control input[type="color"]{
-    width:38px; height:32px; padding:2px; border:1px solid var(--rule); border-radius:6px;
-    background:var(--cream); cursor:pointer;
+  .ss-color-control select{
+    padding:6px 10px; border:1px solid var(--rule); border-radius:6px;
+    background:var(--cream); color:var(--ink); font-family:inherit; font-weight:600;
+    font-size:12.5px; cursor:pointer; min-width:110px;
   }
+  .ss-color-control select:focus{ outline:none; border-color:var(--petrol); }
 
   /* ---- Sağ Panel / Normal Görünüm ---- */
   .content{padding:30px 34px 50px;}
@@ -712,8 +710,8 @@
     body.printing-tags .tc-delete{ display:none !important; }
     /* Seri Sonu etiketlerinde seçilen renk (tüm etiket arka planı) yazdırmada da korunur */
     body.printing-tags .tagcard.ss-card{
-      background: var(--ss-card-color, #C0392B) !important;
-      border-color: rgba(255,255,255,.85) !important;
+      background: var(--ss-card-color, #F9D5D9) !important;
+      border-color: var(--ss-card-border, #C0392B) !important;
       border-width:3px !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
@@ -1003,7 +1001,14 @@
           <input type="text" id="ssCode" placeholder="Ör. 2Q9YTOLRBT0010">
         </div>
         <div class="combo-field ss-color-control" style="flex:0 0 auto; min-width:140px;">
-          <label for="ssColorInput">Etiket Rengi<br><input type="color" id="ssColorInput" value="#C0392B"></label>
+          <label for="ssColorInput">Etiket Rengi<br>
+            <select id="ssColorInput">
+              <option value="#E1EDF6">Açık Mavi</option>
+              <option value="#ECF1E8">Açık Yeşil</option>
+              <option value="#F9D5D9" selected>Pembe</option>
+              <option value="#FAECBB">Krem</option>
+            </select>
+          </label>
         </div>
       </div>
       <div class="combo-builder-row">
@@ -1052,7 +1057,7 @@
 <div class="flash-badge-footer">
   <label class="flash-badge-toggle">
     <input type="checkbox" id="flashBadgeToggle">
-    Flaş İndirim Rozetini Göster
+    İndirim Rozeti
   </label>
   <input type="text" id="flashBadgeTextInput" class="flash-badge-text-input" placeholder="Rozet yazısı" maxlength="40" value="⚡ FLAŞ İNDİRİM">
 </div>
@@ -1436,10 +1441,10 @@ let seenTagKeysEver = new Set();
 let comboTags = [];
 let comboIdCounter = 1;
 
-/* Flaş İndirim rozeti, genel checkbox açıkken varsayılan olarak TÜM etiketlerde
-   görünür; kullanıcı her etiketin kendi küçük rozet kutucuğuyla, o etiketi
-   diğerlerini etkilemeden tek tek kapatabilir/açabilir. Burada sadece
-   "kapatılmış" (gizlenmiş) etiket anahtarları tutulur. */
+/* Genel "İndirim Rozeti" kutucuğu açıkken rozet varsayılan olarak TÜM
+   etiketlerde görünür; kullanıcı bazı etiketlerde istemezse, o kartın
+   yanındaki küçük kutucuktan tek tek kapatabilir. Burada sadece
+   "kapatılmış" (rozeti istenmeyen) etiket anahtarları tutulur. */
 let flashBadgeHiddenKeys = new Set();
 
 /* ---- Veri kalıcılığı: tabloya eklenen ürünler, etiket seçimleri ve birleşik
@@ -1511,9 +1516,9 @@ function applySavedState(saved){
   if(typeof saved.manualIdCounter === 'number') manualIdCounter = saved.manualIdCounter;
   if(Array.isArray(saved.ssTags)) ssTags = saved.ssTags;
   if(typeof saved.ssIdCounter === 'number') ssIdCounter = saved.ssIdCounter;
+  if(Array.isArray(saved.flashBadgeHiddenKeys)) flashBadgeHiddenKeys = new Set(saved.flashBadgeHiddenKeys);
   if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
   if(Array.isArray(saved.seenTagKeysEver)) seenTagKeysEver = new Set(saved.seenTagKeysEver);
-  if(Array.isArray(saved.flashBadgeHiddenKeys)) flashBadgeHiddenKeys = new Set(saved.flashBadgeHiddenKeys);
 
   renderRows();
   renderManualTagSheet();
@@ -2249,9 +2254,9 @@ function buildOriginBadge(isDomestic){
    DOM'da bulunur ama display:none olduğu için hiçbir etkisi olmaz. */
 /* Etiket kartına bağımsız "Flaş İndirim" rozet overlay'ini ekler.
    Rozet normal layout akışına dahil olmaz (position:absolute), mevcut
-   hiçbir elementi kaydırmaz. Görünürlüğü genel checkbox ile kontrol edilir,
-   AMA her etiketin kendi küçük kutucuğuyla, o etiket diğerlerini
-   etkilemeden ayrı ayrı açılıp kapatılabilir (flashBadgeHiddenKeys). */
+   hiçbir elementi kaydırmaz. Görünürlüğü genel "İndirim Rozeti" checkbox'ı
+   ile kontrol edilir; ancak bir etikette istenmiyorsa, kartın YANINDAKİ
+   (üzerinde değil) küçük kutucukla o etikette tek tek kapatılabilir. */
 function appendFlashBadge(card, key){
   if(flashBadgeHiddenKeys.has(key)) card.classList.add('flash-badge-off');
 
@@ -2262,16 +2267,18 @@ function appendFlashBadge(card, key){
   badgeText.textContent = flashBadgeText;
   badge.appendChild(badgeText);
   card.appendChild(badge);
-
-  card.appendChild(buildFlashBadgeSelectWrap(key, card));
 }
 
-/* Bu etikette Flaş İndirim rozetini tek başına göster/gizle kutucuğu */
-function buildFlashBadgeSelectWrap(key, card){
-  const wrap = document.createElement('div');
-  wrap.className = 'tc-badge-select-wrap';
-  wrap.title = 'Bu etikette rozeti göster/gizle';
-  wrap.addEventListener('click', e=> e.stopPropagation());
+/* Etiket kartını, kartın DIŞINDA (altında) duran küçük "İndirim Rozeti"
+   kutucuğuyla birlikte bir kapsayıcıya sarar. Kutucuk kartın kendisine
+   hiçbir şey eklemez, sadece yanında ayrı bir eleman olarak durur. */
+function wrapCardWithBadgeToggle(card, key){
+  const slot = document.createElement('div');
+  slot.className = 'tagcard-slot';
+  slot.appendChild(card);
+
+  const row = document.createElement('label');
+  row.className = 'tc-badge-toggle-row';
   const chk = document.createElement('input');
   chk.type = 'checkbox';
   chk.checked = !flashBadgeHiddenKeys.has(key);
@@ -2285,8 +2292,13 @@ function buildFlashBadgeSelectWrap(key, card){
     }
     saveState();
   });
-  wrap.appendChild(chk);
-  return wrap;
+  row.appendChild(chk);
+  const lbl = document.createElement('span');
+  lbl.textContent = 'İndirim Rozeti';
+  row.appendChild(lbl);
+  slot.appendChild(row);
+
+  return slot;
 }
 
 /* Etiket kartının üzerine, yazdırmaya dahil et/etme seçim kutucuğunu ekler */
@@ -2534,12 +2546,12 @@ function renderSingleTagSheet(){
 
     card.appendChild(botWrap);
     card.addEventListener('click', ()=> openProductDetail(item, row.qty));
-    wrap.appendChild(card);
+    wrap.appendChild(wrapCardWithBadgeToggle(card, row.key));
   });
 
   // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiketler doğrudan burada da gösterilir ---
   detectAutoPairs().forEach(pair=>{
-    wrap.appendChild(buildComboCard(pair.id, pair, true));
+    wrap.appendChild(wrapCardWithBadgeToggle(buildComboCard(pair.id, pair, true), pair.id));
   });
 
   updateTagSelectCount();
@@ -2554,19 +2566,19 @@ function renderComboTagSheet(){
   // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiket önerileri (tablo) ---
   detectAutoPairs().forEach(pair=>{
     const key = pair.id;
-    wrap.appendChild(buildComboCard(key, pair, true));
+    wrap.appendChild(wrapCardWithBadgeToggle(buildComboCard(key, pair, true), key));
   });
 
   // --- Otomatik tespit edilen ikili etiket önerileri (Manuel Etiket sayfası) ---
   detectManualAutoPairs().forEach(pair=>{
     const key = pair.id;
-    wrap.appendChild(buildComboCard(key, pair, true));
+    wrap.appendChild(wrapCardWithBadgeToggle(buildComboCard(key, pair, true), key));
   });
 
   // --- Elle eklenmiş istisnai birleşik etiketler ---
   comboTags.forEach(combo=>{
     const key = 'combo:' + combo.id;
-    wrap.appendChild(buildComboCard(key, combo, false));
+    wrap.appendChild(wrapCardWithBadgeToggle(buildComboCard(key, combo, false), key));
   });
 
   updateComboTagSelectCount();
@@ -2655,12 +2667,12 @@ function renderManualTagSheet(){
   wrap.innerHTML = '';
   manualTags.forEach(tag=>{
     const key = 'manual:' + tag.id;
-    wrap.appendChild(buildManualCard(key, tag));
+    wrap.appendChild(wrapCardWithBadgeToggle(buildManualCard(key, tag), key));
   });
 
   // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiketler doğrudan burada da gösterilir ---
   detectManualAutoPairs().forEach(pair=>{
-    wrap.appendChild(buildComboCard(pair.id, pair, true));
+    wrap.appendChild(wrapCardWithBadgeToggle(buildComboCard(pair.id, pair, true), pair.id));
   });
 
   updateManualTagSelectCount();
@@ -2870,6 +2882,19 @@ document.getElementById('manualResetBtn').addEventListener('click', resetManual)
 let ssTags = [];
 let ssIdCounter = 1;
 
+/* Pastel etiket renginden, kenarlık/rozet için daha koyu bir ton üretir */
+function shadeColor(hex, percent){
+  hex = String(hex || '').replace('#','');
+  if(hex.length === 3) hex = hex.split('').map(c=> c+c).join('');
+  const num = parseInt(hex, 16);
+  if(isNaN(num)) return '#C0392B';
+  let r = (num >> 16) & 0xFF, g = (num >> 8) & 0xFF, b = num & 0xFF;
+  r = Math.max(0, Math.min(255, Math.round(r * (1 + percent))));
+  g = Math.max(0, Math.min(255, Math.round(g * (1 + percent))));
+  b = Math.max(0, Math.min(255, Math.round(b * (1 + percent))));
+  return '#' + [r,g,b].map(v=> v.toString(16).padStart(2,'0')).join('');
+}
+
 function buildSsCard(key, tag){
   if(!seenTagKeysEver.has(key)){
     seenTagKeysEver.add(key);
@@ -2879,7 +2904,9 @@ function buildSsCard(key, tag){
 
   const card = document.createElement('div');
   card.className = 'tagcard ss-card' + (isSelected ? '' : ' deselected');
-  card.style.setProperty('--ss-card-color', tag.color || '#C0392B');
+  const ssBg = tag.color || '#F9D5D9';
+  card.style.setProperty('--ss-card-color', ssBg);
+  card.style.setProperty('--ss-card-border', shadeColor(ssBg, -0.45));
   card.dataset.key = key;
   card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
   appendFlashBadge(card, key);
@@ -2954,7 +2981,7 @@ function renderSsTagSheet(){
   wrap.innerHTML = '';
   ssTags.forEach(tag=>{
     const key = 'ss:' + tag.id;
-    wrap.appendChild(buildSsCard(key, tag));
+    wrap.appendChild(wrapCardWithBadgeToggle(buildSsCard(key, tag), key));
   });
   updateSsTagSelectCount();
 }
@@ -3113,7 +3140,7 @@ document.getElementById('addSsBtn').addEventListener('click', ()=>{
   const priceVal = parseFloat(priceEl.value);
   const oldVal = parseFloat(oldPriceEl.value);
   const imported = ssImportedInput.checked;
-  const color = ssColorInput.value || '#C0392B';
+  const color = ssColorInput.value || '#F9D5D9';
 
   if(!name){ alert('Lütfen Kategori ve Takım seçin.'); return; }
   if(!priceVal || priceVal <= 0){ alert('Lütfen geçerli bir satış fiyatı girin.'); return; }
@@ -3149,7 +3176,7 @@ function resetSs(){
 
   document.getElementById('ssPrice').value = '';
   document.getElementById('ssOldPrice').value = '';
-  ssColorInput.value = '#C0392B';
+  ssColorInput.value = '#F9D5D9';
 
   ssTags = [];
   [...selectedTagKeys].forEach(k=>{ if(k.startsWith('ss:')) selectedTagKeys.delete(k); });
