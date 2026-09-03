@@ -431,6 +431,7 @@
     justify-content:center;
     position:relative;
     width:100%;
+    flex-shrink:0;
     border-bottom: 1.5px solid var(--rule);
     padding-bottom: calc(var(--tag-h) * 0.015);
   }
@@ -465,6 +466,9 @@
     align-items:center;
     text-align:center;
     flex-grow:1;
+    flex-shrink:1;
+    min-height:0;
+    overflow:hidden;
     gap: calc(var(--tag-h) * 0.015);
     margin: calc(var(--tag-h) * 0.01) 0;
   }
@@ -510,6 +514,7 @@
     border-top:1.5px solid var(--rule);
     padding-top: calc(var(--tag-h) * 0.02);
     width:100%;
+    flex-shrink:0;
   }
 
   .tc-qr{
