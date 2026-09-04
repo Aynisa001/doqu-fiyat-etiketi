@@ -742,18 +742,15 @@
   <button type="button" class="pagetab" data-page="ikili">🔗 İkili Etiket Oluşturucu</button>
   <button type="button" class="pagetab" data-page="manuel">✍️ Manuel Etiket</button>
   <button type="button" class="pagetab" data-page="serisonu">🏁 Seri Sonu Ürünler</button>
+  <button type="button" class="pagetab" data-page="kategoribasim">📋 Kategori Toplu Basım</button>
 </div>
 
 <main class="app-page active" id="page-basim" data-page="basim">
   <aside class="panel">
     <h2>Seçim Paneli</h2>
 
-    <label for="kategoriSearch">Kategori</label>
-    <div class="takim-combo" id="kategoriCombo">
-      <input type="text" id="kategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="kategoriComboList">
-      <div class="takim-combo-list" id="kategoriComboList" role="listbox"></div>
-      <select id="kategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
-    </div>
+    <label for="kategori">Kategori</label>
+    <select id="kategori"></select>
 
     <label for="takimSearch">Takım</label>
     <div class="takim-combo" id="takimCombo">
@@ -917,12 +914,8 @@
       <p>Ürünü, "Etiket Basımı" sayfasındaki ile aynı mantıkla Kategori ve Takım'dan seçin — sadece fiyatı siz gireceksiniz.</p>
       <div class="combo-builder-row">
         <div class="combo-field">
-          <label for="manualKategoriSearch">Kategori</label>
-          <div class="takim-combo" id="manualKategoriCombo">
-            <input type="text" id="manualKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="manualKategoriComboList">
-            <div class="takim-combo-list" id="manualKategoriComboList" role="listbox"></div>
-            <select id="manualKategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
-          </div>
+          <label for="manualKategori">Kategori</label>
+          <select id="manualKategori"></select>
         </div>
         <div class="combo-field">
           <label for="manualTakimSearch">Takım</label>
@@ -996,12 +989,8 @@
       <p>Ürünü, "Manuel Etiket" sayfasındaki ile aynı mantıkla Kategori ve Takım'dan seçin — fiyatı siz girersiniz, etiketin rengini de burada belirleyebilirsiniz.</p>
       <div class="combo-builder-row">
         <div class="combo-field">
-          <label for="ssKategoriSearch">Kategori</label>
-          <div class="takim-combo" id="ssKategoriCombo">
-            <input type="text" id="ssKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ssKategoriComboList">
-            <div class="takim-combo-list" id="ssKategoriComboList" role="listbox"></div>
-            <select id="ssKategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
-          </div>
+          <label for="ssKategori">Kategori</label>
+          <select id="ssKategori"></select>
         </div>
         <div class="combo-field">
           <label for="ssTakimSearch">Takım</label>
@@ -1068,6 +1057,41 @@
     </div>
 
     <div class="tag-sheet" id="ssTagSheet"></div>
+  </section>
+</div>
+
+<!-- ================= SAYFA 5: KATEGORİ TOPLU BASIM ================= -->
+<div class="app-page page-single" id="page-kategoribasim" data-page="kategoribasim">
+  <section class="content">
+    <div class="head-row">
+      <div class="brandbig"><img src="data:image/webp;base64,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" alt="Doqu Home" class="brandbig-img"></div>
+    </div>
+    <h1 class="settitle">Kategori Toplu Basım</h1>
+    <p class="setsub">Sadece bir kategori seçin — o kategorideki TÜM ürünlerin etiketleri otomatik olarak aşağıda listelenir ve hepsi seçili gelir. İstemediklerinizi tek tek çıkarabilir, ardından hepsini toplu yazdırabilirsiniz.</p>
+
+    <label for="kategoriBasimSel" style="max-width:420px; margin-top:20px;">Kategori</label>
+    <select id="kategoriBasimSel" style="max-width:420px;"></select>
+
+    <div class="tagbar">
+      <div>
+        <h2>Kategorideki Etiketler</h2>
+        <p>Seçtiğiniz kategorideki tüm ürünlerin etiketleri burada otomatik listelenir.</p>
+      </div>
+      <div class="tagbar-actions">
+        <div class="tag-size-control">
+          <label>Gen (cm) <input type="number" id="kategoriBasimTagWidthInput" value="10" min="3" max="30" step="0.5"></label>
+          <label>Yük (cm) <input type="number" id="kategoriBasimTagHeightInput" value="7" min="3" max="30" step="0.5"></label>
+        </div>
+        <div class="tag-select-control">
+          <button type="button" id="kategoriBasimSelectAllBtn" class="tagselect-btn">Tümünü Seç</button>
+          <button type="button" id="kategoriBasimSelectNoneBtn" class="tagselect-btn">Seçimi Kaldır</button>
+        </div>
+        <button type="button" id="printKategoriBasimTagsBtn">🏷 Seçili Etiketleri Yazdır</button>
+      </div>
+      <div class="tag-select-hint">Seçili etiket: <span class="tag-select-count" id="kategoriBasimTagSelectCount">0</span> / <span id="kategoriBasimTagTotalCount">0</span></div>
+    </div>
+
+    <div class="tag-sheet" id="kategoriBasimTagSheet"></div>
   </section>
 </div>
 
@@ -1431,9 +1455,6 @@ Object.keys(EXCEL_CATALOG).forEach(cat=>{
 const ROW_COUNT = 9;
 
 const kategoriSel = document.getElementById('kategori');
-const kategoriSearchInput = document.getElementById('kategoriSearch');
-const kategoriComboList = document.getElementById('kategoriComboList');
-const kategoriCombo = document.getElementById('kategoriCombo');
 const takimSel = document.getElementById('takim');
 const takimSearchInput = document.getElementById('takimSearch');
 const takimComboList = document.getElementById('takimComboList');
@@ -1514,7 +1535,6 @@ function applySavedState(saved){
 
   if(saved.kategori && CATALOG[saved.kategori]){
     kategoriSel.value = saved.kategori;
-    syncKategoriDisplay();
     populateTakim();
     if(saved.takim && (PRESETS[saved.kategori]||{})[saved.takim] !== undefined){
       takimSel.value = saved.takim;
@@ -1571,104 +1591,7 @@ function populateKategori(){
   });
   if(prevSelected && CATALOG[prevSelected]) kategoriSel.value = prevSelected;
   else kategoriSel.value = '';
-  syncKategoriDisplay();
 }
-
-/* ---- Kategori için aranabilir combobox (Takım ile birebir aynı mantık) ---- */
-function syncKategoriDisplay(){
-  const selectedOption = kategoriSel.options[kategoriSel.selectedIndex];
-  kategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
-}
-
-function getKategoriMatches(query){
-  const q = trLower(query).trim();
-  const options = Array.from(kategoriSel.options).filter(o=> o.value !== '');
-  if(!q) return options;
-  const starts = [], contains = [];
-  options.forEach(o=>{
-    const label = trLower(o.textContent);
-    if(label.startsWith(q)) starts.push(o);
-    else if(label.includes(q)) contains.push(o);
-  });
-  return starts.concat(contains);
-}
-
-function renderKategoriComboList(query){
-  const matches = getKategoriMatches(query);
-  kategoriComboList.innerHTML = '';
-
-  const clearOpt = document.createElement('div');
-  clearOpt.className = 'takim-combo-option takim-combo-clear';
-  clearOpt.textContent = '— Kategori Seç — (temizle)';
-  clearOpt.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectKategoriOption(''); });
-  kategoriComboList.appendChild(clearOpt);
-
-  if(matches.length === 0){
-    const empty = document.createElement('div');
-    empty.className = 'takim-combo-empty';
-    empty.textContent = 'Eşleşen kategori bulunamadı';
-    kategoriComboList.appendChild(empty);
-    return;
-  }
-  matches.forEach(o=>{
-    const item = document.createElement('div');
-    item.className = 'takim-combo-option' + (o.value === kategoriSel.value ? ' active' : '');
-    item.setAttribute('role', 'option');
-    item.innerHTML = highlightMatch(o.textContent, query);
-    item.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectKategoriOption(o.value); });
-    kategoriComboList.appendChild(item);
-  });
-}
-
-function openKategoriCombo(query){
-  kategoriComboList.classList.add('open');
-  kategoriSearchInput.setAttribute('aria-expanded', 'true');
-  renderKategoriComboList(query || '');
-}
-
-function closeKategoriCombo(){
-  kategoriComboList.classList.remove('open');
-  kategoriSearchInput.setAttribute('aria-expanded', 'false');
-}
-
-function selectKategoriOption(value){
-  kategoriSel.value = value;
-  syncKategoriDisplay();
-  closeKategoriCombo();
-  kategoriSel.dispatchEvent(new Event('change'));
-}
-
-kategoriSearchInput.addEventListener('focus', ()=>{
-  kategoriSearchInput.select();
-  openKategoriCombo('');
-});
-
-kategoriSearchInput.addEventListener('input', ()=>{
-  openKategoriCombo(kategoriSearchInput.value);
-});
-
-kategoriSearchInput.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){
-    syncKategoriDisplay();
-    closeKategoriCombo();
-    kategoriSearchInput.blur();
-  } else if(e.key === 'Enter'){
-    e.preventDefault();
-    const matches = getKategoriMatches(kategoriSearchInput.value);
-    if(matches.length){ selectKategoriOption(matches[0].value); }
-  }
-});
-
-kategoriSearchInput.addEventListener('blur', ()=>{
-  setTimeout(()=>{
-    syncKategoriDisplay();
-    closeKategoriCombo();
-  }, 120);
-});
-
-document.addEventListener('click', (e)=>{
-  if(kategoriCombo && !kategoriCombo.contains(e.target)) closeKategoriCombo();
-});
 
 function populateTakim(){
   const prevSelected = takimSel.value;
@@ -1821,7 +1744,6 @@ takimSel.addEventListener('change', applyPreset);
    sayfa ilk açıldığındaki boş haline döner. Kayıtlı localStorage durumu da silinir. */
 function resetAll(){
   kategoriSel.value = '';
-  syncKategoriDisplay();
   populateTakim();
   takimSel.value = '';
   syncTakimDisplay();
@@ -1867,10 +1789,9 @@ function applyFlashBadgeText(text){
 }
 
 (function initFlashBadgeToggle(){
-  /* İndirim rozeti her sayfa açılışında varsayılan olarak KAPALI gelir;
-     kullanıcı isterse elle açar. Önceki oturumdan "açık" durumu artık
-     hatırlanmaz — sadece rozet YAZISI hatırlanır. */
-  applyFlashBadgeVisibility(false);
+  let enabled = false;
+  try{ enabled = localStorage.getItem(FLASH_BADGE_STORAGE_KEY) === '1'; }catch(e){}
+  applyFlashBadgeVisibility(enabled);
 
   let savedText = '';
   try{ savedText = localStorage.getItem(FLASH_BADGE_TEXT_STORAGE_KEY) || ''; }catch(e){}
@@ -1882,6 +1803,7 @@ if(flashBadgeToggle){
   flashBadgeToggle.addEventListener('change', ()=>{
     const enabled = flashBadgeToggle.checked;
     applyFlashBadgeVisibility(enabled);
+    try{ localStorage.setItem(FLASH_BADGE_STORAGE_KEY, enabled ? '1' : '0'); }catch(e){}
   });
 }
 
@@ -1957,6 +1879,7 @@ function makeTagCountUpdater(sheetIds, countId, totalId){
 const updateComboTagSelectCount = makeTagCountUpdater('comboTagSheet', 'comboTagSelectCount', 'comboTagTotalCount');
 const updateManualTagSelectCount = makeTagCountUpdater('manualTagSheet', 'manualTagSelectCount', 'manualTagTotalCount');
 const updateSsTagSelectCount = makeTagCountUpdater('ssTagSheet', 'ssTagSelectCount', 'ssTagTotalCount');
+const updateKategoriBasimTagSelectCount = makeTagCountUpdater('kategoriBasimTagSheet', 'kategoriBasimTagSelectCount', 'kategoriBasimTagTotalCount');
 
 function wireTagSelectButtons(selectAllId, selectNoneId, sheetIds, countUpdateFn){
   const allBtn = document.getElementById(selectAllId);
@@ -1989,8 +1912,42 @@ function wireTagSelectButtons(selectAllId, selectNoneId, sheetIds, countUpdateFn
 wireTagSelectButtons('comboSelectAllBtn', 'comboSelectNoneBtn', 'comboTagSheet', updateComboTagSelectCount);
 wireTagSelectButtons('manualSelectAllBtn', 'manualSelectNoneBtn', 'manualTagSheet', updateManualTagSelectCount);
 wireTagSelectButtons('ssSelectAllBtn', 'ssSelectNoneBtn', 'ssTagSheet', updateSsTagSelectCount);
+wireTagSelectButtons('kategoriBasimSelectAllBtn', 'kategoriBasimSelectNoneBtn', 'kategoriBasimTagSheet', updateKategoriBasimTagSelectCount);
 
-['printComboTagsBtn', 'printManualTagsBtn', 'printSsTagsBtn'].forEach(id=>{
+/* ---- Kategori Toplu Basım sayfası: sadece kategori seçilir, o kategorideki
+   TÜM ürünlerin etiketleri otomatik listelenir (satır/takım eklemeye gerek yok). ---- */
+const kategoriBasimSel = document.getElementById('kategoriBasimSel');
+
+function populateKategoriBasimSel(){
+  const prevSelected = kategoriBasimSel.value;
+  kategoriBasimSel.innerHTML = '';
+  const empty = document.createElement('option');
+  empty.value = ''; empty.textContent = '— Kategori Seç —';
+  kategoriBasimSel.appendChild(empty);
+  Object.keys(CATALOG).forEach(cat=>{
+    const o = document.createElement('option');
+    o.value = cat; o.textContent = cat;
+    kategoriBasimSel.appendChild(o);
+  });
+  if(prevSelected && CATALOG[prevSelected]) kategoriBasimSel.value = prevSelected;
+  else kategoriBasimSel.value = '';
+}
+
+function renderKategoriBasimTagSheet(){
+  const wrap = document.getElementById('kategoriBasimTagSheet');
+  wrap.innerHTML = '';
+  const cat = kategoriBasimSel.value;
+  const items = CATALOG[cat] || [];
+  items.forEach(it=>{
+    const key = cat + '::' + it.name;
+    wrap.appendChild(buildProductTagCard(it, key, 1));
+  });
+  updateKategoriBasimTagSelectCount();
+  saveState();
+}
+kategoriBasimSel.addEventListener('change', renderKategoriBasimTagSheet);
+
+['printComboTagsBtn', 'printManualTagsBtn', 'printSsTagsBtn', 'printKategoriBasimTagsBtn'].forEach(id=>{
   const btn = document.getElementById(id);
   if(btn) btn.addEventListener('click', ()=>{
     document.body.classList.add('printing-tags');
@@ -2015,7 +1972,8 @@ const tagSizeInputPairs = [
   [document.getElementById('tagWidthInput'), document.getElementById('tagHeightInput')],
   [document.getElementById('comboTagWidthInput'), document.getElementById('comboTagHeightInput')],
   [document.getElementById('manualTagWidthInput'), document.getElementById('manualTagHeightInput')],
-  [document.getElementById('ssTagWidthInput'), document.getElementById('ssTagHeightInput')]
+  [document.getElementById('ssTagWidthInput'), document.getElementById('ssTagHeightInput')],
+  [document.getElementById('kategoriBasimTagWidthInput'), document.getElementById('kategoriBasimTagHeightInput')]
 ].filter(([w,h])=> w && h);
 
 function applyTagSize(sourceW, sourceH){
@@ -2584,6 +2542,77 @@ function renderTagSheet(){
   renderComboTagSheet();
 }
 
+function buildProductTagCard(item, key, qty){
+  // Yeni görülen bir ürün etiketi varsayılan olarak seçili başlar
+  if(!seenTagKeysEver.has(key)){
+    seenTagKeysEver.add(key);
+    selectedTagKeys.add(key);
+  }
+  const isSelected = selectedTagKeys.has(key);
+
+  const card = document.createElement('div');
+  card.className = 'tagcard' + (isSelected ? '' : ' deselected');
+  card.dataset.key = key;
+  card.appendChild(buildSelectCheckboxWrap(key, isSelected, card));
+  appendFlashBadge(card, key);
+
+  // 1. Üst Kısım: Logo ve Adet Bilgisi
+  const head = document.createElement('div');
+  head.className = 'tc-head';
+
+  const logo = document.createElement('div');
+  logo.className = 'tc-logo';
+  logo.innerHTML = '<img src="data:image/webp;base64,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" alt="Doqu Home" class="tc-logo-img">';
+  head.appendChild(logo);
+
+  if(qty > 1){
+    const qtyBadge = document.createElement('div');
+    qtyBadge.className = 'tc-qty';
+    qtyBadge.textContent = `×${qty}`;
+    head.appendChild(qtyBadge);
+  }
+  card.appendChild(head);
+
+  // 2. Orta Kısım: Ürün Adı ve Mega Fiyat
+  const body = document.createElement('div');
+  body.className = 'tc-body';
+
+  const name = document.createElement('div');
+  name.className = 'tc-name';
+  name.textContent = item.name;
+  body.appendChild(name);
+
+  const price = document.createElement('div');
+  price.className = 'tc-price';
+  const unit = item.disc ?? item.price;
+  price.innerHTML = (item.disc ? `<span class="tc-old">${fmtTag(item.price)}</span>` : '') + fmtTag(unit);
+  body.appendChild(price);
+
+  card.appendChild(body);
+
+  // 3. Alt Kısım: QR Kod + Açıklama/Tarih + Yerli Üretim Rozeti
+  const botWrap = document.createElement('div');
+  botWrap.className = 'tc-bottom-wrap';
+
+  const qrWrap = document.createElement('div');
+  qrWrap.className = 'tc-qr';
+  const qrTarget = `https://www.doquhome.com.tr/arama/${encodeURIComponent(item.code || item.name)}`;
+  appendQr(qrWrap, qrTarget);
+  botWrap.appendChild(qrWrap);
+
+  const footText = document.createElement('div');
+  footText.className = 'tc-foot-text';
+  footText.innerHTML = `Fiyat Geçerlilik Tarihi: <b>${sheetDate || todayTR()}</b><br>Tavsiye edilen perakende satış fiyatıdır.<br>Fiyatlarımıza KDV dahildir.`;
+  botWrap.appendChild(footText);
+
+  const originBadge = buildOriginBadge(!item.imported);
+  if(originBadge) botWrap.appendChild(originBadge);
+
+  card.appendChild(botWrap);
+  card.addEventListener('click', ()=> openProductDetail(item, qty));
+  return wrapCardWithBadgeToggle(card, key);
+}
+
 function renderSingleTagSheet(){
   const wrap = document.getElementById('tagSheet');
   wrap.innerHTML = '';
@@ -2596,76 +2625,7 @@ function renderSingleTagSheet(){
     seen.add(row.key);
     const item = findItem(row.key);
     if(!item) return;
-
-    // Yeni görülen bir ürün etiketi varsayılan olarak seçili başlar
-    if(!seenTagKeysEver.has(row.key)){
-      seenTagKeysEver.add(row.key);
-      selectedTagKeys.add(row.key);
-    }
-
-    const isSelected = selectedTagKeys.has(row.key);
-
-    const card = document.createElement('div');
-    card.className = 'tagcard' + (isSelected ? '' : ' deselected');
-    card.dataset.key = row.key;
-    card.appendChild(buildSelectCheckboxWrap(row.key, isSelected, card));
-    appendFlashBadge(card, row.key);
-
-    // 1. Üst Kısım: Logo ve Adet Bilgisi
-    const head = document.createElement('div');
-    head.className = 'tc-head';
-
-    const logo = document.createElement('div');
-    logo.className = 'tc-logo';
-    logo.innerHTML = '<img src="data:image/webp;base64,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" alt="Doqu Home" class="tc-logo-img">';
-    head.appendChild(logo);
-
-    if(row.qty > 1){
-      const qtyBadge = document.createElement('div');
-      qtyBadge.className = 'tc-qty';
-      qtyBadge.textContent = `×${row.qty}`;
-      head.appendChild(qtyBadge);
-    }
-    card.appendChild(head);
-
-    // 2. Orta Kısım: Ürün Adı ve Mega Fiyat
-    const body = document.createElement('div');
-    body.className = 'tc-body';
-
-    const name = document.createElement('div');
-    name.className = 'tc-name';
-    name.textContent = item.name;
-    body.appendChild(name);
-
-    const price = document.createElement('div');
-    price.className = 'tc-price';
-    const unit = item.disc ?? item.price;
-    price.innerHTML = (item.disc ? `<span class="tc-old">${fmtTag(item.price)}</span>` : '') + fmtTag(unit);
-    body.appendChild(price);
-
-    card.appendChild(body);
-
-    // 3. Alt Kısım: QR Kod + Açıklama/Tarih + Yerli Üretim Rozeti
-    const botWrap = document.createElement('div');
-    botWrap.className = 'tc-bottom-wrap';
-
-    const qrWrap = document.createElement('div');
-    qrWrap.className = 'tc-qr';
-    const qrTarget = `https://www.doquhome.com.tr/arama/${encodeURIComponent(item.code || item.name)}`;
-    appendQr(qrWrap, qrTarget);
-    botWrap.appendChild(qrWrap);
-
-    const footText = document.createElement('div');
-    footText.className = 'tc-foot-text';
-    footText.innerHTML = `Fiyat Geçerlilik Tarihi: <b>${sheetDate || todayTR()}</b><br>Tavsiye edilen perakende satış fiyatıdır.<br>Fiyatlarımıza KDV dahildir.`;
-    botWrap.appendChild(footText);
-
-    const originBadge = buildOriginBadge(!item.imported);
-    if(originBadge) botWrap.appendChild(originBadge);
-
-    card.appendChild(botWrap);
-    card.addEventListener('click', ()=> openProductDetail(item, row.qty));
-    wrap.appendChild(wrapCardWithBadgeToggle(card, row.key));
+    wrap.appendChild(buildProductTagCard(item, row.key, row.qty));
   });
 
   // --- Otomatik tespit edilen ikili (TEK/ÇİFT vb.) etiketler doğrudan burada da gösterilir ---
@@ -2801,9 +2761,6 @@ function renderManualTagSheet(){
    aside panelle birebir aynı mantık. Seçim yapılınca ürün adı ve kodu otomatik
    dolar; fiyat her zaman elle girilir, adet kullanılmaz. */
 const manualKategoriSel = document.getElementById('manualKategori');
-const manualKategoriSearchInput = document.getElementById('manualKategoriSearch');
-const manualKategoriCombo = document.getElementById('manualKategoriCombo');
-const manualKategoriComboList = document.getElementById('manualKategoriComboList');
 const manualTakimSel = document.getElementById('manualTakim');
 const manualTakimSearchInput = document.getElementById('manualTakimSearch');
 const manualTakimCombo = document.getElementById('manualTakimCombo');
@@ -2824,105 +2781,8 @@ function populateManualKategori(){
   });
   if(prevSelected && CATALOG[prevSelected]) manualKategoriSel.value = prevSelected;
   else manualKategoriSel.value = '';
-  syncManualKategoriDisplay();
   populateManualTakim();
 }
-
-/* ---- Kategori için aranabilir combobox (Takım ile birebir aynı mantık) ---- */
-function syncManualKategoriDisplay(){
-  const selectedOption = manualKategoriSel.options[manualKategoriSel.selectedIndex];
-  manualKategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
-}
-
-function getManualKategoriMatches(query){
-  const q = trLower(query).trim();
-  const options = Array.from(manualKategoriSel.options).filter(o=> o.value !== '');
-  if(!q) return options;
-  const starts = [], contains = [];
-  options.forEach(o=>{
-    const label = trLower(o.textContent);
-    if(label.startsWith(q)) starts.push(o);
-    else if(label.includes(q)) contains.push(o);
-  });
-  return starts.concat(contains);
-}
-
-function renderManualKategoriComboList(query){
-  const matches = getManualKategoriMatches(query);
-  manualKategoriComboList.innerHTML = '';
-
-  const clearOpt = document.createElement('div');
-  clearOpt.className = 'takim-combo-option takim-combo-clear';
-  clearOpt.textContent = '— Kategori Seç — (temizle)';
-  clearOpt.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectManualKategoriOption(''); });
-  manualKategoriComboList.appendChild(clearOpt);
-
-  if(matches.length === 0){
-    const empty = document.createElement('div');
-    empty.className = 'takim-combo-empty';
-    empty.textContent = 'Eşleşen kategori bulunamadı';
-    manualKategoriComboList.appendChild(empty);
-    return;
-  }
-  matches.forEach(o=>{
-    const item = document.createElement('div');
-    item.className = 'takim-combo-option' + (o.value === manualKategoriSel.value ? ' active' : '');
-    item.setAttribute('role', 'option');
-    item.innerHTML = highlightMatch(o.textContent, query);
-    item.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectManualKategoriOption(o.value); });
-    manualKategoriComboList.appendChild(item);
-  });
-}
-
-function openManualKategoriCombo(query){
-  manualKategoriComboList.classList.add('open');
-  manualKategoriSearchInput.setAttribute('aria-expanded', 'true');
-  renderManualKategoriComboList(query || '');
-}
-
-function closeManualKategoriCombo(){
-  manualKategoriComboList.classList.remove('open');
-  manualKategoriSearchInput.setAttribute('aria-expanded', 'false');
-}
-
-function selectManualKategoriOption(value){
-  manualKategoriSel.value = value;
-  syncManualKategoriDisplay();
-  closeManualKategoriCombo();
-  manualKategoriSel.dispatchEvent(new Event('change'));
-}
-
-manualKategoriSearchInput.addEventListener('focus', ()=>{
-  manualKategoriSearchInput.select();
-  openManualKategoriCombo('');
-});
-
-manualKategoriSearchInput.addEventListener('input', ()=>{
-  openManualKategoriCombo(manualKategoriSearchInput.value);
-});
-
-manualKategoriSearchInput.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){
-    syncManualKategoriDisplay();
-    closeManualKategoriCombo();
-    manualKategoriSearchInput.blur();
-  } else if(e.key === 'Enter'){
-    e.preventDefault();
-    const matches = getManualKategoriMatches(manualKategoriSearchInput.value);
-    if(matches.length){ selectManualKategoriOption(matches[0].value); }
-  }
-});
-
-manualKategoriSearchInput.addEventListener('blur', ()=>{
-  setTimeout(()=>{
-    syncManualKategoriDisplay();
-    closeManualKategoriCombo();
-  }, 120);
-});
-
-document.addEventListener('click', (e)=>{
-  if(manualKategoriCombo && !manualKategoriCombo.contains(e.target)) closeManualKategoriCombo();
-});
 
 function populateManualTakim(){
   manualTakimSel.innerHTML = '';
@@ -3082,7 +2942,6 @@ document.getElementById('addManualBtn').addEventListener('click', ()=>{
    sayfaların (Etiket Basımı, İkili Etiket) kaydedilmiş durumuna dokunmaz. */
 function resetManual(){
   manualKategoriSel.value = '';
-  syncManualKategoriDisplay();
   populateManualTakim();
 
   document.getElementById('manualPrice').value = '';
@@ -3210,9 +3069,6 @@ function renderSsTagSheet(){
    birebir aynı mantık — seçim yapılınca ürün adı ve kodu otomatik dolar; fiyat
    ve etiket rengi her zaman elle girilir. */
 const ssKategoriSel = document.getElementById('ssKategori');
-const ssKategoriSearchInput = document.getElementById('ssKategoriSearch');
-const ssKategoriCombo = document.getElementById('ssKategoriCombo');
-const ssKategoriComboList = document.getElementById('ssKategoriComboList');
 const ssTakimSel = document.getElementById('ssTakim');
 const ssTakimSearchInput = document.getElementById('ssTakimSearch');
 const ssTakimCombo = document.getElementById('ssTakimCombo');
@@ -3234,105 +3090,8 @@ function populateSsKategori(){
   });
   if(prevSelected && CATALOG[prevSelected]) ssKategoriSel.value = prevSelected;
   else ssKategoriSel.value = '';
-  syncSsKategoriDisplay();
   populateSsTakim();
 }
-
-/* ---- Kategori için aranabilir combobox (Takım ile birebir aynı mantık) ---- */
-function syncSsKategoriDisplay(){
-  const selectedOption = ssKategoriSel.options[ssKategoriSel.selectedIndex];
-  ssKategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
-}
-
-function getSsKategoriMatches(query){
-  const q = trLower(query).trim();
-  const options = Array.from(ssKategoriSel.options).filter(o=> o.value !== '');
-  if(!q) return options;
-  const starts = [], contains = [];
-  options.forEach(o=>{
-    const label = trLower(o.textContent);
-    if(label.startsWith(q)) starts.push(o);
-    else if(label.includes(q)) contains.push(o);
-  });
-  return starts.concat(contains);
-}
-
-function renderSsKategoriComboList(query){
-  const matches = getSsKategoriMatches(query);
-  ssKategoriComboList.innerHTML = '';
-
-  const clearOpt = document.createElement('div');
-  clearOpt.className = 'takim-combo-option takim-combo-clear';
-  clearOpt.textContent = '— Kategori Seç — (temizle)';
-  clearOpt.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectSsKategoriOption(''); });
-  ssKategoriComboList.appendChild(clearOpt);
-
-  if(matches.length === 0){
-    const empty = document.createElement('div');
-    empty.className = 'takim-combo-empty';
-    empty.textContent = 'Eşleşen kategori bulunamadı';
-    ssKategoriComboList.appendChild(empty);
-    return;
-  }
-  matches.forEach(o=>{
-    const item = document.createElement('div');
-    item.className = 'takim-combo-option' + (o.value === ssKategoriSel.value ? ' active' : '');
-    item.setAttribute('role', 'option');
-    item.innerHTML = highlightMatch(o.textContent, query);
-    item.addEventListener('mousedown', (e)=>{ e.preventDefault(); selectSsKategoriOption(o.value); });
-    ssKategoriComboList.appendChild(item);
-  });
-}
-
-function openSsKategoriCombo(query){
-  ssKategoriComboList.classList.add('open');
-  ssKategoriSearchInput.setAttribute('aria-expanded', 'true');
-  renderSsKategoriComboList(query || '');
-}
-
-function closeSsKategoriCombo(){
-  ssKategoriComboList.classList.remove('open');
-  ssKategoriSearchInput.setAttribute('aria-expanded', 'false');
-}
-
-function selectSsKategoriOption(value){
-  ssKategoriSel.value = value;
-  syncSsKategoriDisplay();
-  closeSsKategoriCombo();
-  ssKategoriSel.dispatchEvent(new Event('change'));
-}
-
-ssKategoriSearchInput.addEventListener('focus', ()=>{
-  ssKategoriSearchInput.select();
-  openSsKategoriCombo('');
-});
-
-ssKategoriSearchInput.addEventListener('input', ()=>{
-  openSsKategoriCombo(ssKategoriSearchInput.value);
-});
-
-ssKategoriSearchInput.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){
-    syncSsKategoriDisplay();
-    closeSsKategoriCombo();
-    ssKategoriSearchInput.blur();
-  } else if(e.key === 'Enter'){
-    e.preventDefault();
-    const matches = getSsKategoriMatches(ssKategoriSearchInput.value);
-    if(matches.length){ selectSsKategoriOption(matches[0].value); }
-  }
-});
-
-ssKategoriSearchInput.addEventListener('blur', ()=>{
-  setTimeout(()=>{
-    syncSsKategoriDisplay();
-    closeSsKategoriCombo();
-  }, 120);
-});
-
-document.addEventListener('click', (e)=>{
-  if(ssKategoriCombo && !ssKategoriCombo.contains(e.target)) closeSsKategoriCombo();
-});
 
 function populateSsTakim(){
   ssTakimSel.innerHTML = '';
@@ -3492,7 +3251,6 @@ document.getElementById('addSsBtn').addEventListener('click', ()=>{
    sayfaların kaydedilmiş durumuna dokunmaz. */
 function resetSs(){
   ssKategoriSel.value = '';
-  syncSsKategoriDisplay();
   populateSsTakim();
 
   document.getElementById('ssPrice').value = '';
@@ -3684,6 +3442,7 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   populateTakim();
   populateManualKategori();
   populateSsKategori();
+  populateKategoriBasimSel();
   populateComboSelects();
   /* ÖNEMLİ: burada artık applyPreset() ÇAĞRILMIYOR. Eskiden her fiyat
      yenilemesinde (otomatik veya "Fiyatları Şimdi Yenile" ile) tablo sessizce
@@ -3744,6 +3503,7 @@ populateKategori();
 populateTakim();
 populateManualKategori();
 populateSsKategori();
+populateKategoriBasimSel();
 populateComboSelects();
 applyPreset();
 loadPricesFromSheet().then(()=> applySavedState(initialSavedStateSnapshot));
