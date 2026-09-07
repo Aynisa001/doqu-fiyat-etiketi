@@ -204,6 +204,12 @@
   }
   .kb-cat-chip button:hover{background:rgba(255,255,255,.4);}
   .kb-cat-chips-empty{font-size:12.5px; color:var(--ink-soft); margin-top:12px;}
+  .kb-cat-select-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; max-width:560px;}
+  .kb-cat-select-row select{flex:1; min-width:200px;}
+  #kategoriBasimSelectAllCatsBtn{white-space:nowrap;}
+
+  /* Yazdırma özeti: normalde gizli, sadece yazdırırken üstte görünür */
+  .kb-print-summary{display:none;}
   .kb-search-row{margin:16px 0 4px;}
   .kb-search-input{
     width:100%; max-width:420px; padding:10px 14px; border-radius:8px; border:1px solid var(--rule);
@@ -768,6 +774,22 @@
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
+    /* Kategori Toplu Basım: yazdırırken seçim kontrolleri (dropdown, buton, rozetler)
+       gizlenir; bunun yerine seçilen kategorilerin adı sayfanın en üstünde
+       düz metin olarak gösterilir. */
+    body.printing-tags label[for="kategoriBasimSel"],
+    body.printing-tags .kb-cat-select-row,
+    body.printing-tags .kb-cat-chips{ display:none !important; }
+    body.printing-tags .kb-print-summary{
+      display:block !important;
+      width:100%;
+      margin:0 0 16px;
+      padding:0 0 12px;
+      border-bottom:1.5px solid #000;
+      font-size:13px;
+      font-weight:800;
+      color:#000;
+    }
   }
 </style>
 </head>
@@ -1117,8 +1139,12 @@
     <p class="setsub">Sadece bir kategori seçin — o kategorideki TÜM ürünlerin etiketleri otomatik olarak aşağıda listelenir ve hepsi seçili gelir. İstemediklerinizi tek tek çıkarabilir, ardından hepsini toplu yazdırabilirsiniz.</p>
 
     <label for="kategoriBasimSel" style="max-width:420px; margin-top:20px;">Kategori</label>
-    <select id="kategoriBasimSel" style="max-width:420px;"></select>
+    <div class="kb-cat-select-row">
+      <select id="kategoriBasimSel"></select>
+      <button type="button" id="kategoriBasimSelectAllCatsBtn" class="tagselect-btn">📋 Tüm Kategorileri Seç</button>
+    </div>
     <div class="kb-cat-chips" id="kategoriBasimChips"></div>
+    <div class="kb-print-summary" id="kategoriBasimPrintSummary"></div>
 
     <div class="tagbar">
       <div>
@@ -2128,6 +2154,19 @@ if(kategoriBasimSearchInput){
   });
 }
 
+/* Yazdırma anında sayfanın en üstünde görünecek düz metin özet:
+   hangi kategorilerin seçili olduğunu, ekrandaki dropdown/rozet gibi
+   etkileşimli kontroller olmadan gösterir. */
+function updateKategoriBasimPrintSummary(){
+  const summary = document.getElementById('kategoriBasimPrintSummary');
+  if(!summary) return;
+  if(kategoriBasimSelectedCats.size === 0){
+    summary.textContent = '';
+    return;
+  }
+  summary.textContent = 'Kategoriler: ' + [...kategoriBasimSelectedCats].join(', ');
+}
+
 function renderKategoriBasimTagSheet(){
   const wrap = document.getElementById('kategoriBasimTagSheet');
   wrap.innerHTML = '';
@@ -2143,11 +2182,19 @@ function renderKategoriBasimTagSheet(){
     });
   });
   renderKategoriBasimChips();
+  updateKategoriBasimPrintSummary();
   applyKategoriBasimSearchFilter();
   updateKategoriBasimTagSelectCount();
   saveState();
 }
 kategoriBasimSel.addEventListener('change', renderKategoriBasimTagSheet);
+
+/* "Tüm Kategorileri Seç": katalogdaki her kategoriyi tek tıkla birikmiş
+   listeye ekler — kullanıcının tek tek seçmesine gerek kalmaz. */
+document.getElementById('kategoriBasimSelectAllCatsBtn').addEventListener('click', ()=>{
+  Object.keys(CATALOG).forEach(c=> kategoriBasimSelectedCats.add(c));
+  renderKategoriBasimTagSheet();
+});
 
 /* Kategori Toplu Basım sayfasını sıfırlar: birikmiş kategori listesini ve
    kategori seçimini temizler, sayfa boş listeyle baştan başlar. Diğer
