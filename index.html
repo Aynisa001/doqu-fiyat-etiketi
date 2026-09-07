@@ -192,6 +192,26 @@
   }
   .tag-select-count{font-weight:800; color:var(--petrol-deep);}
 
+  /* ---- Kategori Toplu Basım: eklenen kategori rozetleri + arama kutusu ---- */
+  .kb-cat-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+  .kb-cat-chip{
+    display:flex; align-items:center; gap:7px; padding:6px 8px 6px 14px; border-radius:20px;
+    background:var(--petrol-deep); color:#fff; font-size:12.5px; font-weight:700;
+  }
+  .kb-cat-chip button{
+    display:flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%;
+    border:none; background:rgba(255,255,255,.22); color:#fff; font-size:12px; line-height:1; cursor:pointer; padding:0;
+  }
+  .kb-cat-chip button:hover{background:rgba(255,255,255,.4);}
+  .kb-cat-chips-empty{font-size:12.5px; color:var(--ink-soft); margin-top:12px;}
+  .kb-search-row{margin:16px 0 4px;}
+  .kb-search-input{
+    width:100%; max-width:420px; padding:10px 14px; border-radius:8px; border:1px solid var(--rule);
+    background:var(--card); font-size:13.5px; color:var(--ink); font-family:inherit;
+  }
+  .kb-search-input:focus{outline:none; border-color:var(--petrol);}
+  .kb-search-noresult{width:100%; padding:20px 4px; font-size:13px; color:var(--ink-soft);}
+
   /* ---- Otomatik / Özel İki Ürünlü Etiket ---- */
   .combo-builder{
     margin-top:22px; padding:18px 20px; border-radius:10px; background:var(--card);
@@ -351,6 +371,33 @@
     border-radius:20px; padding:5px 12px; margin-top:2px;
   }
   @media print{ .pd-overlay{ display:none !important; } }
+
+  /* ---- Yazdırmadan önce özet penceresi ---- */
+  .pc-overlay{
+    display:none; position:fixed; inset:0; z-index:210;
+    background:rgba(20,18,14,.55);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .pc-overlay.open{ display:flex; }
+  .pc-modal{
+    background:var(--card); border-radius:14px; max-width:340px; width:100%;
+    box-shadow:0 18px 50px rgba(0,0,0,.28); padding:28px 26px 22px; text-align:center;
+  }
+  .pc-icon{
+    width:52px; height:52px; margin:0 auto 14px; border-radius:50%; background:var(--cream);
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+  }
+  .pc-title{ font-size:17px; font-weight:800; margin:0 0 6px; }
+  .pc-sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 22px; line-height:1.5; }
+  .pc-actions{ display:flex; gap:10px; }
+  .pc-btn{
+    flex:1; padding:11px 14px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; border:none;
+  }
+  .pc-btn-secondary{ background:var(--cream); color:var(--ink-soft); border:1px solid var(--rule) !important; }
+  .pc-btn-secondary:hover{ border-color:var(--petrol) !important; color:var(--petrol-deep); }
+  .pc-btn-primary{ background:var(--petrol-deep); color:#fff; }
+  .pc-btn-primary:hover{ background:var(--petrol); }
+  @media print{ .pc-overlay{ display:none !important; } }
 
   /* Ekranda gösterilen seçim kutusu (yazdırmada gizlenir) */
   .tc-select-wrap{
@@ -1071,6 +1118,7 @@
 
     <label for="kategoriBasimSel" style="max-width:420px; margin-top:20px;">Kategori</label>
     <select id="kategoriBasimSel" style="max-width:420px;"></select>
+    <div class="kb-cat-chips" id="kategoriBasimChips"></div>
 
     <div class="tagbar">
       <div>
@@ -1085,10 +1133,15 @@
         <div class="tag-select-control">
           <button type="button" id="kategoriBasimSelectAllBtn" class="tagselect-btn">Tümünü Seç</button>
           <button type="button" id="kategoriBasimSelectNoneBtn" class="tagselect-btn">Seçimi Kaldır</button>
+          <button type="button" id="kategoriBasimResetBtn" class="tagselect-btn">↺ Varsayılana Dön</button>
         </div>
         <button type="button" id="printKategoriBasimTagsBtn">🏷 Seçili Etiketleri Yazdır</button>
       </div>
       <div class="tag-select-hint">Seçili etiket: <span class="tag-select-count" id="kategoriBasimTagSelectCount">0</span> / <span id="kategoriBasimTagTotalCount">0</span></div>
+    </div>
+
+    <div class="kb-search-row">
+      <input type="text" id="kategoriBasimSearchInput" class="kb-search-input" placeholder="🔍 Ürün adı veya koduna göre filtrele…">
     </div>
 
     <div class="tag-sheet" id="kategoriBasimTagSheet"></div>
@@ -1107,6 +1160,18 @@
   <div class="pd-modal" id="productDetailModal" role="dialog" aria-modal="true">
     <button type="button" class="pd-close" id="productDetailClose" aria-label="Kapat">×</button>
     <div id="productDetailBody"></div>
+  </div>
+</div>
+
+<div class="pc-overlay" id="printConfirmOverlay">
+  <div class="pc-modal" id="printConfirmModal" role="dialog" aria-modal="true">
+    <div class="pc-icon">🖨</div>
+    <div class="pc-title" id="printConfirmTitle">— etiket yazdırılacak</div>
+    <div class="pc-sub" id="printConfirmSub">—</div>
+    <div class="pc-actions">
+      <button type="button" class="pc-btn pc-btn-secondary" id="printConfirmCancel">Vazgeç</button>
+      <button type="button" class="pc-btn pc-btn-primary" id="printConfirmGo">🖨 Yazdır</button>
+    </div>
   </div>
 </div>
 
@@ -1507,6 +1572,8 @@ function saveState(){
       manualIdCounter,
       ssTags,
       ssIdCounter,
+      kategoriBasim: kategoriBasimSel.value,
+      kategoriBasimSelectedCats: [...kategoriBasimSelectedCats],
       flashBadgeHiddenKeys: [...flashBadgeHiddenKeys]
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -1557,6 +1624,8 @@ function applySavedState(saved){
   if(typeof saved.manualIdCounter === 'number') manualIdCounter = saved.manualIdCounter;
   if(Array.isArray(saved.ssTags)) ssTags = saved.ssTags;
   if(typeof saved.ssIdCounter === 'number') ssIdCounter = saved.ssIdCounter;
+  if(Array.isArray(saved.kategoriBasimSelectedCats)) kategoriBasimSelectedCats = new Set(saved.kategoriBasimSelectedCats.filter(c=> CATALOG[c]));
+  if(saved.kategoriBasim && CATALOG[saved.kategoriBasim]) kategoriBasimSel.value = saved.kategoriBasim;
   if(Array.isArray(saved.flashBadgeHiddenKeys)) flashBadgeHiddenKeys = new Set(saved.flashBadgeHiddenKeys);
   if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
   if(Array.isArray(saved.seenTagKeysEver)) seenTagKeysEver = new Set(saved.seenTagKeysEver);
@@ -1564,6 +1633,7 @@ function applySavedState(saved){
   renderRows();
   renderManualTagSheet();
   renderSsTagSheet();
+  renderKategoriBasimTagSheet();
 }
 
 function fmt(n){
@@ -1814,9 +1884,66 @@ if(flashBadgeTextInput){
   });
 }
 
+/* ---- Yazdırmadan önce özet penceresi ----
+   Her "Seçili Etiketleri Yazdır" butonu, doğrudan yazdırma diyaloğunu açmak
+   yerine önce kaç etiketin ve yaklaşık kaç A4 sayfasının yazdırılacağını
+   gösteren küçük bir onay penceresi açar. Sayfa sayısı, mevcut etiket
+   boyutuna (--tag-w/--tag-h) göre yapılan bir tahmindir; gerçek kağıt/
+   yazıcı ayarlarına göre birkaç etiket farklı çıkabilir. */
+const printConfirmOverlay = document.getElementById('printConfirmOverlay');
+const printConfirmTitle = document.getElementById('printConfirmTitle');
+const printConfirmSub = document.getElementById('printConfirmSub');
+const printConfirmGo = document.getElementById('printConfirmGo');
+const printConfirmCancel = document.getElementById('printConfirmCancel');
+let printConfirmAction = null;
+
+function estimateLabelsPerPage(){
+  const wCm = Math.max(3, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tag-w')) || 10);
+  const hCm = Math.max(3, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tag-h')) || 7);
+  const gapCm = 0.55; // .tag-sheet'teki 20px boşluğun yaklaşık cm karşılığı
+  const pageWCm = 19;   // A4 (21cm) eksi tipik yazıcı kenar boşlukları
+  const pageHCm = 27.5; // A4 (29.7cm) eksi tipik yazıcı kenar boşlukları
+  const cols = Math.max(1, Math.floor((pageWCm + gapCm) / (wCm + gapCm)));
+  const rows = Math.max(1, Math.floor((pageHCm + gapCm) / (hCm + gapCm)));
+  return Math.max(1, cols * rows);
+}
+
+function openPrintConfirm(sheetId, onConfirm){
+  const count = document.querySelectorAll('#'+sheetId+' .tagcard:not(.deselected)').length;
+  if(count === 0){
+    printConfirmTitle.textContent = 'Yazdırılacak etiket yok';
+    printConfirmSub.textContent = 'Önce en az bir etiket seçili olmalı.';
+    printConfirmGo.style.display = 'none';
+  } else {
+    const perPage = estimateLabelsPerPage();
+    const pages = Math.max(1, Math.ceil(count / perPage));
+    printConfirmTitle.textContent = `${count} etiket yazdırılacak`;
+    printConfirmSub.textContent = `Yaklaşık ${pages} sayfa (A4) — mevcut etiket boyutuna göre tahmini, gerçek çıktı yazıcı ayarına göre değişebilir.`;
+    printConfirmGo.style.display = '';
+  }
+  printConfirmAction = onConfirm;
+  printConfirmOverlay.classList.add('open');
+}
+function closePrintConfirm(){
+  printConfirmOverlay.classList.remove('open');
+  printConfirmAction = null;
+}
+printConfirmCancel.addEventListener('click', closePrintConfirm);
+printConfirmOverlay.addEventListener('click', (e)=>{ if(e.target === printConfirmOverlay) closePrintConfirm(); });
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && printConfirmOverlay.classList.contains('open')) closePrintConfirm();
+});
+printConfirmGo.addEventListener('click', ()=>{
+  const action = printConfirmAction;
+  closePrintConfirm();
+  if(action) action();
+});
+
 document.getElementById('printTagsBtn').addEventListener('click', ()=>{
-  document.body.classList.add('printing-tags');
-  window.print();
+  openPrintConfirm('tagSheet', ()=>{
+    document.body.classList.add('printing-tags');
+    window.print();
+  });
 });
 window.addEventListener('afterprint', ()=>{
   document.body.classList.remove('printing-tags');
@@ -1914,9 +2041,17 @@ wireTagSelectButtons('manualSelectAllBtn', 'manualSelectNoneBtn', 'manualTagShee
 wireTagSelectButtons('ssSelectAllBtn', 'ssSelectNoneBtn', 'ssTagSheet', updateSsTagSelectCount);
 wireTagSelectButtons('kategoriBasimSelectAllBtn', 'kategoriBasimSelectNoneBtn', 'kategoriBasimTagSheet', updateKategoriBasimTagSelectCount);
 
-/* ---- Kategori Toplu Basım sayfası: sadece kategori seçilir, o kategorideki
-   TÜM ürünlerin etiketleri otomatik listelenir (satır/takım eklemeye gerek yok). ---- */
+/* ---- Kategori Toplu Basım sayfası: kategori seçilir, o kategorideki
+   TÜM ürünlerin etiketleri otomatik listelenir. Yeni bir kategori seçildiğinde
+   önceki kategorinin etiketleri sayfadan SİLİNMEZ — yeni kategori mevcut
+   listenin üzerine eklenir (birikimli). Her eklenen kategori üstte bir
+   rozet olarak görünür; rozetin × butonuyla sadece o kategori listeden
+   çıkarılabilir. Baştan başlamak için "Varsayılana Dön" butonu birikmiş
+   kategori listesinin tamamını temizler. ---- */
 const kategoriBasimSel = document.getElementById('kategoriBasimSel');
+const kategoriBasimSearchInput = document.getElementById('kategoriBasimSearchInput');
+let kategoriBasimSelectedCats = new Set();
+let kategoriBasimSearchTerm = '';
 
 function populateKategoriBasimSel(){
   const prevSelected = kategoriBasimSel.value;
@@ -1931,27 +2066,117 @@ function populateKategoriBasimSel(){
   });
   if(prevSelected && CATALOG[prevSelected]) kategoriBasimSel.value = prevSelected;
   else kategoriBasimSel.value = '';
+  // Katalog yenilendiğinde artık var olmayan kategorileri birikmiş listeden çıkar
+  [...kategoriBasimSelectedCats].forEach(c=>{ if(!CATALOG[c]) kategoriBasimSelectedCats.delete(c); });
+}
+
+/* Eklenen her kategori için üstte kaldırılabilir bir rozet gösterir. */
+function renderKategoriBasimChips(){
+  const chipsWrap = document.getElementById('kategoriBasimChips');
+  chipsWrap.innerHTML = '';
+  if(kategoriBasimSelectedCats.size === 0){
+    const hint = document.createElement('div');
+    hint.className = 'kb-cat-chips-empty';
+    hint.textContent = 'Henüz kategori eklenmedi — yukarıdan bir kategori seçin.';
+    chipsWrap.appendChild(hint);
+    return;
+  }
+  kategoriBasimSelectedCats.forEach(c=>{
+    const chip = document.createElement('div');
+    chip.className = 'kb-cat-chip';
+    const label = document.createElement('span');
+    label.textContent = c;
+    chip.appendChild(label);
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.textContent = '×';
+    removeBtn.title = `${c} kategorisini listeden çıkar`;
+    removeBtn.addEventListener('click', ()=>{
+      kategoriBasimSelectedCats.delete(c);
+      if(kategoriBasimSel.value === c) kategoriBasimSel.value = '';
+      renderKategoriBasimTagSheet();
+    });
+    chip.appendChild(removeBtn);
+    chipsWrap.appendChild(chip);
+  });
+}
+
+/* Etiket kartlarını gizlemeden (seçim durumunu bozmadan) ürün adı/koduna
+   göre görünürlüklerini günceller. */
+function applyKategoriBasimSearchFilter(){
+  const wrap = document.getElementById('kategoriBasimTagSheet');
+  const q = trLower(kategoriBasimSearchTerm).trim();
+  let visibleCount = 0;
+  wrap.querySelectorAll('.tagcard').forEach(card=>{
+    const hay = trLower(card.dataset.searchText || '');
+    const match = !q || hay.includes(q);
+    card.style.display = match ? '' : 'none';
+    if(match) visibleCount++;
+  });
+  let noResult = wrap.querySelector('.kb-search-noresult');
+  if(q && visibleCount === 0){
+    if(!noResult){
+      noResult = document.createElement('div');
+      noResult.className = 'kb-search-noresult';
+      wrap.appendChild(noResult);
+    }
+    noResult.textContent = `“${kategoriBasimSearchTerm}” ile eşleşen etiket bulunamadı.`;
+  } else if(noResult){
+    noResult.remove();
+  }
+}
+if(kategoriBasimSearchInput){
+  kategoriBasimSearchInput.addEventListener('input', ()=>{
+    kategoriBasimSearchTerm = kategoriBasimSearchInput.value;
+    applyKategoriBasimSearchFilter();
+  });
 }
 
 function renderKategoriBasimTagSheet(){
   const wrap = document.getElementById('kategoriBasimTagSheet');
   wrap.innerHTML = '';
   const cat = kategoriBasimSel.value;
-  const items = CATALOG[cat] || [];
-  items.forEach(it=>{
-    const key = cat + '::' + it.name;
-    wrap.appendChild(buildProductTagCard(it, key, 1));
+  if(cat) kategoriBasimSelectedCats.add(cat);
+  kategoriBasimSelectedCats.forEach(c=>{
+    const items = CATALOG[c] || [];
+    items.forEach(it=>{
+      const key = c + '::' + it.name;
+      const card = buildProductTagCard(it, key, 1);
+      card.dataset.searchText = `${it.name} ${it.code || ''}`;
+      wrap.appendChild(card);
+    });
   });
+  renderKategoriBasimChips();
+  applyKategoriBasimSearchFilter();
   updateKategoriBasimTagSelectCount();
   saveState();
 }
 kategoriBasimSel.addEventListener('change', renderKategoriBasimTagSheet);
 
-['printComboTagsBtn', 'printManualTagsBtn', 'printSsTagsBtn', 'printKategoriBasimTagsBtn'].forEach(id=>{
-  const btn = document.getElementById(id);
+/* Kategori Toplu Basım sayfasını sıfırlar: birikmiş kategori listesini ve
+   kategori seçimini temizler, sayfa boş listeyle baştan başlar. Diğer
+   sayfaların (Etiket Basımı, İkili, Manuel, Seri Sonu) durumuna dokunmaz. */
+function resetKategoriBasim(){
+  kategoriBasimSelectedCats = new Set();
+  kategoriBasimSel.value = '';
+  kategoriBasimSearchTerm = '';
+  if(kategoriBasimSearchInput) kategoriBasimSearchInput.value = '';
+  renderKategoriBasimTagSheet();
+}
+document.getElementById('kategoriBasimResetBtn').addEventListener('click', resetKategoriBasim);
+
+Object.entries({
+  'printComboTagsBtn': 'comboTagSheet',
+  'printManualTagsBtn': 'manualTagSheet',
+  'printSsTagsBtn': 'ssTagSheet',
+  'printKategoriBasimTagsBtn': 'kategoriBasimTagSheet'
+}).forEach(([btnId, sheetId])=>{
+  const btn = document.getElementById(btnId);
   if(btn) btn.addEventListener('click', ()=>{
-    document.body.classList.add('printing-tags');
-    window.print();
+    openPrintConfirm(sheetId, ()=>{
+      document.body.classList.add('printing-tags');
+      window.print();
+    });
   });
 });
 
@@ -3443,6 +3668,7 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   populateManualKategori();
   populateSsKategori();
   populateKategoriBasimSel();
+  renderKategoriBasimTagSheet();
   populateComboSelects();
   /* ÖNEMLİ: burada artık applyPreset() ÇAĞRILMIYOR. Eskiden her fiyat
      yenilemesinde (otomatik veya "Fiyatları Şimdi Yenile" ile) tablo sessizce
