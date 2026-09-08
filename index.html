@@ -1849,25 +1849,14 @@ function applyPreset(){
 kategoriSel.addEventListener('change', ()=>{ populateTakim(); applyPreset(); });
 takimSel.addEventListener('change', applyPreset);
 
-/* "Varsayılana Dön": sadece tablo satırlarını değil, Kategori/Takım seçimlerini,
-   işaretli etiketleri ve eklenmiş özel (ikili) etiketleri de tamamen temizler —
-   sayfa ilk açıldığındaki boş haline döner. Kayıtlı localStorage durumu da silinir. */
+/* "Varsayılana Dön" (ana sayfa): kayıtlı localStorage durumunu silip
+   sayfanın tamamını yeniden yükler (tam sayfa yenileme) — böylece her şey
+   ilk açılıştaki gibi sıfırdan başlar. Diğer sekmelerin kendi
+   "Varsayılana Dön" butonları (resetManual, resetSs, resetKategoriBasim)
+   sayfayı yenilemez, yalnızca kendi sekmelerini sıfırlar. */
 function resetAll(){
-  kategoriSel.value = '';
-  populateTakim();
-  takimSel.value = '';
-  syncTakimDisplay();
-
-  rows = [];
-  while(rows.length < ROW_COUNT) rows.push({key:null, qty:1, optional:false});
-
-  selectedTagKeys = new Set();
-  seenTagKeysEver = new Set();
-  comboTags = [];
-  comboIdCounter = 1;
-
   try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
-  renderRows();
+  location.reload();
 }
 document.getElementById('resetBtn').addEventListener('click', resetAll);
 document.getElementById('printBtn').addEventListener('click', ()=> window.print());
