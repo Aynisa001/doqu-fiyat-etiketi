@@ -66,6 +66,21 @@
   .pagetab.active{background:var(--petrol-deep); border-color:var(--petrol-deep); color:#fff;}
   @media print{ .pagetabs{display:none !important;} }
 
+  /* ---- Sheets güncelleme bildirimi ---- */
+  .update-toast{
+    position:fixed; top:18px; right:18px; z-index:999;
+    display:flex; align-items:center; gap:9px;
+    padding:12px 18px; border-radius:10px;
+    background:#f0f7ee; border:1px solid #a9d1a0; color:#2c5c26;
+    font-size:13px; font-weight:700; font-family:inherit;
+    box-shadow:0 4px 14px rgba(0,0,0,.14);
+    transform:translateY(-14px); opacity:0; pointer-events:none;
+    transition:transform .25s ease, opacity .25s ease;
+  }
+  .update-toast.show{ transform:translateY(0); opacity:1; }
+  .update-toast-dot{ width:8px; height:8px; border-radius:50%; background:#3f8f38; display:inline-block; flex:none; }
+  @media print{ .update-toast{display:none !important;} }
+
   /* ---- Flaş İndirim Rozeti alt kontrol barı ---- */
   .flash-badge-footer{
     display:flex; justify-content:center; padding:18px 32px 34px;
@@ -804,6 +819,11 @@
 </style>
 </head>
 <body>
+
+<div class="update-toast" id="updateToast" role="status" aria-live="polite">
+  <span class="update-toast-dot"></span>
+  <span>Fiyatlar güncellendi</span>
+</div>
 
 <div class="browserbar">doquhome.com.tr/fiyat-etiketi</div>
 
@@ -3777,6 +3797,22 @@ function applyCatalogUpdate({newCategories, order, productCount}){
   renderRows();
 }
 
+function hashSheetText(str){
+  let h = 5381;
+  for(let i=0;i<str.length;i++){ h = ((h*33) ^ str.charCodeAt(i)) >>> 0; }
+  return h.toString(36);
+}
+
+const SHEET_HASH_KEY = 'doquSheetSnapshotHash';
+
+function showUpdateToast(){
+  const toast = document.getElementById('updateToast');
+  if(!toast) return;
+  toast.classList.add('show');
+  clearTimeout(showUpdateToast._t);
+  showUpdateToast._t = setTimeout(()=> toast.classList.remove('show'), 6000);
+}
+
 async function loadPricesFromSheet(){
   const note = document.getElementById('syncNote');
   const btn = document.getElementById('refreshBtn');
@@ -3784,11 +3820,16 @@ async function loadPricesFromSheet(){
   try{
     if(typeof Papa === 'undefined') throw new Error('CSV ayrıştırma kütüphanesi yüklenemedi.');
     const cacheBuster = '&_=' + Date.now();
-    let res, csvText;
+    let res, csvText, fromLiveSheet = false;
     try{
       res = await fetch(SHEET_CSV_URL + cacheBuster, {cache:'no-store'});
       if(!res.ok) throw new Error('Google Sheets\'e ulaşılamadı (HTTP ' + res.status + ').');
       csvText = await res.text();
+      fromLiveSheet = true;
+      const newHash = hashSheetText(csvText);
+      const prevHash = localStorage.getItem(SHEET_HASH_KEY);
+      if(prevHash && prevHash !== newHash) showUpdateToast();
+      localStorage.setItem(SHEET_HASH_KEY, newHash);
     }catch(sheetErr){
       console.warn('Canlı Sheets verisi alınamadı, yerel prices.csv deneniyor:', sheetErr.message);
       res = await fetch('./prices.csv?_=' + Date.now());
