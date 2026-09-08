@@ -180,7 +180,11 @@
   }
   .tagbar button:hover{background:var(--petrol);}
 
-  .tag-select-control{display:flex; align-items:center; gap:8px;}
+  .tag-select-control{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .tagselect-btn.badge-btn{
+    border-color:#e0b400 !important; color:#8a6d00 !important;
+  }
+  .tagselect-btn.badge-btn:hover{border-color:#c99a00 !important; color:#6b5400 !important;}
   .tagselect-btn{
     padding:8px 14px !important; border-radius:20px !important; border:1px solid var(--rule) !important;
     background:var(--card) !important; color:var(--ink-soft) !important;
@@ -203,6 +207,12 @@
     border:none; background:rgba(255,255,255,.22); color:#fff; font-size:12px; line-height:1; cursor:pointer; padding:0;
   }
   .kb-cat-chip button:hover{background:rgba(255,255,255,.4);}
+  .kb-cat-chip-badge{
+    width:auto !important; border-radius:10px !important; padding:0 6px !important;
+    background:rgba(255,255,255,.14) !important; opacity:.55; font-size:12px;
+  }
+  .kb-cat-chip-badge.is-on{background:#ffd23f !important; opacity:1;}
+  .kb-cat-chip-badge:hover{opacity:1;}
   .kb-cat-chips-empty{font-size:12.5px; color:var(--ink-soft); margin-top:12px;}
   .kb-cat-select-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; max-width:560px;}
   .kb-cat-select-row select{flex:1; min-width:200px;}
@@ -1575,6 +1585,12 @@ let comboIdCounter = 1;
    "kapatılmış" (rozeti istenmeyen) etiket anahtarları tutulur. */
 let flashBadgeHiddenKeys = new Set();
 
+/* Kategori Toplu Basım'da her ürün key'inin rozet varsayılan durumunun
+   (kapalı) daha önce uygulanıp uygulanmadığını tutar — aynı ürün tekrar
+   render edildiğinde varsayılan tekrar dayatılmasın, kullanıcının açtığı
+   rozet kapanmasın diye. */
+let kbBadgeSeenKeys = new Set();
+
 /* ---- Veri kalıcılığı: tabloya eklenen ürünler, etiket seçimleri ve birleşik
    etiketler tarayıcının localStorage'ına kaydedilir; sayfa yenilense veya
    kapatılıp tekrar açılsa bile aynı cihazda geri yüklenir. ---- */
@@ -1596,7 +1612,8 @@ function saveState(){
       ssIdCounter,
       kategoriBasim: kategoriBasimSel.value,
       kategoriBasimSelectedCats: [...kategoriBasimSelectedCats],
-      flashBadgeHiddenKeys: [...flashBadgeHiddenKeys]
+      flashBadgeHiddenKeys: [...flashBadgeHiddenKeys],
+      kbBadgeSeenKeys: [...kbBadgeSeenKeys]
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }catch(e){
@@ -1649,6 +1666,7 @@ function applySavedState(saved){
   if(Array.isArray(saved.kategoriBasimSelectedCats)) kategoriBasimSelectedCats = new Set(saved.kategoriBasimSelectedCats.filter(c=> CATALOG[c]));
   if(saved.kategoriBasim && CATALOG[saved.kategoriBasim]) kategoriBasimSel.value = saved.kategoriBasim;
   if(Array.isArray(saved.flashBadgeHiddenKeys)) flashBadgeHiddenKeys = new Set(saved.flashBadgeHiddenKeys);
+  if(Array.isArray(saved.kbBadgeSeenKeys)) kbBadgeSeenKeys = new Set(saved.kbBadgeSeenKeys);
   if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
   if(Array.isArray(saved.seenTagKeysEver)) seenTagKeysEver = new Set(saved.seenTagKeysEver);
 
@@ -2093,6 +2111,34 @@ function populateKategoriBasimSel(){
 }
 
 /* Eklenen her kategori için üstte kaldırılabilir bir rozet gösterir. */
+/* Bir kategorideki ürünlerin en az biri rozetli (gizli değil) ise "açık"
+   kabul edilir; tıklanınca o kategorinin TÜM ürünleri tek seferde
+   açılır/kapatılır — tek tek işaretlemeye gerek kalmaz. */
+function isCategoryBadgeOn(c){
+  const items = CATALOG[c] || [];
+  if(items.length === 0) return true;
+  return items.some(it=> !flashBadgeHiddenKeys.has(c + '::' + it.name));
+}
+
+function toggleCategoryBadge(c){
+  const items = CATALOG[c] || [];
+  const turnOff = isCategoryBadgeOn(c);
+  const wrap = document.getElementById('kategoriBasimTagSheet');
+  items.forEach(it=>{
+    const key = c + '::' + it.name;
+    if(turnOff) flashBadgeHiddenKeys.add(key); else flashBadgeHiddenKeys.delete(key);
+    const card = wrap ? wrap.querySelector(`.tagcard[data-key="${CSS.escape(key)}"]`) : null;
+    if(card){
+      card.classList.toggle('flash-badge-off', turnOff);
+      const slot = card.closest('.tagcard-slot');
+      const cb = slot ? slot.querySelector('.tc-badge-toggle-row input') : null;
+      if(cb) cb.checked = !turnOff;
+    }
+  });
+  saveState();
+  renderKategoriBasimChips();
+}
+
 function renderKategoriBasimChips(){
   const chipsWrap = document.getElementById('kategoriBasimChips');
   chipsWrap.innerHTML = '';
@@ -2109,6 +2155,18 @@ function renderKategoriBasimChips(){
     const label = document.createElement('span');
     label.textContent = c;
     chip.appendChild(label);
+
+    const badgeOn = isCategoryBadgeOn(c);
+    const badgeBtn = document.createElement('button');
+    badgeBtn.type = 'button';
+    badgeBtn.className = 'kb-cat-chip-badge' + (badgeOn ? ' is-on' : '');
+    badgeBtn.textContent = '⚡';
+    badgeBtn.title = badgeOn
+      ? `${c} kategorisindeki rozeti tüm ürünlerden kaldır`
+      : `${c} kategorisindeki tüm ürünlere rozet ekle`;
+    badgeBtn.addEventListener('click', ()=> toggleCategoryBadge(c));
+    chip.appendChild(badgeBtn);
+
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.textContent = '×';
@@ -2176,6 +2234,15 @@ function renderKategoriBasimTagSheet(){
     const items = CATALOG[c] || [];
     items.forEach(it=>{
       const key = c + '::' + it.name;
+      // Kategori Toplu Basım'da bir ürün ilk kez görülüyorsa rozet varsayılan
+      // olarak KAPALI başlar; kullanıcı isterse tek tek veya kategori
+      // rozetinden (⚡) açar. Daha sonra tekrar render edilse bile (ör. arama
+      // filtresi, başka kategori eklenmesi) bu varsayılan tekrar uygulanmaz —
+      // kullanıcının yaptığı seçim korunur.
+      if(!kbBadgeSeenKeys.has(key)){
+        kbBadgeSeenKeys.add(key);
+        flashBadgeHiddenKeys.add(key);
+      }
       const card = buildProductTagCard(it, key, 1);
       card.dataset.searchText = `${it.name} ${it.code || ''}`;
       wrap.appendChild(card);
