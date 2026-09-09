@@ -123,7 +123,7 @@
     color:var(--ink-soft); margin:0 0 14px;
   }
   label{
-    display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    display:block; font-size:12.5px; font-weight:700; letter-spacing:0;
     color:var(--ink-soft); margin:14px 0 6px;
   }
   label:first-of-type{margin-top:0;}
@@ -135,7 +135,20 @@
 
   /* ---- Aranabilir Takım Seçimi (searchable combobox) ---- */
   .takim-combo{position:relative;}
-  .takim-combo-input{cursor:text;}
+  .takim-combo-input{cursor:text; padding-left:32px; padding-right:30px;}
+  .takim-combo-icon{
+    position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    width:15px; height:15px; pointer-events:none; color:var(--ink-soft); opacity:.6;
+  }
+  .takim-combo-clear-btn{
+    position:absolute; right:5px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border:none; background:transparent; cursor:pointer;
+    color:var(--ink-soft); align-items:center; justify-content:center;
+    border-radius:50%; font-size:16px; line-height:1; padding:0; display:none;
+  }
+  .takim-combo-clear-btn.visible{display:flex;}
+  .takim-combo-clear-btn:hover{background:var(--rule); color:var(--petrol-deep);}
+  @media print{ .takim-combo-icon, .takim-combo-clear-btn{display:none !important;} }
   .takim-combo-native{
     position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
     overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
@@ -223,11 +236,15 @@
   }
   .kb-cat-chip button:hover{background:rgba(255,255,255,.4);}
   .kb-cat-chip-badge{
-    width:auto !important; border-radius:10px !important; padding:0 6px !important;
-    background:rgba(255,255,255,.14) !important; opacity:.55; font-size:12px;
+    width:20px !important; height:20px !important; border-radius:50% !important; padding:0 !important;
+    background:transparent !important; border:1.5px solid rgba(255,255,255,.5) !important;
+    opacity:1; font-size:11px; transition:all .12s ease;
   }
-  .kb-cat-chip-badge.is-on{background:#ffd23f !important; opacity:1;}
-  .kb-cat-chip-badge:hover{opacity:1;}
+  .kb-cat-chip-badge.is-on{
+    background:#ffd23f !important; border-color:#ffd23f !important;
+    box-shadow:0 0 0 3px rgba(255,210,63,.22);
+  }
+  .kb-cat-chip-badge:hover{border-color:#fff !important;}
   .kb-cat-chips-empty{font-size:12.5px; color:var(--ink-soft); margin-top:12px;}
   .kb-cat-select-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; max-width:560px;}
   .kb-cat-select-row select{flex:1; min-width:200px;}
@@ -730,10 +747,23 @@
   /* ---- Aranabilir Ünite Seçimi (Takım ile aynı stil) ---- */
   .unite-combo{position:relative; min-width:200px;}
   .unite-combo-input{
-    width:100%; cursor:text; padding:8px 9px; border:1px solid var(--rule); border-radius:6px;
+    width:100%; cursor:text; padding:8px 26px 8px 26px; border:1px solid var(--rule); border-radius:6px;
     background:var(--cream); font-family:inherit; font-size:12.5px; color:var(--ink);
   }
   .unite-combo-input:focus{outline:2px solid var(--petrol); outline-offset:1px;}
+  .unite-combo-icon{
+    position:absolute; left:8px; top:50%; transform:translateY(-50%);
+    width:13px; height:13px; pointer-events:none; color:var(--ink-soft); opacity:.6;
+  }
+  .unite-combo-clear-btn{
+    position:absolute; right:4px; top:50%; transform:translateY(-50%);
+    width:19px; height:19px; border:none; background:transparent; cursor:pointer;
+    color:var(--ink-soft); align-items:center; justify-content:center;
+    border-radius:50%; font-size:14px; line-height:1; padding:0; display:none;
+  }
+  .unite-combo-clear-btn.visible{display:flex;}
+  .unite-combo-clear-btn:hover{background:var(--rule); color:var(--petrol-deep);}
+  @media print{ .unite-combo-icon, .unite-combo-clear-btn{display:none !important;} }
   .unite-combo-list{
     position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:45;
     background:var(--card); border:1px solid var(--rule); border-radius:6px;
@@ -851,14 +881,18 @@
 
     <label for="kategoriSearch">Kategori</label>
     <div class="takim-combo" id="kategoriCombo">
+      <svg class="takim-combo-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       <input type="text" id="kategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="kategoriComboList">
+      <button type="button" class="takim-combo-clear-btn" id="kategoriClearBtn" aria-label="Temizle" tabindex="-1">×</button>
       <div class="takim-combo-list" id="kategoriComboList" role="listbox"></div>
       <select id="kategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
     </div>
 
     <label for="takimSearch">Takım</label>
     <div class="takim-combo" id="takimCombo">
+      <svg class="takim-combo-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       <input type="text" id="takimSearch" class="takim-combo-input" placeholder="Takım seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="takimComboList">
+      <button type="button" class="takim-combo-clear-btn" id="takimClearBtn" aria-label="Temizle" tabindex="-1">×</button>
       <div class="takim-combo-list" id="takimComboList" role="listbox"></div>
       <select id="takim" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
     </div>
@@ -1020,7 +1054,9 @@
         <div class="combo-field">
           <label for="manualKategoriSearch">Kategori</label>
           <div class="takim-combo" id="manualKategoriCombo">
-            <input type="text" id="manualKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="manualKategoriComboList">
+            <svg class="takim-combo-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input type="text" id="manualKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="manualKategoriComboList">
+      <button type="button" class="takim-combo-clear-btn" id="manualKategoriClearBtn" aria-label="Temizle" tabindex="-1">×</button>
             <div class="takim-combo-list" id="manualKategoriComboList" role="listbox"></div>
             <select id="manualKategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
           </div>
@@ -1028,7 +1064,9 @@
         <div class="combo-field">
           <label for="manualTakimSearch">Takım</label>
           <div class="takim-combo" id="manualTakimCombo">
-            <input type="text" id="manualTakimSearch" class="takim-combo-input" placeholder="Takım seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="manualTakimComboList">
+            <svg class="takim-combo-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input type="text" id="manualTakimSearch" class="takim-combo-input" placeholder="Takım seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="manualTakimComboList">
+      <button type="button" class="takim-combo-clear-btn" id="manualTakimClearBtn" aria-label="Temizle" tabindex="-1">×</button>
             <div class="takim-combo-list" id="manualTakimComboList" role="listbox"></div>
             <select id="manualTakim" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
           </div>
@@ -1099,7 +1137,9 @@
         <div class="combo-field">
           <label for="ssKategoriSearch">Kategori</label>
           <div class="takim-combo" id="ssKategoriCombo">
-            <input type="text" id="ssKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ssKategoriComboList">
+            <svg class="takim-combo-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input type="text" id="ssKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ssKategoriComboList">
+      <button type="button" class="takim-combo-clear-btn" id="ssKategoriClearBtn" aria-label="Temizle" tabindex="-1">×</button>
             <div class="takim-combo-list" id="ssKategoriComboList" role="listbox"></div>
             <select id="ssKategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
           </div>
@@ -1107,7 +1147,9 @@
         <div class="combo-field">
           <label for="ssTakimSearch">Takım</label>
           <div class="takim-combo" id="ssTakimCombo">
-            <input type="text" id="ssTakimSearch" class="takim-combo-input" placeholder="Takım seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ssTakimComboList">
+            <svg class="takim-combo-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input type="text" id="ssTakimSearch" class="takim-combo-input" placeholder="Takım seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ssTakimComboList">
+      <button type="button" class="takim-combo-clear-btn" id="ssTakimClearBtn" aria-label="Temizle" tabindex="-1">×</button>
             <div class="takim-combo-list" id="ssTakimComboList" role="listbox"></div>
             <select id="ssTakim" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
           </div>
@@ -1184,7 +1226,9 @@
     <label for="kategoriBasimCatSearch" style="max-width:420px; margin-top:20px;">Kategori</label>
     <div class="kb-cat-select-row">
       <div class="takim-combo" id="kategoriBasimCatCombo">
-        <input type="text" id="kategoriBasimCatSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="kategoriBasimCatComboList">
+        <svg class="takim-combo-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input type="text" id="kategoriBasimCatSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="kategoriBasimCatComboList">
+      <button type="button" class="takim-combo-clear-btn" id="kategoriBasimCatClearBtn" aria-label="Temizle" tabindex="-1">×</button>
         <div class="takim-combo-list" id="kategoriBasimCatComboList" role="listbox"></div>
         <select id="kategoriBasimSel" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
       </div>
@@ -1767,6 +1811,7 @@ function populateTakim(){
 function syncKategoriDisplay(){
   const selectedOption = kategoriSel.options[kategoriSel.selectedIndex];
   kategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+  if(typeof refreshKategoriClearBtn === 'function') refreshKategoriClearBtn();
 }
 
 function getKategoriMatches(query){
@@ -1864,9 +1909,27 @@ kategoriSearchInput.addEventListener('blur', ()=>{
 document.addEventListener('click', (e)=>{
   if(kategoriCombo && !kategoriCombo.contains(e.target)) closeKategoriCombo();
 });
+const refreshKategoriClearBtn = wireComboClearBtn(document.getElementById('kategoriClearBtn'), kategoriSearchInput, ()=> selectKategoriOption(''));
 
 /* ---- Takım için aranabilir combobox (searchable select) ---- */
 function trLower(s){ return String(s ?? '').toLocaleLowerCase('tr-TR'); }
+
+/* Aranabilir kutuların hepsinde ortak kullanılan temizle (×) butonu:
+   kutuda yazı varken görünür, tıklanınca seçimi kaldırır ve kutuya odaklanır. */
+function wireComboClearBtn(btnEl, searchInputEl, onClear){
+  if(!btnEl || !searchInputEl) return;
+  const refresh = ()=> btnEl.classList.toggle('visible', !!searchInputEl.value);
+  searchInputEl.addEventListener('input', refresh);
+  refresh();
+  btnEl.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    onClear();
+    refresh();
+    searchInputEl.focus();
+  });
+  return refresh;
+}
+
 
 function highlightMatch(text, query){
   if(!query) return text;
@@ -1880,6 +1943,7 @@ function highlightMatch(text, query){
 function syncTakimDisplay(){
   const selectedOption = takimSel.options[takimSel.selectedIndex];
   takimSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+  if(typeof refreshTakimClearBtn === 'function') refreshTakimClearBtn();
 }
 
 function getTakimMatches(query){
@@ -1977,6 +2041,7 @@ takimSearchInput.addEventListener('blur', ()=>{
 document.addEventListener('click', (e)=>{
   if(takimCombo && !takimCombo.contains(e.target)) closeTakimCombo();
 });
+const refreshTakimClearBtn = wireComboClearBtn(document.getElementById('takimClearBtn'), takimSearchInput, ()=> selectTakimOption(''));
 
 function applyPreset(){
   const cat = kategoriSel.value;
@@ -2252,6 +2317,7 @@ function populateKategoriBasimSel(){
 function syncKategoriBasimCatDisplay(){
   const selectedOption = kategoriBasimSel.options[kategoriBasimSel.selectedIndex];
   kategoriBasimCatSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+  if(typeof refreshKategoriBasimCatClearBtn === 'function') refreshKategoriBasimCatClearBtn();
 }
 
 function getKategoriBasimCatMatches(query){
@@ -2349,6 +2415,7 @@ kategoriBasimCatSearchInput.addEventListener('blur', ()=>{
 document.addEventListener('click', (e)=>{
   if(kategoriBasimCatCombo && !kategoriBasimCatCombo.contains(e.target)) closeKategoriBasimCatCombo();
 });
+const refreshKategoriBasimCatClearBtn = wireComboClearBtn(document.getElementById('kategoriBasimCatClearBtn'), kategoriBasimCatSearchInput, ()=> selectKategoriBasimCatOption(''));
 
 /* Eklenen her kategori için üstte kaldırılabilir bir rozet gösterir. */
 /* Bir kategorideki ürünlerin en az biri rozetli (gizli değil) ise "açık"
@@ -2576,12 +2643,26 @@ function buildRowSelect(rowIdx, selectedKey){
   const wrap = document.createElement('div');
   wrap.className = 'unite-combo';
 
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('class', 'unite-combo-icon');
+  icon.setAttribute('viewBox', '0 0 20 20');
+  icon.setAttribute('fill', 'none');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.innerHTML = '<circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="13" y1="13" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>';
+
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'unite-combo-input';
   input.placeholder = 'Ünite seçin veya arayın…';
   input.autocomplete = 'off';
   input.value = selectedItem ? selectedItem.name : '';
+
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.className = 'unite-combo-clear-btn';
+  clearBtn.setAttribute('aria-label', 'Temizle');
+  clearBtn.tabIndex = -1;
+  clearBtn.textContent = '×';
 
   const list = document.createElement('div');
   list.className = 'unite-combo-list';
@@ -2630,6 +2711,10 @@ function buildRowSelect(rowIdx, selectedKey){
     });
   }
 
+  function refreshClearBtn(){
+    clearBtn.classList.toggle('visible', !!input.value);
+  }
+
   input.addEventListener('focus', ()=>{
     input.select();
     list.classList.add('open');
@@ -2638,6 +2723,7 @@ function buildRowSelect(rowIdx, selectedKey){
   input.addEventListener('input', ()=>{
     list.classList.add('open');
     renderList(input.value);
+    refreshClearBtn();
   });
   input.addEventListener('keydown', (e)=>{
     if(e.key === 'Escape'){
@@ -2654,10 +2740,21 @@ function buildRowSelect(rowIdx, selectedKey){
     setTimeout(()=>{
       input.value = selectedItem ? selectedItem.name : '';
       list.classList.remove('open');
+      refreshClearBtn();
     }, 120);
   });
+  clearBtn.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    selectItem(null);
+    input.value = '';
+    refreshClearBtn();
+    input.focus();
+  });
+  refreshClearBtn();
 
+  wrap.appendChild(icon);
   wrap.appendChild(input);
+  wrap.appendChild(clearBtn);
   wrap.appendChild(list);
   return wrap;
 }
@@ -3368,6 +3465,7 @@ function populateManualKategori(){
 function syncManualKategoriDisplay(){
   const selectedOption = manualKategoriSel.options[manualKategoriSel.selectedIndex];
   manualKategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+  if(typeof refreshManualKategoriClearBtn === 'function') refreshManualKategoriClearBtn();
 }
 
 function getManualKategoriMatches(query){
@@ -3465,6 +3563,7 @@ manualKategoriSearchInput.addEventListener('blur', ()=>{
 document.addEventListener('click', (e)=>{
   if(manualKategoriCombo && !manualKategoriCombo.contains(e.target)) closeManualKategoriCombo();
 });
+const refreshManualKategoriClearBtn = wireComboClearBtn(document.getElementById('manualKategoriClearBtn'), manualKategoriSearchInput, ()=> selectManualKategoriOption(''));
 
 function populateManualTakim(){
   manualTakimSel.innerHTML = '';
@@ -3487,6 +3586,7 @@ function populateManualTakim(){
 function syncManualTakimDisplay(){
   const selectedOption = manualTakimSel.options[manualTakimSel.selectedIndex];
   manualTakimSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+  if(typeof refreshManualTakimClearBtn === 'function') refreshManualTakimClearBtn();
 }
 
 function getManualTakimMatches(query){
@@ -3582,6 +3682,7 @@ manualTakimSearchInput.addEventListener('blur', ()=>{
 document.addEventListener('click', (e)=>{
   if(manualTakimCombo && !manualTakimCombo.contains(e.target)) closeManualTakimCombo();
 });
+const refreshManualTakimClearBtn = wireComboClearBtn(document.getElementById('manualTakimClearBtn'), manualTakimSearchInput, ()=> selectManualTakimOption(''));
 
 document.getElementById('addManualBtn').addEventListener('click', ()=>{
   const priceEl = document.getElementById('manualPrice');
@@ -3784,6 +3885,7 @@ function populateSsKategori(){
 function syncSsKategoriDisplay(){
   const selectedOption = ssKategoriSel.options[ssKategoriSel.selectedIndex];
   ssKategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+  if(typeof refreshSsKategoriClearBtn === 'function') refreshSsKategoriClearBtn();
 }
 
 function getSsKategoriMatches(query){
@@ -3881,6 +3983,7 @@ ssKategoriSearchInput.addEventListener('blur', ()=>{
 document.addEventListener('click', (e)=>{
   if(ssKategoriCombo && !ssKategoriCombo.contains(e.target)) closeSsKategoriCombo();
 });
+const refreshSsKategoriClearBtn = wireComboClearBtn(document.getElementById('ssKategoriClearBtn'), ssKategoriSearchInput, ()=> selectSsKategoriOption(''));
 
 function populateSsTakim(){
   ssTakimSel.innerHTML = '';
@@ -3903,6 +4006,7 @@ function populateSsTakim(){
 function syncSsTakimDisplay(){
   const selectedOption = ssTakimSel.options[ssTakimSel.selectedIndex];
   ssTakimSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+  if(typeof refreshSsTakimClearBtn === 'function') refreshSsTakimClearBtn();
 }
 
 function getSsTakimMatches(query){
@@ -3998,6 +4102,7 @@ ssTakimSearchInput.addEventListener('blur', ()=>{
 document.addEventListener('click', (e)=>{
   if(ssTakimCombo && !ssTakimCombo.contains(e.target)) closeSsTakimCombo();
 });
+const refreshSsTakimClearBtn = wireComboClearBtn(document.getElementById('ssTakimClearBtn'), ssTakimSearchInput, ()=> selectSsTakimOption(''));
 
 document.getElementById('addSsBtn').addEventListener('click', ()=>{
   const priceEl = document.getElementById('ssPrice');
