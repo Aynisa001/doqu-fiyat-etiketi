@@ -231,6 +231,7 @@
   .kb-cat-chips-empty{font-size:12.5px; color:var(--ink-soft); margin-top:12px;}
   .kb-cat-select-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; max-width:560px;}
   .kb-cat-select-row select{flex:1; min-width:200px;}
+  .kb-cat-select-row .takim-combo{flex:1; min-width:200px;}
   #kategoriBasimSelectAllCatsBtn{white-space:nowrap;}
 
   /* Yazdırma özeti: normalde gizli, sadece yazdırırken üstte görünür */
@@ -802,7 +803,7 @@
     /* Kategori Toplu Basım: yazdırırken seçim kontrolleri (dropdown, buton, rozetler)
        gizlenir; bunun yerine seçilen kategorilerin adı sayfanın en üstünde
        düz metin olarak gösterilir. */
-    body.printing-tags label[for="kategoriBasimSel"],
+    body.printing-tags label[for="kategoriBasimCatSearch"],
     body.printing-tags .kb-cat-select-row,
     body.printing-tags .kb-cat-chips{ display:none !important; }
     body.printing-tags .kb-print-summary{
@@ -848,8 +849,12 @@
   <aside class="panel">
     <h2>Seçim Paneli</h2>
 
-    <label for="kategori">Kategori</label>
-    <select id="kategori"></select>
+    <label for="kategoriSearch">Kategori</label>
+    <div class="takim-combo" id="kategoriCombo">
+      <input type="text" id="kategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="kategoriComboList">
+      <div class="takim-combo-list" id="kategoriComboList" role="listbox"></div>
+      <select id="kategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
+    </div>
 
     <label for="takimSearch">Takım</label>
     <div class="takim-combo" id="takimCombo">
@@ -1013,8 +1018,12 @@
       <p>Ürünü, "Etiket Basımı" sayfasındaki ile aynı mantıkla Kategori ve Takım'dan seçin — sadece fiyatı siz gireceksiniz.</p>
       <div class="combo-builder-row">
         <div class="combo-field">
-          <label for="manualKategori">Kategori</label>
-          <select id="manualKategori"></select>
+          <label for="manualKategoriSearch">Kategori</label>
+          <div class="takim-combo" id="manualKategoriCombo">
+            <input type="text" id="manualKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="manualKategoriComboList">
+            <div class="takim-combo-list" id="manualKategoriComboList" role="listbox"></div>
+            <select id="manualKategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
+          </div>
         </div>
         <div class="combo-field">
           <label for="manualTakimSearch">Takım</label>
@@ -1088,8 +1097,12 @@
       <p>Ürünü, "Manuel Etiket" sayfasındaki ile aynı mantıkla Kategori ve Takım'dan seçin — fiyatı siz girersiniz, etiketin rengini de burada belirleyebilirsiniz.</p>
       <div class="combo-builder-row">
         <div class="combo-field">
-          <label for="ssKategori">Kategori</label>
-          <select id="ssKategori"></select>
+          <label for="ssKategoriSearch">Kategori</label>
+          <div class="takim-combo" id="ssKategoriCombo">
+            <input type="text" id="ssKategoriSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ssKategoriComboList">
+            <div class="takim-combo-list" id="ssKategoriComboList" role="listbox"></div>
+            <select id="ssKategori" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
+          </div>
         </div>
         <div class="combo-field">
           <label for="ssTakimSearch">Takım</label>
@@ -1168,9 +1181,13 @@
     <h1 class="settitle">Kategori Toplu Basım</h1>
     <p class="setsub">Sadece bir kategori seçin — o kategorideki TÜM ürünlerin etiketleri otomatik olarak aşağıda listelenir ve hepsi seçili gelir. İstemediklerinizi tek tek çıkarabilir, ardından hepsini toplu yazdırabilirsiniz.</p>
 
-    <label for="kategoriBasimSel" style="max-width:420px; margin-top:20px;">Kategori</label>
+    <label for="kategoriBasimCatSearch" style="max-width:420px; margin-top:20px;">Kategori</label>
     <div class="kb-cat-select-row">
-      <select id="kategoriBasimSel"></select>
+      <div class="takim-combo" id="kategoriBasimCatCombo">
+        <input type="text" id="kategoriBasimCatSearch" class="takim-combo-input" placeholder="Kategori seçin veya arayın…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="kategoriBasimCatComboList">
+        <div class="takim-combo-list" id="kategoriBasimCatComboList" role="listbox"></div>
+        <select id="kategoriBasimSel" class="takim-combo-native" tabindex="-1" aria-hidden="true"></select>
+      </div>
       <button type="button" id="kategoriBasimSelectAllCatsBtn" class="tagselect-btn">📋 Tüm Kategorileri Seç</button>
     </div>
     <div class="kb-cat-chips" id="kategoriBasimChips"></div>
@@ -1572,6 +1589,9 @@ Object.keys(EXCEL_CATALOG).forEach(cat=>{
 const ROW_COUNT = 9;
 
 const kategoriSel = document.getElementById('kategori');
+const kategoriSearchInput = document.getElementById('kategoriSearch');
+const kategoriComboList = document.getElementById('kategoriComboList');
+const kategoriCombo = document.getElementById('kategoriCombo');
 const takimSel = document.getElementById('takim');
 const takimSearchInput = document.getElementById('takimSearch');
 const takimComboList = document.getElementById('takimComboList');
@@ -1661,6 +1681,7 @@ function applySavedState(saved){
 
   if(saved.kategori && CATALOG[saved.kategori]){
     kategoriSel.value = saved.kategori;
+    syncKategoriDisplay();
     populateTakim();
     if(saved.takim && (PRESETS[saved.kategori]||{})[saved.takim] !== undefined){
       takimSel.value = saved.takim;
@@ -1685,6 +1706,7 @@ function applySavedState(saved){
   if(typeof saved.ssIdCounter === 'number') ssIdCounter = saved.ssIdCounter;
   if(Array.isArray(saved.kategoriBasimSelectedCats)) kategoriBasimSelectedCats = new Set(saved.kategoriBasimSelectedCats.filter(c=> CATALOG[c]));
   if(saved.kategoriBasim && CATALOG[saved.kategoriBasim]) kategoriBasimSel.value = saved.kategoriBasim;
+  syncKategoriBasimCatDisplay();
   if(Array.isArray(saved.flashBadgeHiddenKeys)) flashBadgeHiddenKeys = new Set(saved.flashBadgeHiddenKeys);
   if(Array.isArray(saved.kbBadgeSeenKeys)) kbBadgeSeenKeys = new Set(saved.kbBadgeSeenKeys);
   if(Array.isArray(saved.selectedTagKeys)) selectedTagKeys = new Set(saved.selectedTagKeys);
@@ -1721,6 +1743,7 @@ function populateKategori(){
   });
   if(prevSelected && CATALOG[prevSelected]) kategoriSel.value = prevSelected;
   else kategoriSel.value = '';
+  syncKategoriDisplay();
 }
 
 function populateTakim(){
@@ -1739,6 +1762,108 @@ function populateTakim(){
   else takimSel.value = '';
   syncTakimDisplay();
 }
+
+/* ---- Kategori için aranabilir combobox (searchable select) ---- */
+function syncKategoriDisplay(){
+  const selectedOption = kategoriSel.options[kategoriSel.selectedIndex];
+  kategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+}
+
+function getKategoriMatches(query){
+  const q = trLower(query).trim();
+  const options = Array.from(kategoriSel.options).filter(o=> o.value !== '');
+  if(!q) return options;
+  const starts = [], contains = [];
+  options.forEach(o=>{
+    const label = trLower(o.textContent);
+    if(label.startsWith(q)) starts.push(o);
+    else if(label.includes(q)) contains.push(o);
+  });
+  return starts.concat(contains);
+}
+
+function renderKategoriComboList(query){
+  const matches = getKategoriMatches(query);
+  kategoriComboList.innerHTML = '';
+
+  const clearOpt = document.createElement('div');
+  clearOpt.className = 'takim-combo-option takim-combo-clear';
+  clearOpt.textContent = '— Kategori Seç — (temizle)';
+  clearOpt.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    selectKategoriOption('');
+  });
+  kategoriComboList.appendChild(clearOpt);
+
+  if(matches.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'takim-combo-empty';
+    empty.textContent = 'Eşleşen kategori bulunamadı';
+    kategoriComboList.appendChild(empty);
+    return;
+  }
+  matches.forEach(o=>{
+    const item = document.createElement('div');
+    item.className = 'takim-combo-option' + (o.value === kategoriSel.value ? ' active' : '');
+    item.setAttribute('role', 'option');
+    item.innerHTML = highlightMatch(o.textContent, query);
+    item.addEventListener('mousedown', (e)=>{
+      e.preventDefault();
+      selectKategoriOption(o.value);
+    });
+    kategoriComboList.appendChild(item);
+  });
+}
+
+function openKategoriCombo(query){
+  kategoriComboList.classList.add('open');
+  kategoriSearchInput.setAttribute('aria-expanded', 'true');
+  renderKategoriComboList(query || '');
+}
+
+function closeKategoriCombo(){
+  kategoriComboList.classList.remove('open');
+  kategoriSearchInput.setAttribute('aria-expanded', 'false');
+}
+
+function selectKategoriOption(value){
+  kategoriSel.value = value;
+  syncKategoriDisplay();
+  closeKategoriCombo();
+  kategoriSel.dispatchEvent(new Event('change'));
+}
+
+kategoriSearchInput.addEventListener('focus', ()=>{
+  kategoriSearchInput.select();
+  openKategoriCombo('');
+});
+
+kategoriSearchInput.addEventListener('input', ()=>{
+  openKategoriCombo(kategoriSearchInput.value);
+});
+
+kategoriSearchInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    syncKategoriDisplay();
+    closeKategoriCombo();
+    kategoriSearchInput.blur();
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    const matches = getKategoriMatches(kategoriSearchInput.value);
+    if(matches.length){ selectKategoriOption(matches[0].value); }
+  }
+});
+
+kategoriSearchInput.addEventListener('blur', ()=>{
+  setTimeout(()=>{
+    syncKategoriDisplay();
+    closeKategoriCombo();
+  }, 120);
+});
+
+document.addEventListener('click', (e)=>{
+  if(kategoriCombo && !kategoriCombo.contains(e.target)) closeKategoriCombo();
+});
 
 /* ---- Takım için aranabilir combobox (searchable select) ---- */
 function trLower(s){ return String(s ?? '').toLocaleLowerCase('tr-TR'); }
@@ -2099,6 +2224,9 @@ wireTagSelectButtons('kategoriBasimSelectAllBtn', 'kategoriBasimSelectNoneBtn', 
    kategori listesinin tamamını temizler. ---- */
 const kategoriBasimSel = document.getElementById('kategoriBasimSel');
 const kategoriBasimSearchInput = document.getElementById('kategoriBasimSearchInput');
+const kategoriBasimCatSearchInput = document.getElementById('kategoriBasimCatSearch');
+const kategoriBasimCatComboList = document.getElementById('kategoriBasimCatComboList');
+const kategoriBasimCatCombo = document.getElementById('kategoriBasimCatCombo');
 let kategoriBasimSelectedCats = new Set();
 let kategoriBasimSearchTerm = '';
 
@@ -2115,9 +2243,112 @@ function populateKategoriBasimSel(){
   });
   if(prevSelected && CATALOG[prevSelected]) kategoriBasimSel.value = prevSelected;
   else kategoriBasimSel.value = '';
+  syncKategoriBasimCatDisplay();
   // Katalog yenilendiğinde artık var olmayan kategorileri birikmiş listeden çıkar
   [...kategoriBasimSelectedCats].forEach(c=>{ if(!CATALOG[c]) kategoriBasimSelectedCats.delete(c); });
 }
+
+/* ---- Kategori Toplu Basım kategori seçimi için aranabilir combobox ---- */
+function syncKategoriBasimCatDisplay(){
+  const selectedOption = kategoriBasimSel.options[kategoriBasimSel.selectedIndex];
+  kategoriBasimCatSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+}
+
+function getKategoriBasimCatMatches(query){
+  const q = trLower(query).trim();
+  const options = Array.from(kategoriBasimSel.options).filter(o=> o.value !== '');
+  if(!q) return options;
+  const starts = [], contains = [];
+  options.forEach(o=>{
+    const label = trLower(o.textContent);
+    if(label.startsWith(q)) starts.push(o);
+    else if(label.includes(q)) contains.push(o);
+  });
+  return starts.concat(contains);
+}
+
+function renderKategoriBasimCatComboList(query){
+  const matches = getKategoriBasimCatMatches(query);
+  kategoriBasimCatComboList.innerHTML = '';
+
+  const clearOpt = document.createElement('div');
+  clearOpt.className = 'takim-combo-option takim-combo-clear';
+  clearOpt.textContent = '— Kategori Seç — (temizle)';
+  clearOpt.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    selectKategoriBasimCatOption('');
+  });
+  kategoriBasimCatComboList.appendChild(clearOpt);
+
+  if(matches.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'takim-combo-empty';
+    empty.textContent = 'Eşleşen kategori bulunamadı';
+    kategoriBasimCatComboList.appendChild(empty);
+    return;
+  }
+  matches.forEach(o=>{
+    const item = document.createElement('div');
+    item.className = 'takim-combo-option' + (o.value === kategoriBasimSel.value ? ' active' : '');
+    item.setAttribute('role', 'option');
+    item.innerHTML = highlightMatch(o.textContent, query);
+    item.addEventListener('mousedown', (e)=>{
+      e.preventDefault();
+      selectKategoriBasimCatOption(o.value);
+    });
+    kategoriBasimCatComboList.appendChild(item);
+  });
+}
+
+function openKategoriBasimCatCombo(query){
+  kategoriBasimCatComboList.classList.add('open');
+  kategoriBasimCatSearchInput.setAttribute('aria-expanded', 'true');
+  renderKategoriBasimCatComboList(query || '');
+}
+
+function closeKategoriBasimCatCombo(){
+  kategoriBasimCatComboList.classList.remove('open');
+  kategoriBasimCatSearchInput.setAttribute('aria-expanded', 'false');
+}
+
+function selectKategoriBasimCatOption(value){
+  kategoriBasimSel.value = value;
+  syncKategoriBasimCatDisplay();
+  closeKategoriBasimCatCombo();
+  kategoriBasimSel.dispatchEvent(new Event('change'));
+}
+
+kategoriBasimCatSearchInput.addEventListener('focus', ()=>{
+  kategoriBasimCatSearchInput.select();
+  openKategoriBasimCatCombo('');
+});
+
+kategoriBasimCatSearchInput.addEventListener('input', ()=>{
+  openKategoriBasimCatCombo(kategoriBasimCatSearchInput.value);
+});
+
+kategoriBasimCatSearchInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    syncKategoriBasimCatDisplay();
+    closeKategoriBasimCatCombo();
+    kategoriBasimCatSearchInput.blur();
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    const matches = getKategoriBasimCatMatches(kategoriBasimCatSearchInput.value);
+    if(matches.length){ selectKategoriBasimCatOption(matches[0].value); }
+  }
+});
+
+kategoriBasimCatSearchInput.addEventListener('blur', ()=>{
+  setTimeout(()=>{
+    syncKategoriBasimCatDisplay();
+    closeKategoriBasimCatCombo();
+  }, 120);
+});
+
+document.addEventListener('click', (e)=>{
+  if(kategoriBasimCatCombo && !kategoriBasimCatCombo.contains(e.target)) closeKategoriBasimCatCombo();
+});
 
 /* Eklenen her kategori için üstte kaldırılabilir bir rozet gösterir. */
 /* Bir kategorideki ürünlerin en az biri rozetli (gizli değil) ise "açık"
@@ -2182,7 +2413,7 @@ function renderKategoriBasimChips(){
     removeBtn.title = `${c} kategorisini listeden çıkar`;
     removeBtn.addEventListener('click', ()=>{
       kategoriBasimSelectedCats.delete(c);
-      if(kategoriBasimSel.value === c) kategoriBasimSel.value = '';
+      if(kategoriBasimSel.value === c){ kategoriBasimSel.value = ''; syncKategoriBasimCatDisplay(); }
       renderKategoriBasimTagSheet();
     });
     chip.appendChild(removeBtn);
@@ -2278,6 +2509,7 @@ document.getElementById('kategoriBasimSelectAllCatsBtn').addEventListener('click
 function resetKategoriBasim(){
   kategoriBasimSelectedCats = new Set();
   kategoriBasimSel.value = '';
+  syncKategoriBasimCatDisplay();
   kategoriBasimSearchTerm = '';
   if(kategoriBasimSearchInput) kategoriBasimSearchInput.value = '';
   renderKategoriBasimTagSheet();
@@ -3105,6 +3337,9 @@ function renderManualTagSheet(){
    aside panelle birebir aynı mantık. Seçim yapılınca ürün adı ve kodu otomatik
    dolar; fiyat her zaman elle girilir, adet kullanılmaz. */
 const manualKategoriSel = document.getElementById('manualKategori');
+const manualKategoriSearchInput = document.getElementById('manualKategoriSearch');
+const manualKategoriComboList = document.getElementById('manualKategoriComboList');
+const manualKategoriCombo = document.getElementById('manualKategoriCombo');
 const manualTakimSel = document.getElementById('manualTakim');
 const manualTakimSearchInput = document.getElementById('manualTakimSearch');
 const manualTakimCombo = document.getElementById('manualTakimCombo');
@@ -3125,8 +3360,111 @@ function populateManualKategori(){
   });
   if(prevSelected && CATALOG[prevSelected]) manualKategoriSel.value = prevSelected;
   else manualKategoriSel.value = '';
+  syncManualKategoriDisplay();
   populateManualTakim();
 }
+
+/* ---- Manuel Etiket kategorisi için aranabilir combobox ---- */
+function syncManualKategoriDisplay(){
+  const selectedOption = manualKategoriSel.options[manualKategoriSel.selectedIndex];
+  manualKategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+}
+
+function getManualKategoriMatches(query){
+  const q = trLower(query).trim();
+  const options = Array.from(manualKategoriSel.options).filter(o=> o.value !== '');
+  if(!q) return options;
+  const starts = [], contains = [];
+  options.forEach(o=>{
+    const label = trLower(o.textContent);
+    if(label.startsWith(q)) starts.push(o);
+    else if(label.includes(q)) contains.push(o);
+  });
+  return starts.concat(contains);
+}
+
+function renderManualKategoriComboList(query){
+  const matches = getManualKategoriMatches(query);
+  manualKategoriComboList.innerHTML = '';
+
+  const clearOpt = document.createElement('div');
+  clearOpt.className = 'takim-combo-option takim-combo-clear';
+  clearOpt.textContent = '— Kategori Seç — (temizle)';
+  clearOpt.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    selectManualKategoriOption('');
+  });
+  manualKategoriComboList.appendChild(clearOpt);
+
+  if(matches.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'takim-combo-empty';
+    empty.textContent = 'Eşleşen kategori bulunamadı';
+    manualKategoriComboList.appendChild(empty);
+    return;
+  }
+  matches.forEach(o=>{
+    const item = document.createElement('div');
+    item.className = 'takim-combo-option' + (o.value === manualKategoriSel.value ? ' active' : '');
+    item.setAttribute('role', 'option');
+    item.innerHTML = highlightMatch(o.textContent, query);
+    item.addEventListener('mousedown', (e)=>{
+      e.preventDefault();
+      selectManualKategoriOption(o.value);
+    });
+    manualKategoriComboList.appendChild(item);
+  });
+}
+
+function openManualKategoriCombo(query){
+  manualKategoriComboList.classList.add('open');
+  manualKategoriSearchInput.setAttribute('aria-expanded', 'true');
+  renderManualKategoriComboList(query || '');
+}
+
+function closeManualKategoriCombo(){
+  manualKategoriComboList.classList.remove('open');
+  manualKategoriSearchInput.setAttribute('aria-expanded', 'false');
+}
+
+function selectManualKategoriOption(value){
+  manualKategoriSel.value = value;
+  syncManualKategoriDisplay();
+  closeManualKategoriCombo();
+  manualKategoriSel.dispatchEvent(new Event('change'));
+}
+
+manualKategoriSearchInput.addEventListener('focus', ()=>{
+  manualKategoriSearchInput.select();
+  openManualKategoriCombo('');
+});
+
+manualKategoriSearchInput.addEventListener('input', ()=>{
+  openManualKategoriCombo(manualKategoriSearchInput.value);
+});
+
+manualKategoriSearchInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    syncManualKategoriDisplay();
+    closeManualKategoriCombo();
+    manualKategoriSearchInput.blur();
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    const matches = getManualKategoriMatches(manualKategoriSearchInput.value);
+    if(matches.length){ selectManualKategoriOption(matches[0].value); }
+  }
+});
+
+manualKategoriSearchInput.addEventListener('blur', ()=>{
+  setTimeout(()=>{
+    syncManualKategoriDisplay();
+    closeManualKategoriCombo();
+  }, 120);
+});
+
+document.addEventListener('click', (e)=>{
+  if(manualKategoriCombo && !manualKategoriCombo.contains(e.target)) closeManualKategoriCombo();
+});
 
 function populateManualTakim(){
   manualTakimSel.innerHTML = '';
@@ -3286,6 +3624,7 @@ document.getElementById('addManualBtn').addEventListener('click', ()=>{
    sayfaların (Etiket Basımı, İkili Etiket) kaydedilmiş durumuna dokunmaz. */
 function resetManual(){
   manualKategoriSel.value = '';
+  syncManualKategoriDisplay();
   populateManualTakim();
 
   document.getElementById('manualPrice').value = '';
@@ -3413,6 +3752,9 @@ function renderSsTagSheet(){
    birebir aynı mantık — seçim yapılınca ürün adı ve kodu otomatik dolar; fiyat
    ve etiket rengi her zaman elle girilir. */
 const ssKategoriSel = document.getElementById('ssKategori');
+const ssKategoriSearchInput = document.getElementById('ssKategoriSearch');
+const ssKategoriComboList = document.getElementById('ssKategoriComboList');
+const ssKategoriCombo = document.getElementById('ssKategoriCombo');
 const ssTakimSel = document.getElementById('ssTakim');
 const ssTakimSearchInput = document.getElementById('ssTakimSearch');
 const ssTakimCombo = document.getElementById('ssTakimCombo');
@@ -3434,8 +3776,111 @@ function populateSsKategori(){
   });
   if(prevSelected && CATALOG[prevSelected]) ssKategoriSel.value = prevSelected;
   else ssKategoriSel.value = '';
+  syncSsKategoriDisplay();
   populateSsTakim();
 }
+
+/* ---- Seri Sonu kategorisi için aranabilir combobox ---- */
+function syncSsKategoriDisplay(){
+  const selectedOption = ssKategoriSel.options[ssKategoriSel.selectedIndex];
+  ssKategoriSearchInput.value = (selectedOption && selectedOption.value) ? selectedOption.textContent : '';
+}
+
+function getSsKategoriMatches(query){
+  const q = trLower(query).trim();
+  const options = Array.from(ssKategoriSel.options).filter(o=> o.value !== '');
+  if(!q) return options;
+  const starts = [], contains = [];
+  options.forEach(o=>{
+    const label = trLower(o.textContent);
+    if(label.startsWith(q)) starts.push(o);
+    else if(label.includes(q)) contains.push(o);
+  });
+  return starts.concat(contains);
+}
+
+function renderSsKategoriComboList(query){
+  const matches = getSsKategoriMatches(query);
+  ssKategoriComboList.innerHTML = '';
+
+  const clearOpt = document.createElement('div');
+  clearOpt.className = 'takim-combo-option takim-combo-clear';
+  clearOpt.textContent = '— Kategori Seç — (temizle)';
+  clearOpt.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    selectSsKategoriOption('');
+  });
+  ssKategoriComboList.appendChild(clearOpt);
+
+  if(matches.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'takim-combo-empty';
+    empty.textContent = 'Eşleşen kategori bulunamadı';
+    ssKategoriComboList.appendChild(empty);
+    return;
+  }
+  matches.forEach(o=>{
+    const item = document.createElement('div');
+    item.className = 'takim-combo-option' + (o.value === ssKategoriSel.value ? ' active' : '');
+    item.setAttribute('role', 'option');
+    item.innerHTML = highlightMatch(o.textContent, query);
+    item.addEventListener('mousedown', (e)=>{
+      e.preventDefault();
+      selectSsKategoriOption(o.value);
+    });
+    ssKategoriComboList.appendChild(item);
+  });
+}
+
+function openSsKategoriCombo(query){
+  ssKategoriComboList.classList.add('open');
+  ssKategoriSearchInput.setAttribute('aria-expanded', 'true');
+  renderSsKategoriComboList(query || '');
+}
+
+function closeSsKategoriCombo(){
+  ssKategoriComboList.classList.remove('open');
+  ssKategoriSearchInput.setAttribute('aria-expanded', 'false');
+}
+
+function selectSsKategoriOption(value){
+  ssKategoriSel.value = value;
+  syncSsKategoriDisplay();
+  closeSsKategoriCombo();
+  ssKategoriSel.dispatchEvent(new Event('change'));
+}
+
+ssKategoriSearchInput.addEventListener('focus', ()=>{
+  ssKategoriSearchInput.select();
+  openSsKategoriCombo('');
+});
+
+ssKategoriSearchInput.addEventListener('input', ()=>{
+  openSsKategoriCombo(ssKategoriSearchInput.value);
+});
+
+ssKategoriSearchInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    syncSsKategoriDisplay();
+    closeSsKategoriCombo();
+    ssKategoriSearchInput.blur();
+  } else if(e.key === 'Enter'){
+    e.preventDefault();
+    const matches = getSsKategoriMatches(ssKategoriSearchInput.value);
+    if(matches.length){ selectSsKategoriOption(matches[0].value); }
+  }
+});
+
+ssKategoriSearchInput.addEventListener('blur', ()=>{
+  setTimeout(()=>{
+    syncSsKategoriDisplay();
+    closeSsKategoriCombo();
+  }, 120);
+});
+
+document.addEventListener('click', (e)=>{
+  if(ssKategoriCombo && !ssKategoriCombo.contains(e.target)) closeSsKategoriCombo();
+});
 
 function populateSsTakim(){
   ssTakimSel.innerHTML = '';
@@ -3595,6 +4040,7 @@ document.getElementById('addSsBtn').addEventListener('click', ()=>{
    sayfaların kaydedilmiş durumuna dokunmaz. */
 function resetSs(){
   ssKategoriSel.value = '';
+  syncSsKategoriDisplay();
   populateSsTakim();
 
   document.getElementById('ssPrice').value = '';
