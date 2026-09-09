@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -246,6 +247,8 @@
   }
   .kb-cat-chip-badge:hover{border-color:#fff !important;}
   .kb-cat-chips-empty{font-size:12.5px; color:var(--ink-soft); margin-top:12px;}
+  .kb-cat-badge-hint{font-size:12px; color:var(--ink-soft); margin:8px 0 0; line-height:1.4;}
+  .kb-cat-badge-hint strong{color:var(--petrol-deep);}
   .kb-cat-select-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; max-width:560px;}
   .kb-cat-select-row select{flex:1; min-width:200px;}
   .kb-cat-select-row .takim-combo{flex:1; min-width:200px;}
@@ -835,7 +838,8 @@
        düz metin olarak gösterilir. */
     body.printing-tags label[for="kategoriBasimCatSearch"],
     body.printing-tags .kb-cat-select-row,
-    body.printing-tags .kb-cat-chips{ display:none !important; }
+    body.printing-tags .kb-cat-chips,
+    body.printing-tags .kb-cat-badge-hint{ display:none !important; }
     body.printing-tags .kb-print-summary{
       display:block !important;
       width:100%;
@@ -1235,6 +1239,7 @@
       <button type="button" id="kategoriBasimSelectAllCatsBtn" class="tagselect-btn">📋 Tüm Kategorileri Seç</button>
     </div>
     <div class="kb-cat-chips" id="kategoriBasimChips"></div>
+    <p class="kb-cat-badge-hint">💡 Kategori çipindeki <strong>⚡</strong> simgesine tıklayarak o kategorideki tüm ürünlerin indirim rozetini tek seferde açıp kapatabilirsiniz.</p>
     <div class="kb-print-summary" id="kategoriBasimPrintSummary"></div>
 
     <div class="tagbar">
